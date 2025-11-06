@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Online Car and Bike rental system - ready to pick up anytime from anywhere :)",
+  "keywords": [
+    "node",
+    "express",
+    "mongoDB",
+    "bookingApp"
+  ],
+  "homepage": "https://github.com/soumyajiitdas/YatraMate-VehicleRentalSystem#readme",
+  "bugs": {
+    "url": "https://github.com/soumyajiitdas/YatraMate-VehicleRentalSystem/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soumyajiitdas/YatraMate-VehicleRentalSystem.git"
+  },
+  "license": "MIT",
+  "author": "soumyajit das, indrajit ghosh, joy bhowmik, animesh nandy",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.3",
+    "nodemon": "^3.1.10"
+  }
+}
