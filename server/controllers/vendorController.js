@@ -70,3 +70,19 @@ exports.deleteVendor = catchAsync(async (req, res, next) => {
         data: null
     });
 });
+
+// Get vendor by email (for login)
+exports.getVendorByEmail = catchAsync(async (req, res, next) => {
+    const vendor = await Vendor.findOne({ email: req.params.email });
+
+    if (!vendor) {
+        return next(new AppError('No vendor found with that email', 404));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            vendor
+        }
+    });
+});

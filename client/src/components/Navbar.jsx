@@ -1,16 +1,42 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Replace with actual auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+
+  // Check login status on component mount and when location changes
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    const role = localStorage.getItem('userRole');
+    if (user) {
+      setIsLoggedIn(true);
+      setUserRole(role);
+    } else {
+      setIsLoggedIn(false);
+      setUserRole(null);
+    }
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('vendorId');
+    setIsLoggedIn(false);
+    setUserRole(null);
+    setIsMenuOpen(false);
+    navigate('/');
+  };
 
   const isActive = (path) => location.pathname === path;
 
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/vehicles', label: 'Vehicles' },
+    { path: '/pricing', label: 'Pricing' },
     { path: '/bookings', label: 'My Bookings' },
     { path: '/vendor', label: 'For Vendors' },
   ];
@@ -62,7 +88,7 @@ const Navbar = () => {
                   <span className="font-medium">Profile</span>
                 </Link>
                 <button
-                  onClick={() => setIsLoggedIn(false)}
+                  onClick={handleLogout}
                   className="px-5 py-2 text-neutral-700 hover:text-secondary-600 font-medium transition-colors duration-200"
                 >
                   Logout
@@ -131,10 +157,7 @@ const Navbar = () => {
                     Profile
                   </Link>
                   <button
-                    onClick={() => {
-                      setIsLoggedIn(false);
-                      setIsMenuOpen(false);
-                    }}
+                    onClick={handleLogout}
                     className="w-full text-left px-4 py-3 text-neutral-700 hover:bg-primary-50 rounded-lg font-medium"
                   >
                     Logout

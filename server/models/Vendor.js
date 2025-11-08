@@ -1,31 +1,48 @@
 const mongoose = require('mongoose');
 
 const vendorSchema = new mongoose.Schema({
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+    name: {
+        type: String,
+        required: [true, 'Name is required'],
+        trim: true
+    },
+    is_organization: {
+        type: Boolean,
+        default: false
     },
     company_name: {
         type: String,
-        required: true
-    },
-    vendor_name: {
-        type: String,
-        required: true
+        trim: true
     },
     contact_number: {
         type: String,
-        required: true
+        required: [true, 'Contact number is required'],
+        trim: true
     },
     email: {
         type: String,
-        required: true,
-        unique: true
+        required: [true, 'Email is required'],
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+    id_type: {
+        type: String,
+        required: [true, 'ID type is required'],
+        enum: ['pan', 'license', 'passport', 'adhaar', 'business_reg_certificate', 'business_tax_id']
+    },
+    document_url: {
+        type: String,
+        required: [true, 'Document upload is required']
     },
     address: {
         type: String,
-        required: true
+        required: [true, 'Address is required'],
+        trim: true
+    },
+    password_hash: {
+        type: String,
+        required: [true, 'Password is required']
     },
     is_verified: {
         type: Boolean,
@@ -34,6 +51,10 @@ const vendorSchema = new mongoose.Schema({
     total_earnings: {
         type: Number,
         default: 0
+    },
+    role: {
+        type: String,
+        default: 'vendor'
     }
 }, { timestamps: true });
 

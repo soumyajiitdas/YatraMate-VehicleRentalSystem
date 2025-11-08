@@ -70,3 +70,16 @@ exports.deleteVehicle = catchAsync(async (req, res, next) => {
         data: null
     });
 });
+
+// Get vehicles by vendor ID
+exports.getVehiclesByVendor = catchAsync(async (req, res, next) => {
+    const vehicles = await Vehicle.find({ vendor_id: req.params.vendorId });
+
+    res.status(200).json({
+        status: 'success',
+        results: vehicles.length,
+        data: {
+            vehicles
+        }
+    });
+});

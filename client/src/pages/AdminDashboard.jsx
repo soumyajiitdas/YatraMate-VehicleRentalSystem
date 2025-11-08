@@ -10,7 +10,7 @@ const AdminDashboard = () => {
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState(''); // 'user', 'vendor', 'package'
+    const [modalType, setModalType] = useState('');          // 'user', 'vendor', 'package'
     const [editingItem, setEditingItem] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+                        className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium flex items-center"
                     >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -180,8 +180,8 @@ const AdminDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('customers')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'customers'
-                                        ? 'border-red-500 text-red-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-red-500 text-red-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Customers
@@ -189,8 +189,8 @@ const AdminDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('office-staff')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'office-staff'
-                                        ? 'border-red-500 text-red-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-red-500 text-red-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Office Staff
@@ -198,8 +198,8 @@ const AdminDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('vendors')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'vendors'
-                                        ? 'border-red-500 text-red-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-red-500 text-red-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Vendors
@@ -207,8 +207,8 @@ const AdminDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('packages')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'packages'
-                                        ? 'border-red-500 text-red-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-red-500 text-red-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Packages

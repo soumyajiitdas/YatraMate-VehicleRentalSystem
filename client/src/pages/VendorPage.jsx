@@ -1,51 +1,149 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config/api';
 
 const VendorPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    name: '',
+    is_organization: false,
     company_name: '',
-    vendor_name: '',
     contact_number: '',
     email: '',
+    id_type: '',
+    document: null,
     address: '',
+    password: '',
+    confirm_password: '',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [documentUrl, setDocumentUrl] = useState('');
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     }));
-    if (errors[e.target.name]) {
-      setErrors(prev => ({ ...prev, [e.target.name]: '' }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size must be less than 10MB');
+      return;
+    }
+
+    setUploadingDoc(true);
+
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+
+      const response = await fetch(API_ENDPOINTS.uploadFile, {
+        method: 'POST',
+        body: formDataUpload
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        setDocumentUrl(data.data.url);
+        alert('Document uploaded successfully!');
+      } else {
+        alert('Error uploading document');
+      }
+    } catch (error) {
+      alert('Error uploading document: ' + error.message);
+    } finally {
+      setUploadingDoc(false);
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.company_name) newErrors.company_name = 'Company name is required';
-    if (!formData.vendor_name) newErrors.vendor_name = 'Your name is required';
+    if (!formData.name) newErrors.name = 'Name is required';
+    if (formData.is_organization && !formData.company_name) {
+      newErrors.company_name = 'Company/Organization name is required';
+    }
     if (!formData.contact_number) newErrors.contact_number = 'Contact number is required';
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    if (!formData.id_type) newErrors.id_type = 'ID type is required';
+    if (!documentUrl) newErrors.document = 'Document upload is required';
     if (!formData.address) newErrors.address = 'Address is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    if (formData.password !== formData.confirm_password) {
+      newErrors.confirm_password = 'Passwords do not match';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setLoading(true);
-      // TODO: API call
-      setTimeout(() => {
+      try {
+        const response = await fetch(API_ENDPOINTS.vendors, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            is_organization: formData.is_organization,
+            company_name: formData.company_name || undefined,
+            contact_number: formData.contact_number,
+            email: formData.email,
+            id_type: formData.id_type,
+            document_url: documentUrl,
+            address: formData.address,
+            password_hash: formData.password, // In production, this should be hashed
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          alert('Vendor registration successful! Please login to continue.');
+          navigate('/login');
+        } else {
+          alert('Error registering vendor: ' + (data.message || 'Unknown error'));
+        }
+      } catch (error) {
+        alert('Error registering vendor: ' + error.message);
+      } finally {
         setLoading(false);
-        alert('Vendor application submitted successfully! We will review and get back to you.');
-        navigate('/');
-      }, 1000);
+      }
+    }
+  };
+
+  const getIdTypeOptions = () => {
+    if (formData.is_organization) {
+      return [
+        { value: '', label: 'Select ID Type' },
+        { value: 'business_reg_certificate', label: 'Business Registration Certificate' },
+        { value: 'business_tax_id', label: 'Business Tax ID' },
+      ];
+    } else {
+      return [
+        { value: '', label: 'Select ID Type' },
+        { value: 'pan', label: 'PAN Card' },
+        { value: 'license', label: 'Driving License' },
+        { value: 'passport', label: 'Passport' },
+        { value: 'adhaar', label: 'Aadhaar Card' },
+      ];
     }
   };
 
@@ -88,56 +186,76 @@ const VendorPage = () => {
         </div>
       </section>
 
-      {/* Application Form */}
+      {/* Registration Form */}
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-card p-8">
             <h2 className="text-3xl font-display font-bold text-neutral-900 mb-2">
-              Apply Now
+              Vendor Registration
             </h2>
             <p className="text-neutral-600 mb-8">
-              Fill out the form below and our team will get back to you within 24-48 hours.
+              Fill out the form below to register as a vendor.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Name */}
               <div>
                 <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                  Company/Business Name
+                  Name *
                 </label>
                 <input
                   type="text"
-                  name="company_name"
-                  value={formData.company_name}
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
-                    errors.company_name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                  }`}
-                  placeholder="Enter your company name"
-                />
-                {errors.company_name && <p className="mt-1 text-sm text-secondary-600">{errors.company_name}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  name="vendor_name"
-                  value={formData.vendor_name}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
-                    errors.vendor_name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    errors.name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                   }`}
                   placeholder="Enter your name"
                 />
-                {errors.vendor_name && <p className="mt-1 text-sm text-secondary-600">{errors.vendor_name}</p>}
+                {errors.name && <p className="mt-1 text-sm text-secondary-600">{errors.name}</p>}
               </div>
 
+              {/* Register as Organization Checkbox */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="is_organization"
+                  id="is_organization"
+                  checked={formData.is_organization}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                />
+                <label htmlFor="is_organization" className="ml-2 text-sm font-semibold text-neutral-700">
+                  Register as a Company/Organization
+                </label>
+              </div>
+
+              {/* Company Name (conditional) */}
+              {formData.is_organization && (
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                    Company/Organization Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="company_name"
+                    value={formData.company_name}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                      errors.company_name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    }`}
+                    placeholder="Enter company/organization name"
+                  />
+                  {errors.company_name && <p className="mt-1 text-sm text-secondary-600">{errors.company_name}</p>}
+                </div>
+              )}
+
+              {/* Contact Number and Email */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                    Contact Number
+                    Contact Number *
                   </label>
                   <input
                     type="tel"
@@ -154,7 +272,7 @@ const VendorPage = () => {
 
                 <div>
                   <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                    Email Address
+                    Email Address *
                   </label>
                   <input
                     type="email"
@@ -170,9 +288,49 @@ const VendorPage = () => {
                 </div>
               </div>
 
+              {/* ID Type */}
               <div>
                 <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                  Business Address
+                  ID Type *
+                </label>
+                <select
+                  name="id_type"
+                  value={formData.id_type}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    errors.id_type ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                  }`}
+                >
+                  {getIdTypeOptions().map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                {errors.id_type && <p className="mt-1 text-sm text-secondary-600">{errors.id_type}</p>}
+              </div>
+
+              {/* Document Upload (conditional on id_type) */}
+              {formData.id_type && (
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                    Upload Document *
+                  </label>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept="image/*,.pdf"
+                    className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200"
+                    disabled={uploadingDoc}
+                  />
+                  {uploadingDoc && <p className="mt-1 text-sm text-primary-600">Uploading...</p>}
+                  {documentUrl && <p className="mt-1 text-sm text-green-600">✓ Document uploaded successfully</p>}
+                  {errors.document && <p className="mt-1 text-sm text-secondary-600">{errors.document}</p>}
+                </div>
+              )}
+
+              {/* Address */}
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  Personal/Business Address *
                 </label>
                 <textarea
                   name="address"
@@ -182,17 +340,54 @@ const VendorPage = () => {
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
                     errors.address ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                   }`}
-                  placeholder="Enter your business address"
+                  placeholder="Enter your address"
                 />
                 {errors.address && <p className="mt-1 text-sm text-secondary-600">{errors.address}</p>}
               </div>
 
+              {/* Password */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                    Password *
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                      errors.password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    }`}
+                    placeholder="Enter password"
+                  />
+                  {errors.password && <p className="mt-1 text-sm text-secondary-600">{errors.password}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                    Confirm Password *
+                  </label>
+                  <input
+                    type="password"
+                    name="confirm_password"
+                    value={formData.confirm_password}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                      errors.confirm_password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    }`}
+                    placeholder="Confirm password"
+                  />
+                  {errors.confirm_password && <p className="mt-1 text-sm text-secondary-600">{errors.confirm_password}</p>}
+                </div>
+              </div>
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploadingDoc}
                 className="w-full py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold text-lg hover:shadow-glow transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {loading ? 'Submitting...' : 'Submit Application'}
+                {loading ? 'Submitting...' : 'Register as Vendor'}
               </button>
             </form>
           </div>

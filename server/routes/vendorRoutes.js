@@ -8,6 +8,8 @@ router
     .get(vendorController.getAllVendors)
     .post(vendorController.createVendor);
 
+router.get('/email/:email', vendorController.getVendorByEmail);
+
 router
     .route('/:id')
     .get(vendorController.getVendor)

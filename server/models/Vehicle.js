@@ -64,6 +64,18 @@ const vehicleSchema = new mongoose.Schema({
     },
     description: {
         type: String
+    },
+    total_distance_travelled: {
+        type: Number,
+        default: 0
+    },
+    total_hours_booked: {
+        type: Number,
+        default: 0
+    },
+    total_bookings: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

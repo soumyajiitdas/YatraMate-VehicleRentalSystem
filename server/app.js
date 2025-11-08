@@ -8,6 +8,7 @@ const userRouter = require('./routes/userRoutes');
 const vehicleRouter = require('./routes/vehicleRoutes');
 const vendorRouter = require('./routes/vendorRoutes');
 const packageRouter = require('./routes/packageRoutes');
+const uploadRouter = require('./routes/uploadRoutes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/vehicles', vehicleRouter);
 app.use('/api/v1/vendors', vendorRouter);
 app.use('/api/v1/packages', packageRouter);
+app.use('/api/v1/upload', uploadRouter);
 
 app.get('/', (req, res) => {
     res.status(200).send('YatraMate server is running successfully! 🎉');

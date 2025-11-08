@@ -47,31 +47,70 @@ const LoginPage = () => {
     e.preventDefault();
     if (validateForm()) {
       setLoading(true);
-      // TODO: Replace with actual API call
-      // For now, storing user data in localStorage
-      const mockUser = {
-        id: '123456',
-        email: formData.email,
-        role: formData.role,
-        name: 'Demo User'
-      };
       
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('userRole', formData.role);
-      
-      setTimeout(() => {
-        setLoading(false);
-        alert('Login successful!');
-        
-        // Redirect based on role
-        if (formData.role === 'office_staff') {
-          navigate('/office-staff');
-        } else if (formData.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
+      // Handle vendor login separately
+      if (formData.role === 'vendor') {
+        try {
+          const response = await fetch(`http://localhost:8000/api/v1/vendors/email/${encodeURIComponent(formData.email)}`);
+          const data = await response.json();
+          
+          if (data.status === 'success') {
+            const vendor = data.data.vendor;
+            
+            // Simple password check (in production, this should be done on backend)
+            if (vendor.password_hash === formData.password) {
+              const user = {
+                id: vendor._id,
+                email: vendor.email,
+                role: 'vendor',
+                name: vendor.name
+              };
+              
+              localStorage.setItem('user', JSON.stringify(user));
+              localStorage.setItem('userRole', 'vendor');
+              localStorage.setItem('vendorId', vendor._id);
+              
+              setLoading(false);
+              alert('Login successful!');
+              navigate('/vendor-dashboard');
+            } else {
+              setLoading(false);
+              alert('Invalid password');
+            }
+          } else {
+            setLoading(false);
+            alert('Vendor not found');
+          }
+        } catch (error) {
+          setLoading(false);
+          alert('Error during login: ' + error.message);
         }
-      }, 1000);
+      } else {
+        // Mock login for other roles
+        const mockUser = {
+          id: '123456',
+          email: formData.email,
+          role: formData.role,
+          name: 'Demo User'
+        };
+        
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        localStorage.setItem('userRole', formData.role);
+        
+        setTimeout(() => {
+          setLoading(false);
+          alert('Login successful!');
+          
+          // Redirect based on role
+          if (formData.role === 'office_staff') {
+            navigate('/office-staff');
+          } else if (formData.role === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/');
+          }
+        }, 1000);
+      }
     }
   };
 
@@ -177,6 +216,7 @@ const LoginPage = () => {
                   className="w-full pl-11 pr-4 py-3 border-2 border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 appearance-none bg-white"
                 >
                   <option value="user">Customer</option>
+                  <option value="vendor">Vendor</option>
                   <option value="office_staff">Office Staff</option>
                   <option value="admin">Admin</option>
                 </select>

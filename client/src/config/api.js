@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     // Vehicle endpoints
     vehicles: `${API_BASE_URL}/vehicles`,
     vehicleById: (id) => `${API_BASE_URL}/vehicles/${id}`,
+    vehiclesByVendor: (vendorId) => `${API_BASE_URL}/vehicles/vendor/${vendorId}`,
 
     // Booking endpoints
     bookings: `${API_BASE_URL}/bookings`,
@@ -27,10 +28,15 @@ export const API_ENDPOINTS = {
     // Vendor endpoints
     vendors: `${API_BASE_URL}/vendors`,
     vendorById: (id) => `${API_BASE_URL}/vendors/${id}`,
+    vendorByEmail: (email) => `${API_BASE_URL}/vendors/email/${email}`,
 
     // Payment endpoints
     payments: `${API_BASE_URL}/payments`,
     paymentById: (id) => `${API_BASE_URL}/payments/${id}`,
+
+    // Upload endpoints
+    uploadAuth: `${API_BASE_URL}/upload/auth`,
+    uploadFile: `${API_BASE_URL}/upload/file`,
 };
 
 export default API_BASE_URL;
