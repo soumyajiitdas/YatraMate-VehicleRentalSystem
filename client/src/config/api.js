@@ -13,6 +13,16 @@ export const API_ENDPOINTS = {
     // Booking endpoints
     bookings: `${API_BASE_URL}/bookings`,
     bookingById: (id) => `${API_BASE_URL}/bookings/${id}`,
+    bookingRequest: `${API_BASE_URL}/bookings/request`,
+    userBookings: (userId) => `${API_BASE_URL}/bookings/user/${userId}`,
+    officeStaffRequests: `${API_BASE_URL}/bookings/office-staff/requests`,
+    confirmPickup: (bookingId) => `${API_BASE_URL}/bookings/${bookingId}/pickup`,
+    confirmReturn: (bookingId) => `${API_BASE_URL}/bookings/${bookingId}/return`,
+
+    // Package endpoints
+    packages: `${API_BASE_URL}/packages`,
+    packageById: (id) => `${API_BASE_URL}/packages/${id}`,
+    packageForVehicle: `${API_BASE_URL}/packages/for-vehicle`,
 
     // Vendor endpoints
     vendors: `${API_BASE_URL}/vendors`,

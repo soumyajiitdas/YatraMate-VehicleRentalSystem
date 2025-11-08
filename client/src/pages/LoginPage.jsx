@@ -7,6 +7,7 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    role: 'user',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -47,16 +48,27 @@ const LoginPage = () => {
     if (validateForm()) {
       setLoading(true);
       // TODO: Replace with actual API call
-      // const response = await fetch(API_ENDPOINTS.login, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      // For now, storing user data in localStorage
+      const mockUser = {
+        id: '123456',
+        email: formData.email,
+        role: formData.role,
+        name: 'Demo User'
+      };
+      
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('userRole', formData.role);
       
       setTimeout(() => {
         setLoading(false);
         alert('Login successful!');
-        navigate('/');
+        
+        // Redirect based on role
+        if (formData.role === 'office_staff') {
+          navigate('/office-staff');
+        } else {
+          navigate('/');
+        }
       }, 1000);
     }
   };
@@ -142,6 +154,35 @@ const LoginPage = () => {
               {errors.password && (
                 <p className="mt-1 text-sm text-secondary-600">{errors.password}</p>
               )}
+            </div>
+
+            {/* Role Selection */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-semibold text-neutral-700 mb-2">
+                Login As
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border-2 border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 appearance-none bg-white"
+                >
+                  <option value="user">Customer</option>
+                  <option value="office_staff">Office Staff</option>
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </span>
+              </div>
             </div>
 
             {/* Forgot Password */}

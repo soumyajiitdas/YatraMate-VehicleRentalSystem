@@ -9,6 +9,7 @@ import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import VendorPage from './pages/VendorPage';
+import OfficeStaffDashboard from './pages/OfficeStaffDashboard';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/vendor" element={<VendorPage />} />
+            <Route path="/office-staff" element={<OfficeStaffDashboard />} />
           </Routes>
         </main>
         <Footer />

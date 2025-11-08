@@ -28,6 +28,20 @@ const vehicleSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    engine_number: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    chassis_number: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    cc_engine: {
+        type: Number,
+        required: true
+    },
     price_per_hour: {
         type: Number,
         required: true
