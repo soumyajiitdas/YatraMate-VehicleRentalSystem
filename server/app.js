@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const bookingRouter = require('./routes/bookingRoutes');
@@ -9,6 +10,8 @@ const vendorRouter = require('./routes/vendorRoutes');
 const packageRouter = require('./routes/packageRoutes');
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 

@@ -123,31 +123,6 @@ const HomePage = () => {
                 Experience the freedom of the road with YatraMate. Choose from our wide range of cars and bikes at affordable prices.
               </p>
 
-              {/* Search Bar */}
-              <div className="bg-white rounded-2xl shadow-2xl p-4 max-w-xl">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex-1 relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </span>
-                    <input
-                      type="text"
-                      placeholder="Search for cars or bikes..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 text-neutral-900 rounded-xl border-2 border-neutral-200 focus:border-primary-500 focus:outline-none transition-all duration-200"
-                    />
-                  </div>
-                  <Link
-                    to="/vehicles"
-                    className="px-8 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-center"
-                  >
-                    Search
-                  </Link>
-                </div>
-              </div>
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">

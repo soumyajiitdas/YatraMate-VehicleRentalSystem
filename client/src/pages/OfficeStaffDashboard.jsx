@@ -84,6 +84,12 @@ const OfficeStaffDashboard = () => {
         fetchBookings();
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
+        navigate('/login');
+    };
+
     const getStatusBadge = (status) => {
         const badges = {
             booking_requested: 'bg-yellow-100 text-yellow-800',
@@ -108,9 +114,31 @@ const OfficeStaffDashboard = () => {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Office Staff Dashboard</h1>
-                    <p className="mt-2 text-gray-600">Manage vehicle pickups and returns</p>
+                <div className="mb-12 flex justify-between items-center">
+                    {/* Logo */}
+                    <div className="flex items-center space-x-2 group">
+                        <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                            YatraMate
+                        </span>
+                    </div>
+                    <div className='text-center'>
+                        <h1 className="text-3xl font-bold text-gray-900">Office Staff Dashboard</h1>
+                        <p className="mt-2 text-gray-600">Manage vehicle pickups and returns</p>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+                    >
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                    </button>
                 </div>
 
                 {/* Tabs */}
@@ -120,8 +148,8 @@ const OfficeStaffDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('pending')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'pending'
-                                        ? 'border-primary-500 text-primary-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-primary-500 text-primary-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Pending Requests
@@ -134,8 +162,8 @@ const OfficeStaffDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('active')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'active'
-                                        ? 'border-primary-500 text-primary-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-primary-500 text-primary-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Active Bookings
@@ -143,8 +171,8 @@ const OfficeStaffDashboard = () => {
                             <button
                                 onClick={() => setActiveTab('completed')}
                                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'completed'
-                                        ? 'border-primary-500 text-primary-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-primary-500 text-primary-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 Completed
@@ -243,7 +271,7 @@ const OfficeStaffDashboard = () => {
                                             {booking.status === 'booking_requested' && (
                                                 <button
                                                     onClick={() => handlePickup(booking)}
-                                                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                                                 >
                                                     Confirm Pickup
                                                 </button>

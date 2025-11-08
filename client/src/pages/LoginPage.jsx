@@ -66,6 +66,8 @@ const LoginPage = () => {
         // Redirect based on role
         if (formData.role === 'office_staff') {
           navigate('/office-staff');
+        } else if (formData.role === 'admin') {
+          navigate('/admin');
         } else {
           navigate('/');
         }
@@ -176,6 +178,7 @@ const LoginPage = () => {
                 >
                   <option value="user">Customer</option>
                   <option value="office_staff">Office Staff</option>
+                  <option value="admin">Admin</option>
                 </select>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
