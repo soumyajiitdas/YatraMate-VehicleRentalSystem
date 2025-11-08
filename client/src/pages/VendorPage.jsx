@@ -187,13 +187,13 @@ const VendorPage = () => {
       </section>
 
       {/* Registration Form */}
-      <section className="py-16">
+      <section className="mb-16 mt-6">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-card p-8">
-            <h2 className="text-3xl font-display font-bold text-neutral-900 mb-2">
+          <div className="bg-white rounded-2xl shadow-card p-8 border border-primary-200">
+            <h2 className="text-3xl text-center font-display font-bold text-primary-500 mb-2">
               Vendor Registration
             </h2>
-            <p className="text-neutral-600 mb-8">
+            <p className="text-center text-neutral-600 mb-8">
               Fill out the form below to register as a vendor.
             </p>
 
