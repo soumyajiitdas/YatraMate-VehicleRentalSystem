@@ -31,10 +31,53 @@ const VehicleDetailsPage = () => {
   };
 
   const handleBooking = async (bookingData) => {
-    // TODO: Replace with actual API call
-    console.log('Booking data:', bookingData);
-    alert('Booking request submitted! You will be redirected to the bookings page.');
-    navigate('/bookings');
+    try {
+      // Get user from localStorage
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!user._id) {
+        alert('Please login to make a booking');
+        navigate('/login');
+        return;
+      }
+
+      // Parse datetime fields to separate date and time
+      const pickupDate = new Date(bookingData.pickup_datetime);
+      const pickupTime = pickupDate.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+
+      const payload = {
+        user_id: user._id,
+        vehicle_id: bookingData.vehicle_id,
+        start_location: bookingData.pickup_location,
+        end_location: bookingData.dropoff_location,
+        requested_pickup_date: pickupDate.toISOString(),
+        requested_pickup_time: pickupTime
+      };
+
+      const response = await fetch(API_ENDPOINTS.bookingRequest, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        alert('Booking request submitted successfully! You will be redirected to your bookings page.');
+        navigate('/bookings');
+      } else {
+        alert(data.message || 'Failed to submit booking request');
+      }
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      alert('Failed to submit booking request. Please try again.');
+    }
   };
 
   if (loading) {
@@ -142,6 +185,11 @@ const VehicleDetailsPage = () => {
                   <p className="text-lg text-neutral-600">
                     {vehicle.brand} • {vehicle.model_name}
                   </p>
+                  {vehicle.cc_engine && (
+                    <p className="text-sm text-neutral-500 mt-2">
+                      <span className="font-semibold">Engine Capacity:</span> {vehicle.cc_engine}cc
+                    </p>
+                  )}
                 </div>
                 <span className="px-4 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-full text-sm font-semibold capitalize">
                   {vehicle.type}
@@ -167,12 +215,14 @@ const VehicleDetailsPage = () => {
                       ₹{vehicle.price_per_day}
                     </div>
                   </div>
-                  <div>
-                    <div className="text-sm text-neutral-600 mb-1">Per Hour</div>
-                    <div className="text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                      ₹{vehicle.price_per_hour}
+                  {vehicle.price_per_km && (
+                    <div>
+                      <div className="text-sm text-neutral-600 mb-1">Per Kilometer</div>
+                      <div className="text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                        ₹{vehicle.price_per_km}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 

@@ -46,17 +46,26 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
 
         setLoading(true);
         try {
-            // TODO: Replace with actual API call
-            // const response = await fetch(API_ENDPOINTS.confirmPickup(booking._id), {
-            //   method: 'PATCH',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify(formData)
-            // });
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const payload = {
+                ...formData,
+                staff_id: user._id || user.id
+            };
 
-            setTimeout(() => {
+            const response = await fetch(API_ENDPOINTS.confirmPickup(booking._id), {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
                 alert('Vehicle pickup confirmed successfully!');
                 onSuccess();
-            }, 1000);
+            } else {
+                alert(data.message || 'Failed to confirm pickup');
+            }
         } catch (error) {
             console.error('Error confirming pickup:', error);
             alert('Failed to confirm pickup. Please try again.');

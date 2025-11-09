@@ -13,58 +13,58 @@ const BookingsPage = () => {
 
   const fetchBookings = async () => {
     setLoading(true);
-    // TODO: Replace with actual API call
-    setTimeout(() => {
-      const mockBookings = [
-        {
-          _id: '1',
+    try {
+      // Get user from localStorage
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!user._id) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(API_ENDPOINTS.userBookings(user._id));
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        // Transform backend data to match frontend structure
+        const transformedBookings = data.data.bookings.map(booking => ({
+          _id: booking._id,
           vehicle: {
-            name: 'Honda City',
-            type: 'car',
-            images: ['https://images.unsplash.com/photo-1760976396211-5546ce83a400?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
+            name: booking.vehicle_id.name,
+            type: booking.vehicle_id.type,
+            images: booking.vehicle_id.images,
+            registration_number: booking.vehicle_id.registration_number
           },
-          pickup_location: 'Kolkata Airport',
-          dropoff_location: 'DumDum',
-          pickup_datetime: '2026-01-20T10:00:00',
-          dropoff_datetime: '2026-01-22T18:00:00',
-          total_cost: 5500,
-          status: 'confirmed',
-          payment_status: 'paid',
-        },
-        {
-          _id: '2',
-          vehicle: {
-            name: 'Royal Enfield Classic',
-            type: 'bike',
-            images: ['https://images.unsplash.com/photo-1738576377901-bf5175eefec1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxiaWtlJTIwcmVudGFsJTIwbW90b3JjeWNsZXxlbnwwfHx8fDE3NjI0OTI0Mjl8MA&ixlib=rb-4.1.0&q=85'],
-          },
-          pickup_location: 'Kolkata',
-          dropoff_location: 'Berhampore',
-          pickup_datetime: '2026-01-15T09:00:00',
-          dropoff_datetime: '2026-01-17T20:00:00',
-          total_cost: 2400,
-          status: 'completed',
-          payment_status: 'paid',
-        },
-        {
-          _id: '3',
-          vehicle: {
-            name: 'Maruti Swift',
-            type: 'car',
-            images: ['https://images.unsplash.com/photo-1761320296536-38a4e068b37d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
-          },
-          pickup_location: 'Berhampore',
-          dropoff_location: 'Darjeeling',
-          pickup_datetime: '2026-01-25T12:00:00',
-          dropoff_datetime: '2026-01-26T12:00:00',
-          total_cost: 2000,
-          status: 'pending',
-          payment_status: 'unpaid',
-        },
-      ];
-      setBookings(mockBookings);
+          pickup_location: booking.start_location,
+          dropoff_location: booking.end_location,
+          pickup_datetime: booking.requested_pickup_date,
+          pickup_time: booking.requested_pickup_time,
+          dropoff_datetime: booking.return_details?.actual_return_date || null,
+          total_cost: booking.final_cost || 0,
+          status: mapBackendStatus(booking.status),
+          payment_status: booking.payment_status,
+          pickup_details: booking.pickup_details,
+          return_details: booking.return_details
+        }));
+        
+        setBookings(transformedBookings);
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  };
+
+  // Map backend status to frontend status
+  const mapBackendStatus = (backendStatus) => {
+    const statusMap = {
+      'booking_requested': 'pending',
+      'picked_up': 'confirmed',
+      'returned': 'completed',
+      'cancelled': 'cancelled'
+    };
+    return statusMap[backendStatus] || backendStatus;
   };
 
   const getStatusColor = (status) => {
@@ -158,14 +158,21 @@ const BookingsPage = () => {
                           <h3 className="text-2xl font-bold text-neutral-900 mb-1">
                             {booking.vehicle.name}
                           </h3>
-                          <span className="inline-block px-3 py-1 bg-linear-to-r from-primary-500 to-secondary-500 text-white text-xs rounded-full font-semibold capitalize">
-                            {booking.vehicle.type}
-                          </span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="inline-block px-3 py-1 bg-linear-to-r from-primary-500 to-secondary-500 text-white text-xs rounded-full font-semibold capitalize">
+                              {booking.vehicle.type}
+                            </span>
+                            {booking.vehicle.registration_number && booking.status === 'confirmed' && (
+                              <span className="inline-block px-3 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full font-semibold">
+                                RC: {booking.vehicle.registration_number}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm text-neutral-600 mb-1">Total Cost</div>
                           <div className="text-2xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                            ₹{booking.total_cost}
+                            ₹{booking.total_cost || 'TBD'}
                           </div>
                         </div>
                       </div>
@@ -179,7 +186,9 @@ const BookingsPage = () => {
                             </svg>
                             <div>
                               <div className="text-neutral-900 font-medium">{booking.pickup_location}</div>
-                              <div className="text-sm text-neutral-600">{formatDate(booking.pickup_datetime)}</div>
+                              <div className="text-sm text-neutral-600">
+                                {new Date(booking.pickup_datetime).toLocaleDateString()} {booking.pickup_time}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -192,7 +201,9 @@ const BookingsPage = () => {
                             </svg>
                             <div>
                               <div className="text-neutral-900 font-medium">{booking.dropoff_location}</div>
-                              <div className="text-sm text-neutral-600">{formatDate(booking.dropoff_datetime)}</div>
+                              {booking.dropoff_datetime && (
+                                <div className="text-sm text-neutral-600">{formatDate(booking.dropoff_datetime)}</div>
+                              )}
                             </div>
                           </div>
                         </div>

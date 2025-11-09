@@ -93,17 +93,26 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
         setLoading(true);
         try {
-            // TODO: Replace with actual API call
-            // const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
-            //   method: 'PATCH',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify(formData)
-            // });
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const payload = {
+                ...formData,
+                staff_id: user._id || user.id
+            };
 
-            setTimeout(() => {
-                alert(`Vehicle return confirmed! Final cost: ₹${costBreakdown.totalCost.toFixed(2)}`);
+            const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                alert(`Vehicle return confirmed! Final cost: ₹${data.data.booking.final_cost.toFixed(2)}`);
                 onSuccess();
-            }, 1000);
+            } else {
+                alert(data.message || 'Failed to confirm return');
+            }
         } catch (error) {
             console.error('Error confirming return:', error);
             alert('Failed to confirm return. Please try again.');

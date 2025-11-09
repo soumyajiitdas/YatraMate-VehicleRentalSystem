@@ -8,7 +8,8 @@ const VehicleCard = ({ vehicle }) => {
     type,
     brand,
     price_per_day,
-    price_per_hour,
+    price_per_km,
+    cc_engine,
     images,
     availability_status,
     location,
@@ -59,6 +60,11 @@ const VehicleCard = ({ vehicle }) => {
             <p className="text-sm text-neutral-600 mt-0.5">
               {brand} • {model_name}
             </p>
+            {cc_engine && (
+              <p className="text-xs text-neutral-500 mt-1 flex items-center">
+                <span className="font-semibold">Engine:</span>&nbsp;{cc_engine}cc
+              </p>
+            )}
           </div>
         </div>
 
@@ -78,10 +84,12 @@ const VehicleCard = ({ vehicle }) => {
               <span className="text-2xl font-bold text-primary-600">₹{price_per_day}</span>
               <span className="text-sm text-neutral-500">/day</span>
             </div>
-            <div className="flex items-baseline space-x-1 mt-1">
-              <span className="text-sm text-neutral-600">₹{price_per_hour}</span>
-              <span className="text-xs text-neutral-500">/hour</span>
-            </div>
+            {price_per_km && (
+              <div className="flex items-baseline space-x-1 mt-1">
+                <span className="text-sm text-neutral-600">₹{price_per_km}</span>
+                <span className="text-xs text-neutral-500">/km</span>
+              </div>
+            )}
           </div>
         </div>
 

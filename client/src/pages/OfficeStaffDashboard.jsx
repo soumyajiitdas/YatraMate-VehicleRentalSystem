@@ -33,31 +33,18 @@ const OfficeStaffDashboard = () => {
 
             const url = status ? `${API_ENDPOINTS.officeStaffRequests}?status=${status}` : API_ENDPOINTS.officeStaffRequests;
 
-            // Mock data for now
-            const mockBookings = {
-                booking_requested: [
-                    {
-                        _id: '1',
-                        user_id: { name: 'John Doe', email: 'john@example.com', phone: '+1234567890' },
-                        vehicle_id: { name: 'Honda Activa', model_name: '6G', type: 'bike', registration_number: 'DL01AB1234', cc_engine: 110 },
-                        package_id: { name: '100-125cc Package', price_per_hour: 50, price_per_km: 5 },
-                        start_location: 'Connaught Place, Delhi',
-                        end_location: 'India Gate, Delhi',
-                        requested_pickup_date: new Date().toISOString(),
-                        requested_pickup_time: '10:00 AM',
-                        status: 'booking_requested',
-                        createdAt: new Date().toISOString()
-                    }
-                ],
-                picked_up: [],
-                returned: []
-            };
+            const response = await fetch(url);
+            const data = await response.json();
 
-            const data = mockBookings[status] || [];
-            setBookings(data);
+            if (data.status === 'success') {
+                setBookings(data.data.bookings);
+            } else {
+                setBookings([]);
+            }
             setLoading(false);
         } catch (error) {
             console.error('Error fetching bookings:', error);
+            setBookings([]);
             setLoading(false);
         }
     };
