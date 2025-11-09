@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 
 const VendorPage = () => {
   const navigate = useNavigate();
+  const { registerVendor } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     is_organization: false,
@@ -95,36 +97,29 @@ const VendorPage = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        const response = await fetch(API_ENDPOINTS.vendors, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            is_organization: formData.is_organization,
-            company_name: formData.company_name || undefined,
-            contact_number: formData.contact_number,
-            email: formData.email,
-            id_type: formData.id_type,
-            document_url: documentUrl,
-            address: formData.address,
-            password_hash: formData.password, // In production, this should be hashed
-          })
+        const result = await registerVendor({
+          name: formData.name,
+          is_organization: formData.is_organization,
+          company_name: formData.company_name || undefined,
+          contact_number: formData.contact_number,
+          email: formData.email,
+          id_type: formData.id_type,
+          document_url: documentUrl,
+          address: formData.address,
+          password: formData.password
         });
 
-        const data = await response.json();
+        setLoading(false);
 
-        if (data.status === 'success') {
-          alert('Vendor registration successful! Please login to continue.');
+        if (result.success) {
+          alert(result.message || 'Vendor registration successful! Your account is pending verification. Please login after verification.');
           navigate('/login');
         } else {
-          alert('Error registering vendor: ' + (data.message || 'Unknown error'));
+          alert(result.message || 'Error registering vendor. Please try again.');
         }
       } catch (error) {
-        alert('Error registering vendor: ' + error.message);
-      } finally {
         setLoading(false);
+        alert('Error registering vendor: ' + error.message);
       }
     }
   };

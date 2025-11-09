@@ -1,21 +1,23 @@
 const express = require('express');
 const vendorController = require('../controllers/vendorController');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Public route for vendor registration moved to authRoutes
 router
     .route('/')
-    .get(vendorController.getAllVendors)
-    .post(vendorController.createVendor);
+    .get(protect, restrictTo('admin', 'office_staff'), vendorController.getAllVendors);
 
-router.get('/email/:email', vendorController.getVendorByEmail);
+// Protect all routes after this middleware
+router.use(protect);
 
-router.patch('/:id/verify', vendorController.verifyVendor);
+router.patch('/:id/verify', restrictTo('admin', 'office_staff'), vendorController.verifyVendor);
 
 router
     .route('/:id')
     .get(vendorController.getVendor)
     .patch(vendorController.updateVendor)
-    .delete(vendorController.deleteVendor);
+    .delete(restrictTo('admin'), vendorController.deleteVendor);
 
 module.exports = router;

@@ -1,32 +1,15 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(null);
-
-  // Check login status on component mount and when location changes
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    const role = localStorage.getItem('userRole');
-    if (user) {
-      setIsLoggedIn(true);
-      setUserRole(role);
-    } else {
-      setIsLoggedIn(false);
-      setUserRole(null);
-    }
-  }, [location]);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('vendorId');
-    setIsLoggedIn(false);
-    setUserRole(null);
+    logout();
     setIsMenuOpen(false);
     navigate('/');
   };
@@ -76,7 +59,7 @@ const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/profile"
@@ -147,7 +130,7 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-neutral-200 space-y-2">
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <>
                   <Link
                     to="/profile"

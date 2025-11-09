@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../config/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -48,68 +49,35 @@ const LoginPage = () => {
     if (validateForm()) {
       setLoading(true);
       
-      // Handle vendor login separately
-      if (formData.role === 'vendor') {
-        try {
-          const response = await fetch(`http://localhost:8000/api/v1/vendors/email/${encodeURIComponent(formData.email)}`);
-          const data = await response.json();
-          
-          if (data.status === 'success') {
-            const vendor = data.data.vendor;
-            
-            // Simple password check (in production, this should be done on backend)
-            if (vendor.password_hash === formData.password) {
-              const user = {
-                id: vendor._id,
-                email: vendor.email,
-                role: 'vendor',
-                name: vendor.name
-              };
-              
-              localStorage.setItem('user', JSON.stringify(user));
-              localStorage.setItem('userRole', 'vendor');
-              localStorage.setItem('vendorId', vendor._id);
-              
-              setLoading(false);
-              alert('Login successful!');
-              navigate('/vendor-dashboard');
-            } else {
-              setLoading(false);
-              alert('Invalid password');
-            }
-          } else {
-            setLoading(false);
-            alert('Vendor not found');
-          }
-        } catch (error) {
-          setLoading(false);
-          alert('Error during login: ' + error.message);
-        }
-      } else {
-        // Mock login for other roles
-        const mockUser = {
-          id: '123456',
+      try {
+        const result = await login({
           email: formData.email,
-          role: formData.role,
-          name: 'Demo User'
-        };
-        
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        localStorage.setItem('userRole', formData.role);
-        
-        setTimeout(() => {
-          setLoading(false);
+          password: formData.password,
+          role: formData.role
+        });
+
+        setLoading(false);
+
+        if (result.success) {
           alert('Login successful!');
           
           // Redirect based on role
-          if (formData.role === 'office_staff') {
+          const userRole = result.data.user.role;
+          if (userRole === 'vendor') {
+            navigate('/vendor-dashboard');
+          } else if (userRole === 'office_staff') {
             navigate('/office-staff');
-          } else if (formData.role === 'admin') {
+          } else if (userRole === 'admin') {
             navigate('/admin');
           } else {
             navigate('/');
           }
-        }, 1000);
+        } else {
+          alert(result.message || 'Login failed. Please check your credentials.');
+        }
+      } catch (error) {
+        setLoading(false);
+        alert('Error during login: ' + error.message);
       }
     }
   };
