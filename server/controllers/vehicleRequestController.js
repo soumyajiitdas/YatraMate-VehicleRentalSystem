@@ -76,7 +76,7 @@ exports.approveVehicleRequest = catchAsync(async (req, res, next) => {
         name: request.name,
         model_name: request.model_name,
         type: request.type,
-        brand: req.body.brand || 'Unknown', // Brand might need to be added to request
+        brand: request.brand,
         registration_number: request.registration_number,
         engine_number: request.engine_number,
         chassis_number: request.chassis_number,

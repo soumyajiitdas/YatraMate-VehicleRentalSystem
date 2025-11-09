@@ -139,7 +139,7 @@ const HomePage = () => {
             <div className="relative lg:block animate-slide-up">
               <div className="relative">
                 <img
-                  src="https://images.unsplash.com/photo-1758411898310-ada9284a3086?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85"
+                  src="https://images.unsplash.com/photo-1594486004716-7c9377490b1f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85"
                   alt="Vehicle"
                   className="rounded-2xl shadow-2xl"
                 />

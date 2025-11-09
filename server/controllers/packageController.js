@@ -45,10 +45,12 @@ exports.getPackageById = catchAsync(async (req, res, next) => {
 
 // Get package for a specific vehicle CC
 exports.getPackageForVehicle = catchAsync(async (req, res, next) => {
-    const { cc_engine, vehicle_type } = req.query;
+    // Support both parameter formats for backward compatibility
+    const cc_engine = req.query.cc_engine || req.query.cc;
+    const vehicle_type = req.query.vehicle_type || req.query.type;
     
     if (!cc_engine || !vehicle_type) {
-        return next(new AppError('Please provide cc_engine and vehicle_type', 400));
+        return next(new AppError('Please provide cc_engine (or cc) and vehicle_type (or type)', 400));
     }
     
     const packageData = await Package.findOne({
@@ -59,7 +61,12 @@ exports.getPackageForVehicle = catchAsync(async (req, res, next) => {
     });
     
     if (!packageData) {
-        return next(new AppError('No package found for this vehicle', 404));
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                package: null
+            }
+        });
     }
     
     res.status(200).json({

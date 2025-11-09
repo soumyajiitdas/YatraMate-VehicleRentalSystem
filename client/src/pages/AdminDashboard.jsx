@@ -41,16 +41,10 @@ const AdminDashboard = () => {
                     setUsers(data.data.users);
                 }
             } else if (activeTab === 'vendors') {
-                const [usersRes, vendorsRes] = await Promise.all([
-                    fetch(API_ENDPOINTS.users),
-                    fetch(API_ENDPOINTS.vendors)
-                ]);
-                const usersData = await usersRes.json();
-                const vendorsData = await vendorsRes.json();
-
-                if (usersData.status === 'success' && vendorsData.status === 'success') {
-                    setUsers(usersData.data.users);
-                    setVendors(vendorsData.data.vendors);
+                const response = await fetch(API_ENDPOINTS.vendors);
+                const data = await response.json();
+                if (data.status === 'success') {
+                    setVendors(data.data.vendors);
                 }
             } else if (activeTab === 'packages') {
                 const response = await fetch(API_ENDPOINTS.packages);
@@ -120,14 +114,8 @@ const AdminDashboard = () => {
             if (activeTab === 'packages') {
                 endpoint = `${API_ENDPOINTS.packageById(deleteTarget._id)}`;
             } else if (activeTab === 'vendors') {
-                // Delete vendor first, then user
-                const vendorDetails = vendors.find(v => v.user_id === deleteTarget._id);
-                if (vendorDetails) {
-                    await fetch(`${API_ENDPOINTS.vendorById(vendorDetails._id)}`, {
-                        method: 'DELETE',
-                    });
-                }
-                endpoint = `${API_ENDPOINTS.users}/${deleteTarget._id}`;
+                // Delete vendor directly
+                endpoint = `${API_ENDPOINTS.vendorById(deleteTarget._id)}`;
             } else {
                 endpoint = `${API_ENDPOINTS.users}/${deleteTarget._id}`;
             }
@@ -330,16 +318,26 @@ const AdminDashboard = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Users Table (Customers, Office Staff, Vendors) */}
-                        {activeTab !== 'packages' && activeTab !== 'vehicle-requests' && (
+                        {/* Users Table (Customers, Office Staff) */}
+                        {(activeTab === 'customers' || activeTab === 'office-staff') && (
                             <UsersTable
                                 users={getFilteredUsers()}
-                                vendors={activeTab === 'vendors' ? vendors : []}
+                                vendors={[]}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
                                 type={activeTab}
                                 onViewVendorDetails={handleViewVendorDetails}
                                 onVerifyVendor={handleVerifyVendor}
+                            />
+                        )}
+
+                        {/* Vendors Table */}
+                        {activeTab === 'vendors' && (
+                            <VendorsTable
+                                vendors={vendors}
+                                onViewVendorDetails={handleViewVendorDetails}
+                                onVerifyVendor={handleVerifyVendor}
+                                onDelete={handleDelete}
                             />
                         )}
 
@@ -511,6 +509,90 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetail
         </div>
     );
 };
+
+// Vendors Table Component
+const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }) => {
+    if (vendors.length === 0) {
+        return (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                <p className="text-gray-500">No vendors found.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Type</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {vendors.map((vendor) => (
+                        <tr key={vendor._id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">{vendor.email}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">{vendor.contact_number}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">{vendor.company_name || 'N/A'}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600 capitalize">{vendor.id_type?.replace('_', ' ')}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                    {vendor.is_verified ? 'Verified' : 'Pending'}
+                                </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {new Date(vendor.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                <button
+                                    onClick={() => onViewVendorDetails(vendor)}
+                                    className="text-indigo-600 hover:text-indigo-900"
+                                >
+                                    View
+                                </button>
+                                {!vendor.is_verified && (
+                                    <button
+                                        onClick={() => onVerifyVendor(vendor._id)}
+                                        className="text-green-600 hover:text-green-900"
+                                    >
+                                        Verify
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => onDelete(vendor)}
+                                    className="text-red-600 hover:text-red-900"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
 
 // Packages Table Component
 const PackagesTable = ({ packages, onEdit, onDelete }) => {
@@ -1211,6 +1293,10 @@ const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) =
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Type</label>
                                 <p className="mt-1 text-gray-900 capitalize">{request.type}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Brand</label>
+                                <p className="mt-1 text-gray-900">{request.brand}</p>
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Registration Number</label>

@@ -13,6 +13,7 @@ const VendorDashboard = () => {
         name: '',
         model_name: '',
         type: 'bike',
+        brand: '',
         registration_number: '',
         engine_number: '',
         chassis_number: '',
@@ -184,6 +185,7 @@ const VendorDashboard = () => {
                     name: formData.name,
                     model_name: formData.model_name,
                     type: formData.type,
+                    brand: formData.brand,
                     registration_number: formData.registration_number,
                     engine_number: formData.engine_number,
                     chassis_number: formData.chassis_number,
@@ -204,6 +206,7 @@ const VendorDashboard = () => {
                     name: '',
                     model_name: '',
                     type: 'bike',
+                    brand: '',
                     registration_number: '',
                     engine_number: '',
                     chassis_number: '',
@@ -366,6 +369,32 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Brand *</label>
+                                <input
+                                    type="text"
+                                    name="brand"
+                                    value={formData.brand}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g., Honda, Toyota, Yamaha"
+                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Location *</label>
+                                <input
+                                    type="text"
+                                    name="location"
+                                    value={formData.location}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="e.g., Kolkata, Delhi, Mumbai"
+                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">Registration Number *</label>
                                 <input
                                     type="text"
@@ -407,18 +436,6 @@ const VendorDashboard = () => {
                                     type="number"
                                     name="cc_engine"
                                     value={formData.cc_engine}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Location *</label>
-                                <input
-                                    type="text"
-                                    name="location"
-                                    value={formData.location}
                                     onChange={handleChange}
                                     required
                                     className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"

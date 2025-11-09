@@ -19,6 +19,10 @@ const vehicleRequestSchema = new mongoose.Schema({
         enum: ['car', 'bike'],
         required: true
     },
+    brand: {
+        type: String,
+        required: true
+    },
     registration_number: {
         type: String,
         required: true
