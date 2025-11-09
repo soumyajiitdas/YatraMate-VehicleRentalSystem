@@ -76,6 +76,10 @@ const vehicleSchema = new mongoose.Schema({
     total_bookings: {
         type: Number,
         default: 0
+    },
+    is_featured: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

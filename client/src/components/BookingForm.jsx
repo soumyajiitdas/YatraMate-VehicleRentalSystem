@@ -209,9 +209,14 @@ const BookingForm = ({ vehicle, onSubmit }) => {
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold text-lg hover:shadow-glow transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2"
+        disabled={!vehicle?.is_available_for_booking}
+        className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center space-x-2 ${
+          vehicle?.is_available_for_booking
+            ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white hover:shadow-glow transform hover:scale-105 cursor-pointer'
+            : 'border-2 border-neutral-300 text-neutral-400 cursor-not-allowed'
+        }`}
       >
-        <span>Confirm Booking</span>
+        <span>{vehicle?.is_available_for_booking ? 'Confirm Booking' : 'Not Available'}</span>
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>

@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
 
     // Vehicle endpoints
     vehicles: `${API_BASE_URL}/vehicles`,
+    vehiclesGrouped: `${API_BASE_URL}/vehicles/grouped`,
+    vehiclesFeatured: `${API_BASE_URL}/vehicles/featured`,
     vehicleById: (id) => `${API_BASE_URL}/vehicles/${id}`,
     vehiclesByVendor: (vendorId) => `${API_BASE_URL}/vehicles/vendor/${vendorId}`,
 

@@ -16,33 +16,18 @@ const VehicleDetailsPage = () => {
 
   const fetchVehicleDetails = async () => {
     setLoading(true);
-    // TODO: Replace with actual API call
-    // const response = await fetch(API_ENDPOINTS.vehicleById(id));
-    // const data = await response.json();
-    
-    setTimeout(() => {
-      const mockVehicle = {
-        _id: id,
-        name: 'Honda City',
-        model_name: '2023',
-        type: 'car',
-        brand: 'Honda',
-        registration_number: 'MH01AB1234',
-        price_per_day: 2500,
-        price_per_hour: 150,
-        images: [
-          'https://images.unsplash.com/photo-1760976396211-5546ce83a400?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85',
-          'https://images.unsplash.com/photo-1760162754961-ed27f26b394f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85',
-          'https://images.unsplash.com/photo-1761320296536-38a4e068b37d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85',
-        ],
-        availability_status: 'available',
-        location: 'Mumbai',
-        description: 'Experience luxury and comfort with this Honda City. Perfect for city drives and long journeys. Comes with all modern amenities including automatic transmission, climate control, and safety features.',
-        vendor_id: '123',
-      };
-      setVehicle(mockVehicle);
+    try {
+      const response = await fetch(API_ENDPOINTS.vehicleById(id));
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setVehicle(data.data.vehicle);
+      }
+    } catch (error) {
+      console.error('Error fetching vehicle details:', error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   const handleBooking = async (bookingData) => {
@@ -106,14 +91,19 @@ const VehicleDetailsPage = () => {
                   alt={vehicle.name}
                   className="w-full h-full object-cover"
                 />
-                {/* Availability Badge */}
-                <div className="absolute top-4 right-4">
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ${
-                    vehicle.availability_status === 'available'
+                {/* Featured Badge and Availability Badge */}
+                <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                  {vehicle.is_featured && (
+                    <span className="px-4 py-2 rounded-full text-sm font-semibold bg-yellow-500/90 text-white backdrop-blur-sm">
+                      Featured
+                    </span>
+                  )}
+                  <span className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ml-auto ${
+                    vehicle.is_available_for_booking
                       ? 'bg-green-500/90 text-white'
                       : 'bg-neutral-500/90 text-white'
                   }`}>
-                    {vehicle.availability_status === 'available' ? 'Available' : 'Not Available'}
+                    {vehicle.is_available_for_booking ? 'Available' : 'Not Available'}
                   </span>
                 </div>
               </div>

@@ -1,53 +1,28 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
+import { API_ENDPOINTS } from '../config/api';
 
 const HomePage = () => {
   const [featuredVehicles, setFeaturedVehicles] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock featured vehicles - Replace with API call
+  // Fetch featured vehicles from API
   useEffect(() => {
-    // This would be an API call to fetch featured vehicles
-    const mockVehicles = [
-      {
-        _id: '1',
-        name: 'Honda City',
-        model_name: '2023',
-        type: 'car',
-        brand: 'Honda',
-        price_per_day: 2500,
-        price_per_hour: 150,
-        images: ['https://images.unsplash.com/photo-1760976396211-5546ce83a400?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
-        availability_status: 'available',
-        location: 'Mumbai',
-      },
-      {
-        _id: '2',
-        name: 'Royal Enfield Classic',
-        model_name: '350',
-        type: 'bike',
-        brand: 'Royal Enfield',
-        price_per_day: 800,
-        price_per_hour: 50,
-        images: ['https://images.unsplash.com/photo-1738576377901-bf5175eefec1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxiaWtlJTIwcmVudGFsJTIwbW90b3JjeWNsZXxlbnwwfHx8fDE3NjI0OTI0Mjl8MA&ixlib=rb-4.1.0&q=85'],
-        availability_status: 'available',
-        location: 'Delhi',
-      },
-      {
-        _id: '3',
-        name: 'Maruti Swift',
-        model_name: 'VXI 2023',
-        type: 'car',
-        brand: 'Maruti',
-        price_per_day: 2000,
-        price_per_hour: 120,
-        images: ['https://images.unsplash.com/photo-1761320296536-38a4e068b37d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
-        availability_status: 'available',
-        location: 'Bangalore',
-      },
-    ];
-    setFeaturedVehicles(mockVehicles);
+    const fetchFeaturedVehicles = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.vehiclesFeatured);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          setFeaturedVehicles(data.data.vehicles);
+        }
+      } catch (error) {
+        console.error('Error fetching featured vehicles:', error);
+      }
+    };
+
+    fetchFeaturedVehicles();
   }, []);
 
   const features = [

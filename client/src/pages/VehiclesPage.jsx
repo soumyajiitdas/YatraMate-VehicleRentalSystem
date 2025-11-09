@@ -12,95 +12,25 @@ const VehiclesPage = () => {
     availability: 'all',
   });
 
-  // Mock vehicles data - Replace with API call
+  // Fetch vehicles data from API
   useEffect(() => {
     fetchVehicles();
   }, []);
 
   const fetchVehicles = async () => {
     setLoading(true);
-    // TODO: Replace with actual API call
-    // const response = await fetch(API_ENDPOINTS.vehicles);
-    // const data = await response.json();
-    
-    setTimeout(() => {
-      const mockVehicles = [
-        {
-          _id: '1',
-          name: 'Honda City',
-          model_name: '2023',
-          type: 'car',
-          brand: 'Honda',
-          price_per_day: 2500,
-          price_per_hour: 150,
-          images: ['https://cdni.autocarindia.com/ExtraImages/20250620010434_Hond_City_Sport_Launched.jpg?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
-          availability_status: 'available',
-          location: 'Mumbai',
-        },
-        {
-          _id: '2',
-          name: 'Maruti Swift',
-          model_name: 'VXI 2023',
-          type: 'car',
-          brand: 'Maruti',
-          price_per_day: 2000,
-          price_per_hour: 120,
-          images: ['https://img.autocarindia.com/ExtraImages/20240515053639_Swift_2024_Web.007_800.jpeg?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
-          availability_status: 'available',
-          location: 'Bangalore',
-        },
-        {
-          _id: '3',
-          name: 'Hyundai Creta',
-          model_name: 'SX 2023',
-          type: 'car',
-          brand: 'Hyundai',
-          price_per_day: 3500,
-          price_per_hour: 200,
-          images: ['https://spn-sta.spinny.com/blog/20220228142605/ezgif.com-gif-maker-100-8.jpg?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85'],
-          availability_status: 'available',
-          location: 'Delhi',
-        },
-        {
-          _id: '4',
-          name: 'Royal Enfield Classic',
-          model_name: '350',
-          type: 'bike',
-          brand: 'Royal Enfield',
-          price_per_day: 800,
-          price_per_hour: 50,
-          images: ['https://stylerug.net/wp-content/uploads/2024/03/2022-royal-enfield-meteor-350-bobber-launch-price-2.jpg?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxiaWtlJTIwcmVudGFsJTIwbW90b3JjeWNsZXxlbnwwfHx8fDE3NjI0OTI0Mjl8MA&ixlib=rb-4.1.0&q=85'],
-          availability_status: 'available',
-          location: 'Goa',
-        },
-        {
-          _id: '5',
-          name: 'Yamaha R15',
-          model_name: 'V4',
-          type: 'bike',
-          brand: 'Yamaha',
-          price_per_day: 1200,
-          price_per_hour: 80,
-          images: ['https://apollo.olx.in/v1/files/v9jnhmpd84s8-IN/image?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxiaWtlJTIwcmVudGFsJTIwbW90b3JjeWNsZXxlbnwwfHx8fDE3NjI0OTI0Mjl8MA&ixlib=rb-4.1.0&q=85'],
-          availability_status: 'available',
-          location: 'Bangalore',
-        },
-        {
-          _id: '6',
-          name: 'KTM Duke 390',
-          model_name: '2023',
-          type: 'bike',
-          brand: 'KTM',
-          price_per_day: 1500,
-          price_per_hour: 100,
-          images: ['https://img.autocarindia.com/Reviews/DSC_9290.jpg?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHxiaWtlJTIwcmVudGFsJTIwbW90b3JjeWNsZXxlbnwwfHx8fDE3NjI0OTI0Mjl8MA&ixlib=rb-4.1.0&q=85'],
-          availability_status: 'available',
-          location: 'Mumbai',
-        },
-      ];
-      setVehicles(mockVehicles);
+    try {
+      const response = await fetch(API_ENDPOINTS.vehiclesGrouped);
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setVehicles(data.data.vehicles);
+      }
+    } catch (error) {
+      console.error('Error fetching vehicles:', error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   const filteredVehicles = vehicles.filter((vehicle) => {
@@ -127,7 +57,10 @@ const VehiclesPage = () => {
     }
     
     // Availability filter
-    if (filters.availability !== 'all' && vehicle.availability_status !== filters.availability) return false;
+    if (filters.availability !== 'all') {
+      if (filters.availability === 'available' && vehicle.availability_status !== 'available') return false;
+      if (filters.availability === 'booked' && vehicle.availability_status === 'available') return false;
+    }
     
     return true;
   });
