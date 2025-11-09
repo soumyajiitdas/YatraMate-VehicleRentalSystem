@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const vehicleSchema = new mongoose.Schema({
+const vehicleRequestSchema = new mongoose.Schema({
     vendor_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Vendor',
@@ -19,27 +19,24 @@ const vehicleSchema = new mongoose.Schema({
         enum: ['car', 'bike'],
         required: true
     },
-    brand: {
+    registration_number: {
         type: String,
         required: true
     },
-    registration_number: {
-        type: String,
-        required: true,
-        unique: true
-    },
     engine_number: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     chassis_number: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     cc_engine: {
         type: Number,
+        required: true
+    },
+    location: {
+        type: String,
         required: true
     },
     rc_document: {
@@ -50,33 +47,22 @@ const vehicleSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    images: [{
-        type: String
-    }],
-    availability_status: {
-        type: String,
-        enum: ['available', 'booked', 'maintenance'],
-        default: 'available'
-    },
-    location: {
+    vehicle_images: [{
         type: String,
         required: true
+    }],
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
     },
-    description: {
+    admin_notes: {
+        type: String,
+        default: ''
+    },
+    rejection_reason: {
         type: String
-    },
-    total_distance_travelled: {
-        type: Number,
-        default: 0
-    },
-    total_hours_booked: {
-        type: Number,
-        default: 0
-    },
-    total_bookings: {
-        type: Number,
-        default: 0
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Vehicle', vehicleSchema);
+module.exports = mongoose.model('VehicleRequest', vehicleRequestSchema);

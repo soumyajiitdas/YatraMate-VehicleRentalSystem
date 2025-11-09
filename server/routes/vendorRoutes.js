@@ -10,6 +10,8 @@ router
 
 router.get('/email/:email', vendorController.getVendorByEmail);
 
+router.patch('/:id/verify', vendorController.verifyVendor);
+
 router
     .route('/:id')
     .get(vendorController.getVendor)

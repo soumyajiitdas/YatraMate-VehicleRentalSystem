@@ -86,3 +86,23 @@ exports.getVendorByEmail = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+// Verify vendor
+exports.verifyVendor = catchAsync(async (req, res, next) => {
+    const vendor = await Vendor.findByIdAndUpdate(
+        req.params.id,
+        { is_verified: true },
+        { new: true, runValidators: true }
+    );
+
+    if (!vendor) {
+        return next(new AppError('No vendor found with that ID', 404));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            vendor
+        }
+    });
+});

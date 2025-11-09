@@ -8,12 +8,17 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [vendors, setVendors] = useState([]);
     const [packages, setPackages] = useState([]);
+    const [vehicleRequests, setVehicleRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');          // 'user', 'vendor', 'package'
     const [editingItem, setEditingItem] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [showVendorDetailsModal, setShowVendorDetailsModal] = useState(false);
+    const [selectedVendor, setSelectedVendor] = useState(null);
+    const [showRequestDetailsModal, setShowRequestDetailsModal] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
 
     useEffect(() => {
         // Check if user is admin
@@ -52,6 +57,12 @@ const AdminDashboard = () => {
                 const data = await response.json();
                 if (data.status === 'success') {
                     setPackages(data.data.packages);
+                }
+            } else if (activeTab === 'vehicle-requests') {
+                const response = await fetch(API_ENDPOINTS.vehicleRequests);
+                const data = await response.json();
+                if (data.status === 'success') {
+                    setVehicleRequests(data.data.requests);
                 }
             }
 
@@ -136,6 +147,77 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleVerifyVendor = async (vendorId) => {
+        try {
+            const response = await fetch(API_ENDPOINTS.verifyVendor(vendorId), {
+                method: 'PATCH'
+            });
+
+            if (response.ok) {
+                alert('Vendor verified successfully!');
+                fetchData();
+            }
+        } catch (error) {
+            console.error('Error verifying vendor:', error);
+            alert('Failed to verify vendor. Please try again.');
+        }
+    };
+
+    const handleViewVendorDetails = (vendor) => {
+        setSelectedVendor(vendor);
+        setShowVendorDetailsModal(true);
+    };
+
+    const handleViewRequestDetails = (request) => {
+        setSelectedRequest(request);
+        setShowRequestDetailsModal(true);
+    };
+
+    const handleApproveRequest = async (requestId) => {
+        try {
+            const response = await fetch(API_ENDPOINTS.approveVehicleRequest(requestId), {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            });
+
+            if (response.ok) {
+                alert('Vehicle request approved successfully!');
+                setShowRequestDetailsModal(false);
+                fetchData();
+            }
+        } catch (error) {
+            console.error('Error approving request:', error);
+            alert('Failed to approve request. Please try again.');
+        }
+    };
+
+    const handleRejectRequest = async (requestId) => {
+        const reason = prompt('Please provide a reason for rejection:');
+        if (!reason) return;
+
+        try {
+            const response = await fetch(API_ENDPOINTS.rejectVehicleRequest(requestId), {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rejection_reason: reason })
+            });
+
+            if (response.ok) {
+                alert('Vehicle request rejected.');
+                setShowRequestDetailsModal(false);
+                fetchData();
+            }
+        } catch (error) {
+            console.error('Error rejecting request:', error);
+            alert('Failed to reject request. Please try again.');
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
@@ -213,6 +295,15 @@ const AdminDashboard = () => {
                             >
                                 Packages
                             </button>
+                            <button
+                                onClick={() => setActiveTab('vehicle-requests')}
+                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'vehicle-requests'
+                                    ? 'border-red-500 text-red-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                            >
+                                Vehicle Requests
+                            </button>
                         </nav>
                     </div>
                 </div>
@@ -240,13 +331,15 @@ const AdminDashboard = () => {
                 ) : (
                     <>
                         {/* Users Table (Customers, Office Staff, Vendors) */}
-                        {activeTab !== 'packages' && (
+                        {activeTab !== 'packages' && activeTab !== 'vehicle-requests' && (
                             <UsersTable
                                 users={getFilteredUsers()}
                                 vendors={activeTab === 'vendors' ? vendors : []}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
                                 type={activeTab}
+                                onViewVendorDetails={handleViewVendorDetails}
+                                onVerifyVendor={handleVerifyVendor}
                             />
                         )}
 
@@ -256,6 +349,14 @@ const AdminDashboard = () => {
                                 packages={packages}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
+                            />
+                        )}
+
+                        {/* Vehicle Requests Table */}
+                        {activeTab === 'vehicle-requests' && (
+                            <VehicleRequestsTable
+                                requests={vehicleRequests}
+                                onViewDetails={handleViewRequestDetails}
                             />
                         )}
                     </>
@@ -290,12 +391,30 @@ const AdminDashboard = () => {
                     }}
                 />
             )}
+
+            {/* Vendor Details Modal */}
+            {showVendorDetailsModal && selectedVendor && (
+                <VendorDetailsModal
+                    vendor={selectedVendor}
+                    onClose={() => setShowVendorDetailsModal(false)}
+                />
+            )}
+
+            {/* Vehicle Request Details Modal */}
+            {showRequestDetailsModal && selectedRequest && (
+                <VehicleRequestDetailsModal
+                    request={selectedRequest}
+                    onClose={() => setShowRequestDetailsModal(false)}
+                    onApprove={handleApproveRequest}
+                    onReject={handleRejectRequest}
+                />
+            )}
         </div>
     );
 };
 
 // Users Table Component
-const UsersTable = ({ users, vendors, onEdit, onDelete, type }) => {
+const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetails, onVerifyVendor }) => {
     if (users.length === 0) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
@@ -324,7 +443,7 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type }) => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                     {users.map((user) => {
-                        const vendorDetails = type === 'vendors' ? vendors.find(v => v.user_id === user._id) : null;
+                        const vendorDetails = type === 'vendors' ? vendors.find(v => v.email === user.email) : null;
                         return (
                             <tr key={user._id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -353,6 +472,24 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type }) => {
                                     {new Date(user.date_joined).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                    {type === 'vendors' && vendorDetails && (
+                                        <>
+                                            <button
+                                                onClick={() => onViewVendorDetails(vendorDetails)}
+                                                className="text-indigo-600 hover:text-indigo-900"
+                                            >
+                                                View
+                                            </button>
+                                            {!vendorDetails.is_verified && (
+                                                <button
+                                                    onClick={() => onVerifyVendor(vendorDetails._id)}
+                                                    className="text-green-600 hover:text-green-900"
+                                                >
+                                                    Verify
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
                                     <button
                                         onClick={() => onEdit(user)}
                                         className="text-blue-600 hover:text-blue-900"
@@ -870,6 +1007,322 @@ const DeleteConfirmModal = ({ onConfirm, onCancel }) => {
                     >
                         Delete
                     </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Vehicle Requests Table Component
+const VehicleRequestsTable = ({ requests, onViewDetails }) => {
+    if (requests.length === 0) {
+        return (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                <p className="text-gray-500">No vehicle requests found.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {requests.map((request) => (
+                        <tr key={request._id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">{request.name}</div>
+                                <div className="text-sm text-gray-500">{request.model_name}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
+                                <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600 capitalize">{request.type}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">{request.registration_number}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                    request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                    'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                    {request.status}
+                                </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {new Date(request.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button
+                                    onClick={() => onViewDetails(request)}
+                                    className="text-blue-600 hover:text-blue-900"
+                                >
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+// Vendor Details Modal
+const VendorDetailsModal = ({ vendor, onClose }) => {
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Vendor Details</h2>
+                        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Name</label>
+                                <p className="mt-1 text-gray-900">{vendor.name}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Email</label>
+                                <p className="mt-1 text-gray-900">{vendor.email}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Company Name</label>
+                                <p className="mt-1 text-gray-900">{vendor.company_name || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Contact Number</label>
+                                <p className="mt-1 text-gray-900">{vendor.contact_number}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">ID Type</label>
+                                <p className="mt-1 text-gray-900 capitalize">{vendor.id_type?.replace('_', ' ')}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Verification Status</label>
+                                <p className="mt-1">
+                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                        vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {vendor.is_verified ? 'Verified' : 'Pending'}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-medium text-gray-500">Address</label>
+                            <p className="mt-1 text-gray-900">{vendor.address}</p>
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-medium text-gray-500 mb-2 block">Uploaded Document</label>
+                            {vendor.document_url ? (
+                                <a 
+                                    href={vendor.document_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                >
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    View Document
+                                </a>
+                            ) : (
+                                <p className="text-gray-500">No document uploaded</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Vehicle Request Details Modal
+const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) => {
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Vehicle Request Details</h2>
+                        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Vendor Info */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <h3 className="font-semibold text-blue-900 mb-2">Vendor Information</h3>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <p><span className="font-medium">Name:</span> {request.vendor_id?.name || 'N/A'}</p>
+                            <p><span className="font-medium">Email:</span> {request.vendor_id?.email || 'N/A'}</p>
+                            <p><span className="font-medium">Company:</span> {request.vendor_id?.company_name || 'N/A'}</p>
+                            <p><span className="font-medium">Contact:</span> {request.vendor_id?.contact_number || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    {/* Vehicle Details */}
+                    <div className="space-y-4 mb-6">
+                        <h3 className="font-semibold text-gray-900 text-lg">Vehicle Details</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Vehicle Name</label>
+                                <p className="mt-1 text-gray-900">{request.name}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Model Name</label>
+                                <p className="mt-1 text-gray-900">{request.model_name}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Type</label>
+                                <p className="mt-1 text-gray-900 capitalize">{request.type}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Registration Number</label>
+                                <p className="mt-1 text-gray-900">{request.registration_number}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Engine Number</label>
+                                <p className="mt-1 text-gray-900">{request.engine_number}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Chassis Number</label>
+                                <p className="mt-1 text-gray-900">{request.chassis_number}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Engine CC</label>
+                                <p className="mt-1 text-gray-900">{request.cc_engine}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Location</label>
+                                <p className="mt-1 text-gray-900">{request.location}</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Status</label>
+                                <p className="mt-1">
+                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                        request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {request.status}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Documents */}
+                    <div className="space-y-4 mb-6">
+                        <h3 className="font-semibold text-gray-900 text-lg">Documents</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-medium text-gray-500 block mb-2">RC Document</label>
+                                <a 
+                                    href={request.rc_document} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                >
+                                    View RC Document
+                                </a>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-500 block mb-2">Insurance Document</label>
+                                <a 
+                                    href={request.insurance_document} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                >
+                                    View Insurance Document
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Vehicle Images */}
+                    <div className="space-y-4 mb-6">
+                        <h3 className="font-semibold text-gray-900 text-lg">Vehicle Images</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            {request.vehicle_images?.map((image, index) => (
+                                <a 
+                                    key={index} 
+                                    href={image} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="block"
+                                >
+                                    <img 
+                                        src={image} 
+                                        alt={`Vehicle ${index + 1}`} 
+                                        className="w-full h-32 object-cover rounded-lg border border-gray-300 hover:border-blue-500 transition-colors"
+                                    />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex justify-end space-x-3 pt-6 border-t">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            Close
+                        </button>
+                        {request.status === 'pending' && (
+                            <>
+                                <button
+                                    onClick={() => onReject(request._id)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                                >
+                                    Reject
+                                </button>
+                                <button
+                                    onClick={() => onApprove(request._id)}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    Approve
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

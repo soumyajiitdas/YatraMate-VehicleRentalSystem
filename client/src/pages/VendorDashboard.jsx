@@ -13,16 +13,21 @@ const VendorDashboard = () => {
         name: '',
         model_name: '',
         type: 'bike',
-        brand: '',
         registration_number: '',
         engine_number: '',
         chassis_number: '',
         cc_engine: '',
-        price_per_hour: '',
-        price_per_day: '',
-        location: '',
-        description: ''
+        location: ''
     });
+
+    const [files, setFiles] = useState({
+        rc_document: null,
+        insurance_document: null,
+        vehicle_images: []
+    });
+
+    const [packageInfo, setPackageInfo] = useState(null);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         const vendorId = localStorage.getItem('vendorId');
@@ -65,12 +70,59 @@ const VendorDashboard = () => {
         }
     };
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
+
+        // Fetch package info when CC engine is entered
+        if (name === 'cc_engine' && value) {
+            try {
+                const response = await fetch(`${API_ENDPOINTS.packageForVehicle}?cc=${value}&type=${formData.type}`);
+                const data = await response.json();
+                if (data.status === 'success' && data.data.package) {
+                    setPackageInfo(data.data.package);
+                } else {
+                    setPackageInfo(null);
+                }
+            } catch (error) {
+                console.error('Error fetching package:', error);
+                setPackageInfo(null);
+            }
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const { name, files: selectedFiles } = e.target;
+        
+        if (name === 'vehicle_images') {
+            // Validate file count (max 5 images)
+            if (selectedFiles.length > 5) {
+                alert('Maximum 5 images allowed');
+                return;
+            }
+            
+            // Validate file sizes
+            const validFiles = Array.from(selectedFiles).filter(file => {
+                if (file.size > 1024 * 1024) {
+                    alert(`${file.name} is larger than 1MB`);
+                    return false;
+                }
+                return true;
+            });
+            
+            setFiles(prev => ({ ...prev, vehicle_images: validFiles }));
+        } else {
+            // Single file validation
+            const file = selectedFiles[0];
+            if (file && file.size > 1024 * 1024) {
+                alert('File size must be less than 1MB');
+                return;
+            }
+            setFiles(prev => ({ ...prev, [name]: file }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -78,46 +130,99 @@ const VendorDashboard = () => {
 
         const vendorId = localStorage.getItem('vendorId');
 
+        // Validate files
+        if (!files.rc_document || !files.insurance_document || files.vehicle_images.length === 0) {
+            alert('Please upload all required documents and at least one vehicle image');
+            return;
+        }
+
+        if (files.vehicle_images.length < 5) {
+            alert('Please upload exactly 5 images (4 sides + interior)');
+            return;
+        }
+
         try {
-            const response = await fetch(API_ENDPOINTS.vehicles, {
+            setUploading(true);
+
+            // Upload RC document
+            const rcFormData = new FormData();
+            rcFormData.append('file', files.rc_document);
+            const rcResponse = await fetch(API_ENDPOINTS.uploadFile, {
+                method: 'POST',
+                body: rcFormData
+            });
+            const rcData = await rcResponse.json();
+
+            // Upload Insurance document
+            const insuranceFormData = new FormData();
+            insuranceFormData.append('file', files.insurance_document);
+            const insuranceResponse = await fetch(API_ENDPOINTS.uploadFile, {
+                method: 'POST',
+                body: insuranceFormData
+            });
+            const insuranceData = await insuranceResponse.json();
+
+            // Upload vehicle images
+            const imagesFormData = new FormData();
+            files.vehicle_images.forEach(file => {
+                imagesFormData.append('files', file);
+            });
+            const imagesResponse = await fetch(API_ENDPOINTS.uploadFiles, {
+                method: 'POST',
+                body: imagesFormData
+            });
+            const imagesData = await imagesResponse.json();
+
+            // Create vehicle request
+            const response = await fetch(API_ENDPOINTS.vehicleRequests, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ...formData,
                     vendor_id: vendorId,
+                    name: formData.name,
+                    model_name: formData.model_name,
+                    type: formData.type,
+                    registration_number: formData.registration_number,
+                    engine_number: formData.engine_number,
+                    chassis_number: formData.chassis_number,
                     cc_engine: parseInt(formData.cc_engine),
-                    price_per_hour: parseFloat(formData.price_per_hour),
-                    price_per_day: parseFloat(formData.price_per_day)
+                    location: formData.location,
+                    rc_document: rcData.data.url,
+                    insurance_document: insuranceData.data.url,
+                    vehicle_images: imagesData.data.files.map(f => f.url)
                 })
             });
 
             const data = await response.json();
 
             if (data.status === 'success') {
-                alert('Vehicle added successfully!');
+                alert('Vehicle request submitted successfully! It will be reviewed by admin.');
                 setShowAddForm(false);
                 setFormData({
                     name: '',
                     model_name: '',
                     type: 'bike',
-                    brand: '',
                     registration_number: '',
                     engine_number: '',
                     chassis_number: '',
                     cc_engine: '',
-                    price_per_hour: '',
-                    price_per_day: '',
-                    location: '',
-                    description: ''
+                    location: ''
                 });
-                fetchVehicles(vendorId);
+                setFiles({
+                    rc_document: null,
+                    insurance_document: null,
+                    vehicle_images: []
+                });
+                setPackageInfo(null);
             } else {
-                alert('Error adding vehicle: ' + (data.message || 'Unknown error'));
+                alert('Error submitting vehicle request: ' + (data.message || 'Unknown error'));
             }
         } catch (error) {
-            alert('Error adding vehicle: ' + error.message);
+            alert('Error submitting vehicle request: ' + error.message);
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -170,7 +275,26 @@ const VendorDashboard = () => {
                     <div className='text-center'>
                         <h1 className="text-3xl font-bold text-gray-900">Vendor Dashboard</h1>
                         {vendorInfo && (
-                            <p className="mt-2 text-gray-600">Welcome, {vendorInfo.name}</p>
+                            <div className="mt-2">
+                                <p className="text-gray-600">Welcome, {vendorInfo.name}</p>
+                                <div className="mt-2">
+                                    {vendorInfo.is_verified ? (
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                            Verified Vendor
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
+                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                            </svg>
+                                            Pending Verification
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
                         )}
                     </div>
                     <button
@@ -201,10 +325,10 @@ const VendorDashboard = () => {
                 {/* Add Vehicle Form */}
                 {showAddForm && (
                     <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 animate-fade-in">
-                        <h3 className="text-xl font-bold text-neutral-900 mb-4">Add New Vehicle</h3>
+                        <h3 className="text-xl font-bold text-neutral-900 mb-4">Add New Vehicle Request</h3>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Vehicle Name</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Vehicle Name *</label>
                                 <input
                                     type="text"
                                     name="name"
@@ -216,7 +340,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Model Name</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Model Name *</label>
                                 <input
                                     type="text"
                                     name="model_name"
@@ -228,7 +352,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Type</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Type *</label>
                                 <select
                                     name="type"
                                     value={formData.type}
@@ -242,19 +366,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Brand</label>
-                                <input
-                                    type="text"
-                                    name="brand"
-                                    value={formData.brand}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Registration Number</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Registration Number *</label>
                                 <input
                                     type="text"
                                     name="registration_number"
@@ -266,7 +378,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine Number</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine Number *</label>
                                 <input
                                     type="text"
                                     name="engine_number"
@@ -278,7 +390,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Chassis Number</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Chassis Number (VIN) *</label>
                                 <input
                                     type="text"
                                     name="chassis_number"
@@ -290,7 +402,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">CC Engine</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine CC *</label>
                                 <input
                                     type="number"
                                     name="cc_engine"
@@ -302,33 +414,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Price Per Hour (₹)</label>
-                                <input
-                                    type="number"
-                                    name="price_per_hour"
-                                    value={formData.price_per_hour}
-                                    onChange={handleChange}
-                                    required
-                                    step="0.01"
-                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Price Per Day (₹)</label>
-                                <input
-                                    type="number"
-                                    name="price_per_day"
-                                    value={formData.price_per_day}
-                                    onChange={handleChange}
-                                    required
-                                    step="0.01"
-                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Location</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Location *</label>
                                 <input
                                     type="text"
                                     name="location"
@@ -339,23 +425,73 @@ const VendorDashboard = () => {
                                 />
                             </div>
 
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Description</label>
-                                <textarea
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    rows="3"
+                            {/* Package Info Display */}
+                            {packageInfo && (
+                                <div className="md:col-span-2 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <h4 className="font-semibold text-blue-900 mb-2">Package Details</h4>
+                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                        <p><span className="font-medium">Package:</span> {packageInfo.name}</p>
+                                        <p><span className="font-medium">Type:</span> {packageInfo.vehicle_type}</p>
+                                        <p><span className="font-medium">Price/Hour:</span> ₹{packageInfo.price_per_hour}</p>
+                                        <p><span className="font-medium">Price/KM:</span> ₹{packageInfo.price_per_km}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* File Uploads */}
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                                    RC Document * <span className="text-xs text-gray-500">(Max 1MB)</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    name="rc_document"
+                                    accept="image/*,application/pdf"
+                                    onChange={handleFileChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                                    Insurance Document * <span className="text-xs text-gray-500">(Max 1MB)</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    name="insurance_document"
+                                    accept="image/*,application/pdf"
+                                    onChange={handleFileChange}
+                                    required
                                     className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                                    Vehicle Images * <span className="text-xs text-gray-500">(5 images: 4 sides + interior, each max 1MB)</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    name="vehicle_images"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleFileChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                />
+                                {files.vehicle_images.length > 0 && (
+                                    <p className="text-xs text-gray-600 mt-1">{files.vehicle_images.length} file(s) selected</p>
+                                )}
+                            </div>
+
+                            <div className="md:col-span-2">
                                 <button
                                     type="submit"
-                                    className="w-full py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
+                                    disabled={uploading}
+                                    className="w-full py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Add Vehicle
+                                    {uploading ? 'Submitting Request...' : 'Submit Vehicle Request'}
                                 </button>
                             </div>
                         </form>

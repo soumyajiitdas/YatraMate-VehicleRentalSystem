@@ -13,4 +13,11 @@ router.post(
     uploadController.uploadFile
 );
 
+// Upload multiple files to ImageKit
+router.post(
+    '/files',
+    uploadController.multerUpload.array('files', 10),
+    uploadController.uploadMultipleFiles
+);
+
 module.exports = router;

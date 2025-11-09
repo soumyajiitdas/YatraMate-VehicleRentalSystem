@@ -47,5 +47,33 @@ exports.uploadFile = catchAsync(async (req, res, next) => {
     });
 });
 
+// Upload multiple files to ImageKit
+exports.uploadMultipleFiles = catchAsync(async (req, res, next) => {
+    if (!req.files || req.files.length === 0) {
+        return next(new AppError('Please upload at least one file', 400));
+    }
+
+    const uploadPromises = req.files.map(file => 
+        imagekit.upload({
+            file: file.buffer,
+            fileName: file.originalname,
+            folder: '/vehicle-documents'
+        })
+    );
+
+    const results = await Promise.all(uploadPromises);
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            files: results.map(result => ({
+                url: result.url,
+                fileId: result.fileId,
+                name: result.name
+            }))
+        }
+    });
+});
+
 // Export multer upload middleware
 exports.multerUpload = upload;

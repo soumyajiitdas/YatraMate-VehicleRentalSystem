@@ -37,6 +37,15 @@ export const API_ENDPOINTS = {
     // Upload endpoints
     uploadAuth: `${API_BASE_URL}/upload/auth`,
     uploadFile: `${API_BASE_URL}/upload/file`,
+    uploadFiles: `${API_BASE_URL}/upload/files`,
+
+    // Vehicle Request endpoints
+    vehicleRequests: `${API_BASE_URL}/vehicle-requests`,
+    vehicleRequestById: (id) => `${API_BASE_URL}/vehicle-requests/${id}`,
+    approveVehicleRequest: (id) => `${API_BASE_URL}/vehicle-requests/${id}/approve`,
+    rejectVehicleRequest: (id) => `${API_BASE_URL}/vehicle-requests/${id}/reject`,
+    vehicleRequestsByVendor: (vendorId) => `${API_BASE_URL}/vehicle-requests/vendor/${vendorId}`,
+    verifyVendor: (id) => `${API_BASE_URL}/vendors/${id}/verify`,
 };
 
 export default API_BASE_URL;
