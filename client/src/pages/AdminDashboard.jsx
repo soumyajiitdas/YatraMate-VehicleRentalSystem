@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const { user, isAuthenticated } = useAuth();
     const [activeTab, setActiveTab] = useState('customers');
     const [users, setUsers] = useState([]);
     const [vendors, setVendors] = useState([]);
@@ -21,14 +23,13 @@ const AdminDashboard = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
 
     useEffect(() => {
-        // Check if user is admin
-        const userRole = localStorage.getItem('userRole');
-        if (userRole !== 'admin') {
+        // Check if user is authenticated and is admin
+        if (!isAuthenticated || !user || user.role !== 'admin') {
             navigate('/');
             return;
         }
         fetchData();
-    }, [activeTab, navigate]);
+    }, [activeTab, navigate, isAuthenticated, user]);
 
     const fetchData = async () => {
         try {
