@@ -1,10 +1,17 @@
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const API_ENDPOINTS = {
+    // Auth endpoints
+    login: `${API_BASE_URL}/auth/login`,
+    register: `${API_BASE_URL}/auth/register`,
+    registerVendor: `${API_BASE_URL}/auth/register-vendor`,
+    logout: `${API_BASE_URL}/auth/logout`,
+    currentUser: `${API_BASE_URL}/auth/me`,
+    updatePassword: `${API_BASE_URL}/auth/update-password`,
+    updateProfile: `${API_BASE_URL}/auth/update-profile`,
+
     // User endpoints
     users: `${API_BASE_URL}/users`,
-    login: `${API_BASE_URL}/users/login`,
-    register: `${API_BASE_URL}/users/register`,
 
     // Vehicle endpoints
     vehicles: `${API_BASE_URL}/vehicles`,

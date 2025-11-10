@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -30,12 +31,41 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.createUser = catchAsync(async (req, res, next) => {
-    const newUser = await User.create(req.body);
+    // This route is for admin to create office staff
+    const { name, email, password, phone, address, role } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return next(new AppError('User with this email already exists', 400));
+    }
+
+    // Hash password if provided
+    let password_hash;
+    if (password) {
+        password_hash = await bcrypt.hash(password, 12);
+    } else {
+        return next(new AppError('Password is required', 400));
+    }
+
+    // Create user with specified role (admin can create office_staff)
+    const newUser = await User.create({
+        name,
+        email,
+        password_hash,
+        phone,
+        address,
+        role: role || 'user'
+    });
+
+    // Remove password from response
+    const userResponse = newUser.toObject();
+    delete userResponse.password_hash;
 
     res.status(201).json({
         status: 'success',
         data: {
-            user: newUser
+            user: userResponse
         }
     });
 });

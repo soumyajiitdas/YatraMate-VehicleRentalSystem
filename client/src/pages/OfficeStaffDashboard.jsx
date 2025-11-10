@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import PickupModal from '../components/PickupModal';
 import ReturnModal from '../components/ReturnModal';
 
 const OfficeStaffDashboard = () => {
     const navigate = useNavigate();
+    const { user, isAuthenticated, logout } = useAuth();
     const [activeTab, setActiveTab] = useState('pending');
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,14 +16,13 @@ const OfficeStaffDashboard = () => {
     const [showReturnModal, setShowReturnModal] = useState(false);
 
     useEffect(() => {
-        // Check if user is office staff
-        const userRole = localStorage.getItem('userRole');
-        if (userRole !== 'office_staff') {
+        // Check if user is authenticated and is office staff
+        if (!isAuthenticated || !user || user.role !== 'office_staff') {
             navigate('/');
             return;
         }
         fetchBookings();
-    }, [activeTab, navigate]);
+    }, [activeTab, navigate, isAuthenticated, user]);
 
     const fetchBookings = async () => {
         try {
@@ -71,9 +72,8 @@ const OfficeStaffDashboard = () => {
         fetchBookings();
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userRole');
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
+    const { user, isAuthenticated, logout } = useAuth();
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -31,17 +33,15 @@ const VendorDashboard = () => {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        const vendorId = localStorage.getItem('vendorId');
-        const user = localStorage.getItem('user');
-
-        if (!vendorId || !user) {
+        // Check if user is authenticated and is vendor
+        if (!isAuthenticated || !user || user.role !== 'vendor') {
             navigate('/login');
             return;
         }
 
-        fetchVendorInfo(vendorId);
-        fetchVehicles(vendorId);
-    }, [navigate]);
+        fetchVendorInfo(user.id);
+        fetchVehicles(user.id);
+    }, [navigate, isAuthenticated, user]);
 
     const fetchVendorInfo = async (vendorId) => {
         try {
@@ -253,10 +253,8 @@ const VendorDashboard = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('vendorId');
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 

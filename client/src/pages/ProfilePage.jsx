@@ -1,16 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { user, logout, updateProfile, updatePassword, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+91 9876543210',
-    address: 'Mumbai, Maharashtra',
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  useEffect(() => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // Initialize form data with user data
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      address: user.address || '',
+    });
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -19,11 +42,80 @@ const ProfilePage = () => {
     }));
   };
 
-  const handleSave = () => {
-    // TODO: API call to update profile
-    setIsEditing(false);
-    alert('Profile updated successfully!');
+  const handlePasswordChange = (e) => {
+    setPasswordData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
+
+  const handleSave = async () => {
+    try {
+      const result = await updateProfile({
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address
+      });
+
+      if (result.success) {
+        setIsEditing(false);
+        alert('Profile updated successfully!');
+        await refreshUser();
+      } else {
+        alert(result.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      alert('Error updating profile: ' + error.message);
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword) {
+      alert('Please fill in all password fields');
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert('New passwords do not match');
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      alert('Password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      const result = await updatePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+
+      if (result.success) {
+        alert('Password updated successfully!');
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+      } else {
+        alert(result.message || 'Failed to update password');
+      }
+    } catch (error) {
+      alert('Error updating password: ' + error.message);
+    }
+  };
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      logout();
+      navigate('/login');
+    }
+  };
+
+  if (!user) {
+    return null;
+  }
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: (
@@ -75,11 +167,7 @@ const ProfilePage = () => {
                 </button>
               ))}
               <button
-                onClick={() => {
-                  if (confirm('Are you sure you want to logout?')) {
-                    navigate('/login');
-                  }
-                }}
+                onClick={handleLogout}
                 className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-secondary-600 hover:bg-secondary-50 transition-all duration-200"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,6 +305,9 @@ const ProfilePage = () => {
                     </label>
                     <input
                       type="password"
+                      name="currentPassword"
+                      value={passwordData.currentPassword}
+                      onChange={handlePasswordChange}
                       placeholder="Enter current password"
                       className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
                     />
@@ -228,6 +319,9 @@ const ProfilePage = () => {
                     </label>
                     <input
                       type="password"
+                      name="newPassword"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
                       placeholder="Enter new password"
                       className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
                     />
@@ -239,12 +333,16 @@ const ProfilePage = () => {
                     </label>
                     <input
                       type="password"
+                      name="confirmPassword"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
                       placeholder="Confirm new password"
                       className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
                     />
                   </div>
 
                   <button
+                    onClick={handlePasswordUpdate}
                     className="px-6 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200"
                   >
                     Update Password

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../config/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -63,12 +64,27 @@ const RegisterPage = () => {
     e.preventDefault();
     if (validateForm()) {
       setLoading(true);
-      // TODO: Replace with actual API call
-      setTimeout(() => {
+      
+      try {
+        const result = await register({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password
+        });
+
         setLoading(false);
-        alert('Registration successful!');
-        navigate('/login');
-      }, 1000);
+
+        if (result.success) {
+          alert('Registration successful!');
+          navigate('/');
+        } else {
+          alert(result.message || 'Registration failed. Please try again.');
+        }
+      } catch (error) {
+        setLoading(false);
+        alert('Error during registration: ' + error.message);
+      }
     }
   };
 
