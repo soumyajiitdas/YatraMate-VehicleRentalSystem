@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -253,10 +253,8 @@ const VendorDashboard = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('vendorId');
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 

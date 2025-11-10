@@ -237,6 +237,19 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     });
 });
 
+// Logout user
+exports.logout = catchAsync(async (req, res, next) => {
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Logged out successfully'
+    });
+});
+
 // Register vendor
 exports.registerVendor = catchAsync(async (req, res, next) => {
     const { name, email, password, is_organization, company_name, contact_number, id_type, document_url, address } = req.body;

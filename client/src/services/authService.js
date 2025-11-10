@@ -74,8 +74,26 @@ class AuthService {
     }
 
     // Logout user
-    logout() {
-        // No need to do anything on the client side, the cookie will be cleared by the server
+    async logout() {
+        try {
+            const response = await fetch(API_ENDPOINTS.logout, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true };
+            } else {
+                return { success: false, message: data.message || 'Logout failed' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
     }
 
     // Get current user from API

@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const [activeTab, setActiveTab] = useState('customers');
     const [users, setUsers] = useState([]);
     const [vendors, setVendors] = useState([]);
@@ -36,25 +36,33 @@ const AdminDashboard = () => {
             setLoading(true);
 
             if (activeTab === 'customers' || activeTab === 'office-staff') {
-                const response = await fetch(API_ENDPOINTS.users);
+                const response = await fetch(API_ENDPOINTS.users, {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 if (data.status === 'success') {
                     setUsers(data.data.users);
                 }
             } else if (activeTab === 'vendors') {
-                const response = await fetch(API_ENDPOINTS.vendors);
+                const response = await fetch(API_ENDPOINTS.vendors, {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 if (data.status === 'success') {
                     setVendors(data.data.vendors);
                 }
             } else if (activeTab === 'packages') {
-                const response = await fetch(API_ENDPOINTS.packages);
+                const response = await fetch(API_ENDPOINTS.packages, {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 if (data.status === 'success') {
                     setPackages(data.data.packages);
                 }
             } else if (activeTab === 'vehicle-requests') {
-                const response = await fetch(API_ENDPOINTS.vehicleRequests);
+                const response = await fetch(API_ENDPOINTS.vehicleRequests, {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 if (data.status === 'success') {
                     setVehicleRequests(data.data.requests);
@@ -123,6 +131,7 @@ const AdminDashboard = () => {
 
             const response = await fetch(endpoint, {
                 method: 'DELETE',
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -139,7 +148,8 @@ const AdminDashboard = () => {
     const handleVerifyVendor = async (vendorId) => {
         try {
             const response = await fetch(API_ENDPOINTS.verifyVendor(vendorId), {
-                method: 'PATCH'
+                method: 'PATCH',
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -169,6 +179,7 @@ const AdminDashboard = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({})
             });
 
@@ -193,6 +204,7 @@ const AdminDashboard = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ rejection_reason: reason })
             });
 
@@ -207,9 +219,8 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userRole');
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 
@@ -747,12 +758,16 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                 body = {
                     name: formData.name,
                     email: formData.email,
-                    password_hash: formData.password_hash,
                     phone: formData.phone,
                     address: formData.address,
                     role: formData.role,
                     is_active: formData.is_active
                 };
+                
+                // Only include password if it's provided (for create or update)
+                if (formData.password_hash) {
+                    body.password = formData.password_hash;
+                }
             }
 
             const response = await fetch(endpoint, {
@@ -760,6 +775,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(body),
             });
 
@@ -786,6 +802,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                             headers: {
                                 'Content-Type': 'application/json',
                             },
+                            credentials: 'include',
                             body: JSON.stringify(vendorBody),
                         });
                     } else {
@@ -795,6 +812,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                             headers: {
                                 'Content-Type': 'application/json',
                             },
+                            credentials: 'include',
                             body: JSON.stringify(vendorBody),
                         });
                     }

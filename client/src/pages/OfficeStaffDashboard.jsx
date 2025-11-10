@@ -7,7 +7,7 @@ import ReturnModal from '../components/ReturnModal';
 
 const OfficeStaffDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const [activeTab, setActiveTab] = useState('pending');
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,9 +72,8 @@ const OfficeStaffDashboard = () => {
         fetchBookings();
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('userRole');
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 
