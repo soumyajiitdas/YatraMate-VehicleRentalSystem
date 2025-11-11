@@ -16,7 +16,7 @@ exports.createPackage = catchAsync(async (req, res, next) => {
 
 // Get all packages
 exports.getAllPackages = catchAsync(async (req, res, next) => {
-    const packages = await Package.find({ is_active: true }).sort({ cc_range_min: 1 });
+    const packages = await Package.find().sort({ cc_range_min: 1 });
     
     res.status(200).json({
         status: 'success',

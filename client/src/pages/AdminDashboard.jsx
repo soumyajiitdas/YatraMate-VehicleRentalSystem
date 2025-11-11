@@ -649,7 +649,7 @@ const PackagesTable = ({ packages, onEdit, onDelete }) => {
                                 <div className="text-sm text-gray-600">₹{pkg.price_per_km}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                                     }`}>
                                     {pkg.is_active ? 'Active' : 'Inactive'}
                                 </span>
