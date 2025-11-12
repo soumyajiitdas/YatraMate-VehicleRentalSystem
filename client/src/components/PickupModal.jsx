@@ -55,6 +55,7 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
             const response = await fetch(API_ENDPOINTS.confirmPickup(booking._id), {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
 

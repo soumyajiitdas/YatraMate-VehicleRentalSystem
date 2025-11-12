@@ -35,14 +35,28 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const calculateCostPreview = (odometerEnd) => {
         const distanceTraveled = odometerEnd - booking.pickup_details.odometer_reading_start;
 
-        // Calculate duration
-        const pickupDateTime = new Date(`${booking.pickup_details.actual_pickup_date} ${booking.pickup_details.actual_pickup_time}`);
-        const returnDateTime = new Date(`${formData.actual_return_date} ${formData.actual_return_time}`);
+        // Calculate duration - handle time format conversion
+        const pickupDate = booking.pickup_details.actual_pickup_date;
+        const pickupTime = booking.pickup_details.actual_pickup_time;
+        
+        // Create proper date strings for parsing
+        let pickupDateTime;
+        if (pickupTime.includes('AM') || pickupTime.includes('PM')) {
+            // Handle 12-hour format
+            pickupDateTime = new Date(`${pickupDate} ${pickupTime}`);
+        } else {
+            // Handle 24-hour format
+            pickupDateTime = new Date(`${pickupDate}T${pickupTime}`);
+        }
+        
+        const returnDateTime = new Date(`${formData.actual_return_date}T${formData.actual_return_time}`);
         const durationHours = Math.ceil((returnDateTime - pickupDateTime) / (1000 * 60 * 60));
 
-        // Calculate costs
-        const costPerDistance = distanceTraveled * booking.package_id.price_per_km;
-        const costPerTime = durationHours * booking.package_id.price_per_hour;
+        // Calculate costs - ensure all values are numbers
+        const pricePerKm = parseFloat(booking.package_id.price_per_km) || 0;
+        const pricePerHour = parseFloat(booking.package_id.price_per_hour) || 0;
+        const costPerDistance = distanceTraveled * pricePerKm;
+        const costPerTime = durationHours * pricePerHour;
         const maxCost = Math.max(costPerDistance, costPerTime);
         const totalCost = maxCost + parseFloat(formData.damage_cost || 0);
 
@@ -102,6 +116,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(payload)
             });
 

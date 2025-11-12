@@ -1,31 +1,47 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 
 const BookingsPage = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     fetchBookings();
-  }, []);
+  }, [isAuthenticated, navigate]);
 
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      // Get user from localStorage
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      // Get user ID from AuthContext
+      const userId = user?._id || user?.id;
       
-      if (!user._id) {
+      if (!userId) {
+        console.log('No user ID found');
         setLoading(false);
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.userBookings(user._id), {
+      const response = await fetch(API_ENDPOINTS.userBookings(userId), {
         credentials: 'include'
       });
+      
+      if (!response.ok) {
+        console.error('Failed to fetch bookings:', response.status, response.statusText);
+        setLoading(false);
+        return;
+      }
+      
       const data = await response.json();
+      console.log('Bookings data:', data);
 
       if (data.status === 'success') {
         // Transform backend data to match frontend structure
