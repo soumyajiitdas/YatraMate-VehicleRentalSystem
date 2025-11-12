@@ -32,15 +32,6 @@ const VehicleDetailsPage = () => {
 
   const handleBooking = async (bookingData) => {
     try {
-      // Get user from localStorage
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      
-      if (!user._id) {
-        alert('Please login to make a booking');
-        navigate('/login');
-        return;
-      }
-
       // Parse datetime fields to separate date and time
       const pickupDate = new Date(bookingData.pickup_datetime);
       const pickupTime = pickupDate.toLocaleTimeString('en-US', { 
@@ -50,7 +41,6 @@ const VehicleDetailsPage = () => {
       });
 
       const payload = {
-        user_id: user._id,
         vehicle_id: bookingData.vehicle_id,
         start_location: bookingData.pickup_location,
         end_location: bookingData.dropoff_location,
@@ -63,16 +53,17 @@ const VehicleDetailsPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(payload)
       });
 
       const data = await response.json();
 
-      if (data.status === 'success') {
+      if (response.ok && data.status === 'success') {
         alert('Booking request submitted successfully! You will be redirected to your bookings page.');
         navigate('/bookings');
       } else {
-        alert(data.message || 'Failed to submit booking request');
+        alert(data.message || 'Failed to submit booking request. Please make sure you are logged in.');
       }
     } catch (error) {
       console.error('Error submitting booking:', error);

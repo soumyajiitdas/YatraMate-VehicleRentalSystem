@@ -26,9 +26,9 @@ exports.createBookingRequest = catchAsync(async (req, res, next) => {
         return next(new AppError('No package found for this vehicle', 404));
     }
     
-    // Create booking request
+    // Create booking request - extract user_id from authenticated user
     const newBooking = await Booking.create({
-        user_id: req.body.user_id,
+        user_id: req.user.id,
         vehicle_id,
         vendor_id: vehicle.vendor_id,
         package_id: packageData._id,

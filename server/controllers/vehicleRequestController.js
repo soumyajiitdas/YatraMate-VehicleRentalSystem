@@ -6,7 +6,13 @@ const AppError = require('../utils/appError');
 
 // Create a new vehicle request
 exports.createVehicleRequest = catchAsync(async (req, res, next) => {
-    const newRequest = await VehicleRequest.create(req.body);
+    // Extract vendor_id from authenticated user
+    const vehicleRequestData = {
+        ...req.body,
+        vendor_id: req.user.id
+    };
+
+    const newRequest = await VehicleRequest.create(vehicleRequestData);
 
     res.status(201).json({
         status: 'success',

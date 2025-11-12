@@ -7,6 +7,7 @@ const VendorDashboard = () => {
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuth();
     const [vehicles, setVehicles] = useState([]);
+    const [vendorInfo, setVendorInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
 
@@ -128,7 +129,7 @@ const VendorDashboard = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const vendorId = localStorage.getItem('vendorId');
+        const vendorId = user?.id;
 
         // Validate files
         if (!files.rc_document || !files.insurance_document || files.vehicle_images.length === 0) {
@@ -179,8 +180,8 @@ const VendorDashboard = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
-                    vendor_id: vendorId,
                     name: formData.name,
                     model_name: formData.model_name,
                     type: formData.type,
@@ -242,8 +243,7 @@ const VendorDashboard = () => {
 
             if (response.ok) {
                 alert('Vehicle deleted successfully!');
-                const vendorId = localStorage.getItem('vendorId');
-                fetchVehicles(vendorId);
+                fetchVehicles(user.id);
             } else {
                 alert('Error deleting vehicle');
             }

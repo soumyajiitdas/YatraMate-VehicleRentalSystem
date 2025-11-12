@@ -1,25 +1,26 @@
 const express = require('express');
 const bookingController = require('../controllers/bookingController');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Customer routes
-router.post('/request', bookingController.createBookingRequest);
-router.get('/user/:userId', bookingController.getUserBookings);
+router.post('/request', protect, restrictTo('user'), bookingController.createBookingRequest);
+router.get('/user/:userId', protect, bookingController.getUserBookings);
 
 // Office staff routes
-router.get('/office-staff/requests', bookingController.getOfficeStaffRequests);
-router.patch('/:bookingId/pickup', bookingController.confirmPickup);
-router.patch('/:bookingId/return', bookingController.confirmReturn);
+router.get('/office-staff/requests', protect, restrictTo('office_staff'), bookingController.getOfficeStaffRequests);
+router.patch('/:bookingId/pickup', protect, restrictTo('office_staff'), bookingController.confirmPickup);
+router.patch('/:bookingId/return', protect, restrictTo('office_staff'), bookingController.confirmReturn);
 
 // General routes
 router
     .route('/')
-    .get(bookingController.getAllBookings);
+    .get(protect, restrictTo('admin'), bookingController.getAllBookings);
 
 router
     .route('/:id')
-    .get(bookingController.getBooking)
-    .delete(bookingController.cancelBooking);
+    .get(protect, bookingController.getBooking)
+    .delete(protect, bookingController.cancelBooking);
 
 module.exports = router;
