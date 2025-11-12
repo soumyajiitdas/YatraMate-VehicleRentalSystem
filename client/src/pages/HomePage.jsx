@@ -81,30 +81,30 @@ const HomePage = () => {
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-400 rounded-full blur-3xl animate-bounce-slow" style={{ animationDelay: '1s' }} />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
-            <div className="space-y-8 animate-slide-in">
-              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
+            <div className="space-y-6 sm:space-y-8 animate-slide-in">
+              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-xs sm:text-sm font-semibold">
                 🚗 Your Journey Starts Here
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
                 Rent Cars & Bikes
                 <span className="block mt-2 bg-linear-to-r from-accent-300 to-accent-100 bg-clip-text text-transparent">
                   Anytime, Anywhere
                 </span>
               </h1>
-              <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed">
                 Experience the freedom of the road with YatraMate. Choose from our wide range of cars and bikes at affordable prices.
               </p>
 
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-2 sm:pt-4">
                 {stats.map((stat, index) => (
                   <div key={index} className="text-center">
-                    <div className="text-2xl sm:text-3xl font-bold">{stat.value}</div>
-                    <div className="text-sm text-white/80 mt-1">{stat.label}</div>
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-white/80 mt-1">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -115,19 +115,19 @@ const HomePage = () => {
               <div className="relative">
                 <img
                   src="https://images.unsplash.com/photo-1594486004716-7c9377490b1f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBjYXIlMjByZW50YWx8ZW58MHx8fHwxNzYyNDkyNDI0fDA&ixlib=rb-4.1.0&q=85"
-                  alt="Vehicle"
-                  className="rounded-2xl shadow-2xl"
+                  alt="Vehicle Image"
+                  className="rounded-2xl shadow-2xl w-full"
                 />
-                <div className="absolute -bottom-6 -left-6 bg-white text-neutral-900 rounded-xl shadow-xl p-4 animate-bounce-slow">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-linear-to-br from-primary-500 to-secondary-500 rounded-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute -bottom-4 sm:-bottom-6 -left-4 sm:-left-6 bg-white text-neutral-900 rounded-xl shadow-xl p-3 sm:p-4 animate-bounce-slow">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <div className="p-1.5 sm:p-2 bg-linear-to-br from-primary-500 to-secondary-500 rounded-lg">
+                      <svg className="w-4 h-4 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm text-neutral-600">Verified & Insured</div>
-                      <div className="font-bold">All Vehicles</div>
+                      <div className="text-xs sm:text-sm text-neutral-600">Verified & Insured</div>
+                      <div className="text-sm sm:text-base font-bold">All Vehicles</div>
                     </div>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ const HomePage = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+            <h2 className="text-2xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
               Why Choose YatraMate?
             </h2>
             <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
@@ -149,7 +149,7 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -171,7 +171,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-2">
+              <h2 className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 mb-2">
                 Featured Vehicles
               </h2>
               <p className="text-lg text-neutral-600">
@@ -217,7 +217,7 @@ const HomePage = () => {
         </div>
         
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-6">
+          <h2 className="text-2xl sm:text-4xl font-display font-bold mb-6">
             Ready to Hit the Road?
           </h2>
           <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto">

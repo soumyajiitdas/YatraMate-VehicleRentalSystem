@@ -153,12 +153,12 @@ const VehicleDetailsPage = () => {
 
               {/* Thumbnail Gallery */}
               {vehicle.images.length > 1 && (
-                <div className="p-4 flex space-x-3">
+                <div className="p-4 flex space-x-2 sm:space-x-3 overflow-x-auto">
                   {vehicle.images.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                         selectedImage === index
                           ? 'border-primary-500 ring-2 ring-primary-200'
                           : 'border-neutral-200 hover:border-primary-300'
@@ -206,19 +206,19 @@ const VehicleDetailsPage = () => {
               </div>
 
               {/* Pricing */}
-              <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-xl p-6 mb-6 border-2 border-primary-200">
-                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Rental Pricing</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-xl p-4 sm:p-6 mb-6 border-2 border-primary-200">
+                <h3 className="text-base sm:text-lg font-semibold text-neutral-900 mb-3 sm:mb-4">Rental Pricing</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <div className="text-sm text-neutral-600 mb-1">Per Day</div>
-                    <div className="text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                    <div className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                       ₹{vehicle.price_per_day}
                     </div>
                   </div>
                   {vehicle.price_per_km && (
                     <div>
                       <div className="text-sm text-neutral-600 mb-1">Per Kilometer</div>
-                      <div className="text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                      <div className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                         ₹{vehicle.price_per_km}
                       </div>
                     </div>
@@ -234,13 +234,13 @@ const VehicleDetailsPage = () => {
 
               {/* Features */}
               <div>
-                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Features & Amenities</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <h3 className="text-base sm:text-lg font-semibold text-neutral-900 mb-4">Features & Amenities</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-3 p-3 bg-neutral-50 rounded-xl">
-                      <span className="text-2xl">{feature.icon}</span>
+                      <span className="text-xl sm:text-2xl">{feature.icon}</span>
                       <div>
-                        <div className="text-sm font-semibold text-neutral-900">{feature.label}</div>
+                        <div className="text-xs sm:text-sm font-semibold text-neutral-900">{feature.label}</div>
                         <div className="text-xs text-neutral-600">{feature.value}</div>
                       </div>
                     </div>

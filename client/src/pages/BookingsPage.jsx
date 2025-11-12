@@ -115,20 +115,22 @@ const BookingsPage = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-2xl shadow-card p-2 mb-8 inline-flex space-x-2">
-          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-6 py-2.5 rounded-xl font-medium capitalize transition-all duration-200 ${
-                filter === status
-                  ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                  : 'text-neutral-700 hover:bg-neutral-100'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
+        <div className="bg-white rounded-2xl shadow-card p-2 mb-8 overflow-x-auto">
+          <div className="flex space-x-2 min-w-max sm:min-w-0">
+            {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl font-medium text-sm sm:text-base capitalize transition-all duration-200 whitespace-nowrap ${
+                  filter === status
+                    ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
+                    : 'text-neutral-700 hover:bg-neutral-100'
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Bookings List */}
@@ -153,9 +155,9 @@ const BookingsPage = () => {
 
                     {/* Booking Details */}
                     <div className="flex-1 space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-2xl font-bold text-neutral-900 mb-1">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-2 truncate">
                             {booking.vehicle.name}
                           </h3>
                           <div className="flex items-center gap-2 flex-wrap">
@@ -169,9 +171,9 @@ const BookingsPage = () => {
                             )}
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left sm:text-right shrink-0">
                           <div className="text-sm text-neutral-600 mb-1">Total Cost</div>
-                          <div className="text-2xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                          <div className="text-xl sm:text-2xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                             ₹{booking.total_cost || 'TBD'}
                           </div>
                         </div>

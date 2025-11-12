@@ -101,40 +101,58 @@ const OfficeStaffDashboard = () => {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-12 flex justify-between items-center">
-                    {/* Logo */}
-                    <div className="flex items-center space-x-2 group">
-                        <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                <div className="mb-8 md:mb-12">
+                    {/* Mobile and Desktop Layout */}
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+                        {/* Logo - Left on desktop, top on mobile */}
+                        <div className="flex items-center justify-between md:justify-start">
+                            <div className="flex items-center space-x-2 group">
+                                <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
+                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <span className="text-xl md:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                                    YatraMate
+                                </span>
+                            </div>
+                            {/* Logout button - visible on mobile only */}
+                            <button
+                                onClick={handleLogout}
+                                className="md:hidden px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium flex items-center"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </button>
                         </div>
-                        <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                            YatraMate
-                        </span>
+
+                        {/* Title - Center */}
+                        <div className='text-center md:flex-1'>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Office Staff Dashboard</h1>
+                            <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Manage vehicle pickups and returns</p>
+                        </div>
+
+                        {/* Logout button - visible on desktop only */}
+                        <button
+                            onClick={handleLogout}
+                            className="hidden md:flex px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium items-center"
+                        >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                        </button>
                     </div>
-                    <div className='text-center'>
-                        <h1 className="text-3xl font-bold text-gray-900">Office Staff Dashboard</h1>
-                        <p className="mt-2 text-gray-600">Manage vehicle pickups and returns</p>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium flex items-center"
-                    >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
-                    </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="bg-white rounded-lg shadow-sm mb-6">
+                <div className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
                     <div className="border-b border-gray-200">
-                        <nav className="flex -mb-px">
+                        <nav className="flex -mb-px overflow-x-auto">
                             <button
                                 onClick={() => setActiveTab('pending')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'pending'
+                                className={`shrink-0 px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'pending'
                                     ? 'border-primary-500 text-primary-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -148,7 +166,7 @@ const OfficeStaffDashboard = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('active')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'active'
+                                className={`shrink-0 px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'active'
                                     ? 'border-primary-500 text-primary-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -157,7 +175,7 @@ const OfficeStaffDashboard = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('completed')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'completed'
+                                className={`shrink-0 px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'completed'
                                     ? 'border-primary-500 text-primary-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -189,11 +207,11 @@ const OfficeStaffDashboard = () => {
                     <div className="space-y-4">
                         {bookings.map((booking) => (
                             <div key={booking._id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between">
+                                <div className="p-4 md:p-6">
+                                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
                                         <div className="flex-1">
-                                            <div className="flex items-center space-x-3 mb-3">
-                                                <h3 className="text-lg font-semibold text-gray-900">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-3">
+                                                <h3 className="text-base md:text-lg font-semibold text-gray-900">
                                                     {booking.vehicle_id.name} - {booking.vehicle_id.model_name}
                                                 </h3>
                                                 {getStatusBadge(booking.status)}
@@ -203,7 +221,7 @@ const OfficeStaffDashboard = () => {
                                                 <div>
                                                     <p className="text-gray-500">Customer</p>
                                                     <p className="font-medium text-gray-900">{booking.user_id.name}</p>
-                                                    <p className="text-gray-600">{booking.user_id.email}</p>
+                                                    <p className="text-gray-600 warp-break-words">{booking.user_id.email}</p>
                                                     <p className="text-gray-600">{booking.user_id.phone}</p>
                                                 </div>
 
@@ -254,11 +272,11 @@ const OfficeStaffDashboard = () => {
                                             </div>
                                         </div>
 
-                                        <div className="ml-6 flex flex-col space-y-2">
+                                        <div className="lg:ml-6 flex flex-row lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2">
                                             {booking.status === 'booking_requested' && (
                                                 <button
                                                     onClick={() => handlePickup(booking)}
-                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                                                    className="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
                                                 >
                                                     Confirm Pickup
                                                 </button>
@@ -267,7 +285,7 @@ const OfficeStaffDashboard = () => {
                                             {booking.status === 'picked_up' && (
                                                 <button
                                                     onClick={() => handleReturn(booking)}
-                                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                                                    className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap"
                                                 >
                                                     Confirm Return
                                                 </button>

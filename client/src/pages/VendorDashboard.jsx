@@ -9,7 +9,6 @@ const VendorDashboard = () => {
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
-    const [vendorInfo, setVendorInfo] = useState(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -260,64 +259,48 @@ const VendorDashboard = () => {
 
     return (
         <div className="min-h-screen bg-neutral-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            {/* Header */}
-                <div className="mb-12 flex justify-between items-center">
-                <div className="flex items-center space-x-2 group">
-                        <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                            YatraMate
-                        </span>
-                    </div>
-                    <div className='text-center'>
-                        <h1 className="text-3xl font-bold text-gray-900">Vendor Dashboard</h1>
-                        {vendorInfo && (
-                            <div className="mt-2">
-                                <p className="text-gray-600">Welcome, {vendorInfo.name}</p>
-                                <div className="mt-2">
-                                    {vendorInfo.is_verified ? (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                            </svg>
-                                            Verified Vendor
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
-                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            Pending Verification
-                                        </span>
-                                    )}
-                                </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                {/* Header */}
+                <div className="mb-8 sm:mb-12">
+                    {/* Top bar with logo and logout */}
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="flex items-center space-x-2 group">
+                            <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
+                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
                             </div>
-                        )}
+                            <span className="text-xl sm:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                                YatraMate
+                            </span>
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="px-3 py-2 sm:px-4 sm:py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-xs sm:text-sm font-medium flex items-center"
+                        >
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span className="hidden sm:inline">Logout</span>
+                        </button>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium flex items-center"
-                    >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
-                    </button>
+                    
+                    {/* Dashboard title and vendor info */}
+                    <div className="text-center">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">Vendor Dashboard</h1>
+                        <p className="text-base sm:text-lg text-gray-600 mb-2">Manage, add and delete your listed vehicles.</p>
+                    </div>
                 </div>
             </div>
             
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
                 {/* Actions */}
-                <div className="mb-6 flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-neutral-900">My Vehicles</h2>
+                <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">My Vehicles</h2>
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
-                        className="px-6 py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
+                        className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
                     >
                         {showAddForm ? 'Cancel' : '+ Add Vehicle'}
                     </button>
@@ -325,9 +308,9 @@ const VendorDashboard = () => {
 
                 {/* Add Vehicle Form */}
                 {showAddForm && (
-                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 animate-fade-in">
-                        <h3 className="text-xl font-bold text-neutral-900 mb-4">Add New Vehicle Request</h3>
-                        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-8 animate-fade-in">
+                        <h3 className="text-lg sm:text-xl font-bold text-neutral-900 mb-4">Add New Vehicle Request</h3>
+                        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">Vehicle Name *</label>
                                 <input
@@ -515,32 +498,32 @@ const VendorDashboard = () => {
 
                 {/* Vehicles List */}
                 {loading ? (
-                    <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                        <p className="mt-4 text-neutral-600">Loading vehicles...</p>
+                    <div className="text-center py-8 sm:py-12">
+                        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary-600 mx-auto"></div>
+                        <p className="mt-4 text-neutral-600 text-sm sm:text-base">Loading vehicles...</p>
                     </div>
                 ) : vehicles.length === 0 ? (
-                    <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
-                        <p className="text-neutral-600 text-lg">No vehicles added yet. Start by adding your first vehicle!</p>
+                    <div className="text-center py-8 sm:py-12 bg-white rounded-2xl shadow-lg px-4">
+                        <p className="text-neutral-600 text-base sm:text-lg">No vehicles added yet. Start by adding your first vehicle!</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         {vehicles.map((vehicle) => (
                             <div key={vehicle._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
-                                <div className="bg-linear-to-r from-primary-500 to-secondary-500 text-white p-4">
-                                    <h3 className="text-xl font-bold">{vehicle.name}</h3>
-                                    <p className="text-white/90">{vehicle.brand} - {vehicle.model_name}</p>
+                                <div className="bg-linear-to-r from-primary-500 to-secondary-500 text-white p-3 sm:p-4">
+                                    <h3 className="text-lg sm:text-xl font-bold truncate">{vehicle.name}</h3>
+                                    <p className="text-white/90 text-sm sm:text-base truncate">{vehicle.brand} - {vehicle.model_name}</p>
                                 </div>
 
-                                <div className="p-4 space-y-3">
+                                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-sm text-neutral-600">Registration:</span>
-                                        <span className="font-semibold text-neutral-900">{vehicle.registration_number}</span>
+                                        <span className="text-xs sm:text-sm text-neutral-600">Registration:</span>
+                                        <span className="font-semibold text-neutral-900 text-xs sm:text-sm">{vehicle.registration_number}</span>
                                     </div>
 
                                     <div className="flex justify-between items-center">
-                                        <span className="text-sm text-neutral-600">Status:</span>
-                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${vehicle.availability_status === 'available' ? 'bg-green-100 text-green-700' :
+                                        <span className="text-xs sm:text-sm text-neutral-600">Status:</span>
+                                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${vehicle.availability_status === 'available' ? 'bg-green-100 text-green-700' :
                                                 vehicle.availability_status === 'booked' ? 'bg-red-100 text-red-700' :
                                                     'bg-yellow-100 text-yellow-700'
                                             }`}>
@@ -548,8 +531,8 @@ const VendorDashboard = () => {
                                         </span>
                                     </div>
 
-                                    <div className="border-t pt-3 mt-3">
-                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <div className="border-t pt-2 sm:pt-3 mt-2 sm:mt-3">
+                                        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
                                             <div>
                                                 <p className="text-neutral-600">Total Distance</p>
                                                 <p className="font-bold text-neutral-900">{vehicle.total_distance_travelled || 0} km</p>
@@ -567,7 +550,7 @@ const VendorDashboard = () => {
 
                                     <button
                                         onClick={() => handleDelete(vehicle._id)}
-                                        className="w-full mt-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200"
+                                        className="w-full mt-3 sm:mt-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200 text-sm sm:text-base"
                                     >
                                         Delete Vehicle
                                     </button>

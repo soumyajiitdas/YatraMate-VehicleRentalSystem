@@ -225,43 +225,61 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-gray-50 py-4 md:py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-12 flex justify-between items-center">
-                    {/* Logo */}
-                    <div className="flex items-center space-x-2 group">
-                        <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                <div className="mb-8 md:mb-12">
+                    {/* Mobile and Desktop Layout */}
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+                        {/* Logo - Left on desktop, top on mobile */}
+                        <div className="flex items-center justify-between md:justify-start">
+                            <div className="flex items-center space-x-2 group">
+                                <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
+                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <span className="text-xl md:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                                    YatraMate
+                                </span>
+                            </div>
+                            {/* Logout button - visible on mobile only */}
+                            <button
+                                onClick={handleLogout}
+                                className="md:hidden px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium flex items-center"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </button>
                         </div>
-                        <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                            YatraMate
-                        </span>
+
+                        {/* Title - Center */}
+                        <div className='text-center md:flex-1'>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                            <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Manage users, vendors, and packages</p>
+                        </div>
+
+                        {/* Logout button - visible on desktop only */}
+                        <button
+                            onClick={handleLogout}
+                            className="hidden md:flex px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium items-center"
+                        >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                        </button>
                     </div>
-                    <div className='text-center'>
-                        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                        <p className="mt-2 text-gray-600">Manage users, vendors, and packages</p>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-secondary-500 transition-colors text-sm font-medium flex items-center"
-                    >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
-                    </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="bg-white rounded-lg shadow-sm mb-6">
+                <div className="bg-white rounded-lg shadow-sm mb-6 overflow-x-auto">
                     <div className="border-b border-gray-200">
-                        <nav className="flex -mb-px">
+                        <nav className="flex -mb-px min-w-max md:min-w-0">
                             <button
                                 onClick={() => setActiveTab('customers')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'customers'
+                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'customers'
                                     ? 'border-red-500 text-red-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -270,7 +288,7 @@ const AdminDashboard = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('office-staff')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'office-staff'
+                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'office-staff'
                                     ? 'border-red-500 text-red-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -279,7 +297,7 @@ const AdminDashboard = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('vendors')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'vendors'
+                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'vendors'
                                     ? 'border-red-500 text-red-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -288,7 +306,7 @@ const AdminDashboard = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('packages')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'packages'
+                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'packages'
                                     ? 'border-red-500 text-red-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -297,7 +315,7 @@ const AdminDashboard = () => {
                             </button>
                             <button
                                 onClick={() => setActiveTab('vehicle-requests')}
-                                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'vehicle-requests'
+                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'vehicle-requests'
                                     ? 'border-red-500 text-red-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -427,98 +445,173 @@ const AdminDashboard = () => {
 const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetails, onVerifyVendor }) => {
     if (users.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
                 <p className="text-gray-500">No {type} found.</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                        {type === 'vendors' && (
-                            <>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </>
-                        )}
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {users.map((user) => {
-                        const vendorDetails = type === 'vendors' ? vendors.find(v => v.email === user.email) : null;
-                        return (
-                            <tr key={user._id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-600">{user.email}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-600">{user.phone || 'N/A'}</div>
-                                </td>
-                                {type === 'vendors' && (
-                                    <>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-600">{vendorDetails?.company_name || 'N/A'}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${vendorDetails?.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                                }`}>
-                                                {vendorDetails?.is_verified ? 'Verified' : 'Pending'}
-                                            </span>
-                                        </td>
-                                    </>
-                                )}
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    {new Date(user.date_joined).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    {type === 'vendors' && vendorDetails && (
+        <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                            {type === 'vendors' && (
+                                <>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </>
+                            )}
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {users.map((user) => {
+                            const vendorDetails = type === 'vendors' ? vendors.find(v => v.email === user.email) : null;
+                            return (
+                                <tr key={user._id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">{user.email}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">{user.phone || 'N/A'}</div>
+                                    </td>
+                                    {type === 'vendors' && (
                                         <>
-                                            <button
-                                                onClick={() => onViewVendorDetails(vendorDetails)}
-                                                className="text-indigo-600 hover:text-indigo-900"
-                                            >
-                                                View
-                                            </button>
-                                            {!vendorDetails.is_verified && (
-                                                <button
-                                                    onClick={() => onVerifyVendor(vendorDetails._id)}
-                                                    className="text-green-600 hover:text-green-900"
-                                                >
-                                                    Verify
-                                                </button>
-                                            )}
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-600">{vendorDetails?.company_name || 'N/A'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${vendorDetails?.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                                    }`}>
+                                                    {vendorDetails?.is_verified ? 'Verified' : 'Pending'}
+                                                </span>
+                                            </td>
                                         </>
                                     )}
-                                    <button
-                                        onClick={() => onEdit(user)}
-                                        className="text-blue-600 hover:text-blue-900"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => onDelete(user)}
-                                        className="text-red-600 hover:text-red-900"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </div>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {new Date(user.date_joined).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                        {type === 'vendors' && vendorDetails && (
+                                            <>
+                                                <button
+                                                    onClick={() => onViewVendorDetails(vendorDetails)}
+                                                    className="text-indigo-600 hover:text-indigo-900"
+                                                >
+                                                    View
+                                                </button>
+                                                {!vendorDetails.is_verified && (
+                                                    <button
+                                                        onClick={() => onVerifyVendor(vendorDetails._id)}
+                                                        className="text-green-600 hover:text-green-900"
+                                                    >
+                                                        Verify
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                        <button
+                                            onClick={() => onEdit(user)}
+                                            className="text-blue-600 hover:text-blue-900"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => onDelete(user)}
+                                            className="text-red-600 hover:text-red-900"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {users.map((user) => {
+                    const vendorDetails = type === 'vendors' ? vendors.find(v => v.email === user.email) : null;
+                    return (
+                        <div key={user._id} className="bg-white rounded-lg shadow-sm p-4">
+                            <div className="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 className="font-semibold text-gray-900">{user.name}</h3>
+                                    <p className="text-sm text-gray-600">{user.email}</p>
+                                </div>
+                                {type === 'vendors' && vendorDetails && (
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${vendorDetails.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                        {vendorDetails.is_verified ? 'Verified' : 'Pending'}
+                                    </span>
+                                )}
+                            </div>
+                            
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500">Phone:</span>
+                                    <span className="text-gray-900">{user.phone || 'N/A'}</span>
+                                </div>
+                                {type === 'vendors' && vendorDetails && (
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Company:</span>
+                                        <span className="text-gray-900">{vendorDetails.company_name || 'N/A'}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500">Joined:</span>
+                                    <span className="text-gray-900">{new Date(user.date_joined).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t">
+                                {type === 'vendors' && vendorDetails && (
+                                    <>
+                                        <button
+                                            onClick={() => onViewVendorDetails(vendorDetails)}
+                                            className="px-3 py-1.5 text-sm text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100"
+                                        >
+                                            View
+                                        </button>
+                                        {!vendorDetails.is_verified && (
+                                            <button
+                                                onClick={() => onVerifyVendor(vendorDetails._id)}
+                                                className="px-3 py-1.5 text-sm text-green-600 bg-green-50 rounded-lg hover:bg-green-100"
+                                            >
+                                                Verify
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+                                <button
+                                    onClick={() => onEdit(user)}
+                                    className="px-3 py-1.5 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => onDelete(user)}
+                                    className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </>
     );
 };
 
@@ -526,82 +619,144 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetail
 const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }) => {
     if (vendors.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
                 <p className="text-gray-500">No vendors found.</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {vendors.map((vendor) => (
-                        <tr key={vendor._id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">{vendor.email}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">{vendor.contact_number}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">{vendor.company_name || 'N/A'}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600 capitalize">{vendor.id_type?.replace('_', ' ')}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                    {vendor.is_verified ? 'Verified' : 'Pending'}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                {new Date(vendor.createdAt).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <button
-                                    onClick={() => onViewVendorDetails(vendor)}
-                                    className="text-indigo-600 hover:text-indigo-900"
-                                >
-                                    View
-                                </button>
-                                {!vendor.is_verified && (
-                                    <button
-                                        onClick={() => onVerifyVendor(vendor._id)}
-                                        className="text-green-600 hover:text-green-900"
-                                    >
-                                        Verify
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => onDelete(vendor)}
-                                    className="text-red-600 hover:text-red-900"
-                                >
-                                    Delete
-                                </button>
-                            </td>
+        <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Type</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {vendors.map((vendor) => (
+                            <tr key={vendor._id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">{vendor.email}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">{vendor.contact_number}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">{vendor.company_name || 'N/A'}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600 capitalize">{vendor.id_type?.replace('_', ' ')}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                        vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {vendor.is_verified ? 'Verified' : 'Pending'}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    {new Date(vendor.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                    <button
+                                        onClick={() => onViewVendorDetails(vendor)}
+                                        className="text-indigo-600 hover:text-indigo-900"
+                                    >
+                                        View
+                                    </button>
+                                    {!vendor.is_verified && (
+                                        <button
+                                            onClick={() => onVerifyVendor(vendor._id)}
+                                            className="text-green-600 hover:text-green-900"
+                                        >
+                                            Verify
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => onDelete(vendor)}
+                                        className="text-red-600 hover:text-red-900"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {vendors.map((vendor) => (
+                    <div key={vendor._id} className="bg-white rounded-lg shadow-sm p-4">
+                        <div className="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 className="font-semibold text-gray-900">{vendor.name}</h3>
+                                <p className="text-sm text-gray-600">{vendor.company_name || 'N/A'}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                {vendor.is_verified ? 'Verified' : 'Pending'}
+                            </span>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Email:</span>
+                                <span className="text-gray-900 truncate ml-2">{vendor.email}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Contact:</span>
+                                <span className="text-gray-900">{vendor.contact_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">ID Type:</span>
+                                <span className="text-gray-900 capitalize">{vendor.id_type?.replace('_', ' ')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Joined:</span>
+                                <span className="text-gray-900">{new Date(vendor.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t">
+                            <button
+                                onClick={() => onViewVendorDetails(vendor)}
+                                className="px-3 py-1.5 text-sm text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100"
+                            >
+                                View
+                            </button>
+                            {!vendor.is_verified && (
+                                <button
+                                    onClick={() => onVerifyVendor(vendor._id)}
+                                    className="px-3 py-1.5 text-sm text-green-600 bg-green-50 rounded-lg hover:bg-green-100"
+                                >
+                                    Verify
+                                </button>
+                            )}
+                            <button
+                                onClick={() => onDelete(vendor)}
+                                className="px-3 py-1.5 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </>
     );
 };
 
@@ -610,69 +765,119 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
 const PackagesTable = ({ packages, onEdit, onDelete }) => {
     if (packages.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
                 <p className="text-gray-500">No packages found.</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CC Range</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price/Hour</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price/KM</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {packages.map((pkg) => (
-                        <tr key={pkg._id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{pkg.name}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600 capitalize">{pkg.vehicle_type}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">{pkg.cc_range_min} - {pkg.cc_range_max} cc</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">₹{pkg.price_per_hour}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">₹{pkg.price_per_km}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                    {pkg.is_active ? 'Active' : 'Inactive'}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <button
-                                    onClick={() => onEdit(pkg)}
-                                    className="text-blue-600 hover:text-blue-900"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    onClick={() => onDelete(pkg)}
-                                    className="text-red-600 hover:text-red-900"
-                                >
-                                    Delete
-                                </button>
-                            </td>
+        <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle Type</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CC Range</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price/Hour</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price/KM</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {packages.map((pkg) => (
+                            <tr key={pkg._id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-medium text-gray-900">{pkg.name}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600 capitalize">{pkg.vehicle_type}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">{pkg.cc_range_min} - {pkg.cc_range_max} cc</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">₹{pkg.price_per_hour}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">₹{pkg.price_per_km}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {pkg.is_active ? 'Active' : 'Inactive'}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                    <button
+                                        onClick={() => onEdit(pkg)}
+                                        className="text-blue-600 hover:text-blue-900"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(pkg)}
+                                        className="text-red-600 hover:text-red-900"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {packages.map((pkg) => (
+                    <div key={pkg._id} className="bg-white rounded-lg shadow-sm p-4">
+                        <div className="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 className="font-semibold text-gray-900">{pkg.name}</h3>
+                                <p className="text-sm text-gray-600 capitalize">{pkg.vehicle_type}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${pkg.is_active ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                {pkg.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">CC Range:</span>
+                                <span className="text-gray-900">{pkg.cc_range_min} - {pkg.cc_range_max} cc</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Price/Hour:</span>
+                                <span className="text-gray-900 font-semibold">₹{pkg.price_per_hour}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Price/KM:</span>
+                                <span className="text-gray-900 font-semibold">₹{pkg.price_per_km}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2 mt-4 pt-3 border-t">
+                            <button
+                                onClick={() => onEdit(pkg)}
+                                className="flex-1 px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                            >
+                                Edit
+                            </button>
+                            <button
+                                onClick={() => onDelete(pkg)}
+                                className="flex-1 px-3 py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </>
     );
 };
 
@@ -828,10 +1033,10 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 md:p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
+                <div className="p-4 md:p-6">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
                         {item ? 'Edit' : 'Create'} {type === 'package' ? 'Package' : type === 'vendor' ? 'Vendor' : 'Office Staff'}
                     </h2>
 
@@ -948,7 +1153,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                         <input
@@ -973,7 +1178,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                                         <input
@@ -1012,7 +1217,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         <div className="border-t pt-4 mt-4">
                                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Vendor Details</h3>
 
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
                                                     <input
@@ -1036,7 +1241,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-4 mt-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
                                                     <input
@@ -1118,68 +1323,118 @@ const DeleteConfirmModal = ({ onConfirm, onCancel }) => {
 const VehicleRequestsTable = ({ requests, onViewDetails }) => {
     if (requests.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
                 <p className="text-gray-500">No vehicle requests found.</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {requests.map((request) => (
-                        <tr key={request._id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{request.name}</div>
-                                <div className="text-sm text-gray-500">{request.model_name}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
-                                <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600 capitalize">{request.type}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600">{request.registration_number}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                    request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                    'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                    {request.status}
-                                </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                {new Date(request.createdAt).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button
-                                    onClick={() => onViewDetails(request)}
-                                    className="text-blue-600 hover:text-blue-900"
-                                >
-                                    View Details
-                                </button>
-                            </td>
+        <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {requests.map((request) => (
+                            <tr key={request._id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm font-medium text-gray-900">{request.name}</div>
+                                    <div className="text-sm text-gray-500">{request.model_name}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
+                                    <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600 capitalize">{request.type}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-600">{request.registration_number}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                        request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {request.status}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    {new Date(request.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button
+                                        onClick={() => onViewDetails(request)}
+                                        className="text-blue-600 hover:text-blue-900"
+                                    >
+                                        View Details
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {requests.map((request) => (
+                    <div key={request._id} className="bg-white rounded-lg shadow-sm p-4">
+                        <div className="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 className="font-semibold text-gray-900">{request.name}</h3>
+                                <p className="text-sm text-gray-600">{request.model_name}</p>
+                            </div>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                                request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                            }`}>
+                                {request.status}
+                            </span>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Vendor:</span>
+                                <span className="text-gray-900">{request.vendor_id?.name || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Type:</span>
+                                <span className="text-gray-900 capitalize">{request.type}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Registration:</span>
+                                <span className="text-gray-900">{request.registration_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Submitted:</span>
+                                <span className="text-gray-900">{new Date(request.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => onViewDetails(request)}
+                            className="w-full mt-4 px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                        >
+                            View Details
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </>
     );
 };
 

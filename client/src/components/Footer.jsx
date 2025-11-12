@@ -117,17 +117,17 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-neutral-700">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-neutral-400 text-sm">
+            <p className="text-neutral-400 text-xs sm:text-sm text-center md:text-left">
               © {currentYear} YatraMate. All rights reserved.
             </p>
-            <div className="flex items-center space-x-6">
-              <Link to="/terms" className="text-neutral-400 hover:text-primary-400 text-sm transition-colors duration-200">
+            <div className="flex items-center flex-wrap justify-center gap-4 sm:gap-6">
+              <Link to="/terms" className="text-neutral-400 hover:text-primary-400 text-xs sm:text-sm transition-colors duration-200">
                 Terms
               </Link>
-              <Link to="/privacy" className="text-neutral-400 hover:text-primary-400 text-sm transition-colors duration-200">
+              <Link to="/privacy" className="text-neutral-400 hover:text-primary-400 text-xs sm:text-sm transition-colors duration-200">
                 Privacy
               </Link>
-              <Link to="/cookies" className="text-neutral-400 hover:text-primary-400 text-sm transition-colors duration-200">
+              <Link to="/cookies" className="text-neutral-400 hover:text-primary-400 text-xs sm:text-sm transition-colors duration-200">
                 Cookies
               </Link>
             </div>

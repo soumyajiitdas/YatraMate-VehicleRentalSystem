@@ -148,10 +148,40 @@ const ProfilePage = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
+        <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
+          {/* Sidebar - Horizontal on mobile, vertical on desktop */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-card p-6 space-y-2">
+            {/* Mobile: Horizontal scroll tabs */}
+            <div className="lg:hidden bg-white rounded-2xl shadow-card p-4 mb-6 overflow-x-auto">
+              <div className="flex space-x-2">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`shrink-0 flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
+                        : 'text-neutral-700 bg-neutral-100'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+                <button
+                  onClick={handleLogout}
+                  className="shrink-0 flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm text-secondary-600 bg-secondary-50 transition-all duration-200 whitespace-nowrap"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+            
+            {/* Desktop: Vertical sidebar */}
+            <div className="hidden lg:block bg-white rounded-2xl shadow-card p-6 space-y-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -183,24 +213,26 @@ const ProfilePage = () => {
             {activeTab === 'profile' && (
               <div className="bg-white rounded-2xl shadow-card p-8 space-y-6">
                 {/* Profile Header */}
-                <div className="flex items-center justify-between pb-6 border-b border-neutral-200">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-20 h-20 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                      {formData.name.charAt(0)}
+                <div className="pb-6 border-b border-neutral-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold shrink-0">
+                        {formData.name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 truncate">{formData.name}</h2>
+                        <p className="text-sm sm:text-base text-neutral-600 truncate">{formData.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-neutral-900">{formData.name}</h2>
-                      <p className="text-neutral-600">{formData.email}</p>
-                    </div>
+                    {!isEditing && (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="w-full sm:w-auto px-5 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all duration-200 text-sm sm:text-base"
+                      >
+                        Edit Profile
+                      </button>
+                    )}
                   </div>
-                  {!isEditing && (
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="px-5 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all duration-200"
-                    >
-                      Edit Profile
-                    </button>
-                  )}
                 </div>
 
                 {/* Profile Form */}

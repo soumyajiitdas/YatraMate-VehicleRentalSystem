@@ -15,6 +15,8 @@ const vehicleRequestRouter = require('./routes/vehicleRequestRoutes');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cors({
     origin: "https://yatramate.vercel.app",
     credentials: true

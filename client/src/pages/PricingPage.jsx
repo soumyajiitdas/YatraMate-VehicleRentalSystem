@@ -31,8 +31,9 @@ const PricingPage = () => {
     };
 
     const filteredPackages = selectedType === 'all'
-        ? packages
-        : packages.filter(pkg => pkg.vehicle_type === selectedType);
+        ? packages.filter(pkg => pkg.is_active)
+        : packages.filter(pkg => pkg.vehicle_type === selectedType && pkg.is_active);
+
 
     const getVehicleIcon = (type) => {
         if (type === 'bike') {
@@ -98,10 +99,10 @@ const PricingPage = () => {
 
             {/* Filter Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex justify-center space-x-4">
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
                     <button
                         onClick={() => setSelectedType('all')}
-                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${selectedType === 'all'
+                        className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${selectedType === 'all'
                             ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
                             : 'bg-white text-neutral-700 hover:bg-neutral-100'
                             }`}
@@ -110,7 +111,7 @@ const PricingPage = () => {
                     </button>
                     <button
                         onClick={() => setSelectedType('bike')}
-                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${selectedType === 'bike'
+                        className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${selectedType === 'bike'
                             ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
                             : 'bg-white text-neutral-700 hover:bg-neutral-100'
                             }`}
@@ -119,7 +120,7 @@ const PricingPage = () => {
                     </button>
                     <button
                         onClick={() => setSelectedType('car')}
-                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${selectedType === 'car'
+                        className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${selectedType === 'car'
                             ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
                             : 'bg-white text-neutral-700 hover:bg-neutral-100'
                             }`}
@@ -195,9 +196,11 @@ const PricingPage = () => {
 
                             {/* CTA */}
                             <div className="px-6 pb-6">
+                            <Link to="/vehicles">
                                 <button className="w-full py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200">
                                     View Vehicles
                                 </button>
+                            </Link>
                             </div>
                         </div>
                     ))}
