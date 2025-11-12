@@ -34,7 +34,9 @@ const OfficeStaffDashboard = () => {
 
             const url = status ? `${API_ENDPOINTS.officeStaffRequests}?status=${status}` : API_ENDPOINTS.officeStaffRequests;
 
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                credentials: 'include'
+            });
             const data = await response.json();
 
             if (data.status === 'success') {
@@ -278,7 +280,7 @@ const OfficeStaffDashboard = () => {
                                                     onClick={() => handlePickup(booking)}
                                                     className="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
                                                 >
-                                                    Confirm Pickup
+                                                    Complete Pickup
                                                 </button>
                                             )}
 

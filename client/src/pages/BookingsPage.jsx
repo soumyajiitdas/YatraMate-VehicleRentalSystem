@@ -22,7 +22,9 @@ const BookingsPage = () => {
         return;
       }
 
-      const response = await fetch(API_ENDPOINTS.userBookings(user._id));
+      const response = await fetch(API_ENDPOINTS.userBookings(user._id), {
+        credentials: 'include'
+      });
       const data = await response.json();
 
       if (data.status === 'success') {

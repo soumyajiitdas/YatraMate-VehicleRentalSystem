@@ -4,8 +4,8 @@ import { API_ENDPOINTS } from '../config/api';
 const PickupModal = ({ booking, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         staff_id: JSON.parse(localStorage.getItem('user'))?.id || '',
-        actual_pickup_date: new Date().toISOString().split('T')[0],
-        actual_pickup_time: new Date().toTimeString().slice(0, 5),
+        actual_pickup_date: new Date(booking.requested_pickup_date).toISOString().split('T')[0],
+        actual_pickup_time: booking.requested_pickup_time,
         odometer_reading_start: '',
         vehicle_plate_number: booking.vehicle_id.registration_number,
         id_proof_type: 'aadhar_card',
