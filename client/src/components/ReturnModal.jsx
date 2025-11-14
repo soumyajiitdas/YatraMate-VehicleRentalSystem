@@ -32,33 +32,82 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         }
     };
 
-    const calculateCostPreview = (odometerEnd) => {
-        const distanceTraveled = odometerEnd - booking.pickup_details.odometer_reading_start;
-
-        // Calculate duration - handle time format conversion
-        const pickupDate = booking.pickup_details.actual_pickup_date;
-        const pickupTime = booking.pickup_details.actual_pickup_time;
-        
-        // Create proper date strings for parsing
-        let pickupDateTime;
-        if (pickupTime.includes('AM') || pickupTime.includes('PM')) {
-            // Handle 12-hour format
-            pickupDateTime = new Date(`${pickupDate} ${pickupTime}`);
-        } else {
-            // Handle 24-hour format
-            pickupDateTime = new Date(`${pickupDate}T${pickupTime}`);
+    const calculateCostPreview = (odometerEndParam) => {
+        const odometerEnd = Number(odometerEndParam);
+        const odometerStart = Number(booking.pickup_details.odometer_reading_start);
+        if (Number.isNaN(odometerEnd) || Number.isNaN(odometerStart)) {
+            console.error('Invalid odometer values', { odometerEndParam, start: booking.pickup_details.odometer_reading_start });
+            return;
         }
-        
-        const returnDateTime = new Date(`${formData.actual_return_date}T${formData.actual_return_time}`);
-        const durationHours = Math.ceil((returnDateTime - pickupDateTime) / (1000 * 60 * 60));
+        const distanceTraveled = odometerEnd - odometerStart;
+        if (distanceTraveled < 0) {
+            console.error('End odometer less than start', { odometerEnd, odometerStart });
+            return;
+        }
 
-        // Calculate costs - ensure all values are numbers
+        const rawPickupDateISO = booking.pickup_details.requested_pickup_date || booking.pickup_details.actual_pickup_date;
+        const rawPickupTime = booking.pickup_details.requested_pickup_time || booking.pickup_details.actual_pickup_time || '';
+
+        const pickupDateObj = new Date(rawPickupDateISO);
+        if (isNaN(pickupDateObj.getTime())) {
+            console.error('Invalid pickup date ISO', rawPickupDateISO);
+            return;
+        }
+
+        const parseTimeString = (t) => {
+            if (!t || typeof t !== 'string') return null;
+            const s = t.trim().toUpperCase();
+            // If contains AM/PM
+            const ampmMatch = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/);
+            if (ampmMatch) {
+                let h = parseInt(ampmMatch[1], 10);
+                const m = parseInt(ampmMatch[2], 10);
+                const mod = ampmMatch[3];
+                if (mod === 'PM' && h !== 12) h += 12;
+                if (mod === 'AM' && h === 12) h = 0;
+                return { hours: h, minutes: m };
+            }
+            const hhmm = s.match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
+            if (hhmm) return { hours: parseInt(hhmm[1], 10), minutes: parseInt(hhmm[2], 10) };
+            return null;
+        };
+
+        const pickupTimeParts = parseTimeString(rawPickupTime);
+        if (pickupTimeParts) {
+            pickupDateObj.setHours(pickupTimeParts.hours, pickupTimeParts.minutes, 0, 0);
+        } else {
+            console.warn('Could not parse pickup time; using time present in pickup ISO', rawPickupTime);
+        }
+
+        const returnDateStr = formData.actual_return_date;
+        const returnTimeStr = formData.actual_return_time;
+
+        let returnDateObj;
+        if (returnDateStr && returnTimeStr) {
+            returnDateObj = new Date(`${returnDateStr}T${returnTimeStr}:00`);
+        } else if (returnDateStr) {
+            returnDateObj = new Date(returnDateStr);
+        } else {
+            returnDateObj = new Date();    // fallback to now
+        }
+        if (isNaN(returnDateObj.getTime())) {
+            console.error('Invalid return date/time', { returnDateStr, returnTimeStr });
+            return;
+        }
+
+        const msDiff = returnDateObj.getTime() - pickupDateObj.getTime();
+        if (msDiff < 0) {
+            console.warn('Return time is before pickup time; duration negative', { msDiff });
+        }
+        const durationHours = Math.ceil(msDiff / (1000 * 60 * 60));
+
         const pricePerKm = parseFloat(booking.package_id.price_per_km) || 0;
         const pricePerHour = parseFloat(booking.package_id.price_per_hour) || 0;
         const costPerDistance = distanceTraveled * pricePerKm;
         const costPerTime = durationHours * pricePerHour;
         const maxCost = Math.max(costPerDistance, costPerTime);
-        const totalCost = maxCost + parseFloat(formData.damage_cost || 0);
+        const damageCost = parseFloat(formData.damage_cost || 0) || 0;
+        const totalCost = maxCost + damageCost;
 
         setCostBreakdown({
             distanceTraveled,
@@ -66,10 +115,11 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             costPerDistance,
             costPerTime,
             maxCost,
-            damageCost: parseFloat(formData.damage_cost || 0),
+            damageCost,
             totalCost
         });
     };
+
 
     const validateForm = () => {
         const newErrors = {};
