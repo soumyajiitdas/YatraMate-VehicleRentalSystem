@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
+import VehicleCardSkeleton from '../components/VehicleCardSkeleton';
 import { API_ENDPOINTS } from '../config/api';
 
 const HomePage = () => {
   const [featuredVehicles, setFeaturedVehicles] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadingVehicles, setLoadingVehicles] = useState(true);
 
   // Fetch featured vehicles from API
   useEffect(() => {
@@ -19,6 +21,8 @@ const HomePage = () => {
         }
       } catch (error) {
         console.error('Error fetching featured vehicles:', error);
+      } finally {
+        setLoadingVehicles(false);
       }
     };
 
@@ -190,9 +194,16 @@ const HomePage = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {featuredVehicles.map((vehicle) => (
-              <VehicleCard key={vehicle._id} vehicle={vehicle} />
-            ))}
+            {loadingVehicles ? (
+              // Show skeleton loaders while vehicles are loading
+              Array.from({ length: 6 }).map((_, index) => (
+                <VehicleCardSkeleton key={index} />
+              ))
+            ) : (
+              featuredVehicles.map((vehicle) => (
+                <VehicleCard key={vehicle._id} vehicle={vehicle} />
+              ))
+            )}
           </div>
 
           <div className="text-center sm:hidden">
