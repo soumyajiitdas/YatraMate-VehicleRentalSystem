@@ -3,12 +3,18 @@ const multer = require('multer');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-// Initialize ImageKit
-const imagekit = new ImageKit({
-    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
-    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
-});
+// Initialize ImageKit only if credentials are provided
+let imagekit = null;
+if (process.env.IMAGEKIT_PUBLIC_KEY && 
+    process.env.IMAGEKIT_PRIVATE_KEY && 
+    process.env.IMAGEKIT_URL_ENDPOINT &&
+    process.env.IMAGEKIT_PUBLIC_KEY !== 'placeholder') {
+    imagekit = new ImageKit({
+        publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+        privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+        urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
+    });
+}
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
@@ -21,12 +27,19 @@ const upload = multer({
 
 // Get ImageKit authentication parameters
 exports.getAuthParameters = catchAsync(async (req, res, next) => {
+    if (!imagekit) {
+        return next(new AppError('ImageKit is not configured', 500));
+    }
     const result = imagekit.getAuthenticationParameters();
     res.status(200).json(result);
 });
 
 // Upload file to ImageKit
 exports.uploadFile = catchAsync(async (req, res, next) => {
+    if (!imagekit) {
+        return next(new AppError('ImageKit is not configured', 500));
+    }
+    
     if (!req.file) {
         return next(new AppError('Please upload a file', 400));
     }
@@ -49,6 +62,10 @@ exports.uploadFile = catchAsync(async (req, res, next) => {
 
 // Upload multiple files to ImageKit
 exports.uploadMultipleFiles = catchAsync(async (req, res, next) => {
+    if (!imagekit) {
+        return next(new AppError('ImageKit is not configured', 500));
+    }
+    
     if (!req.files || req.files.length === 0) {
         return next(new AppError('Please upload at least one file', 400));
     }

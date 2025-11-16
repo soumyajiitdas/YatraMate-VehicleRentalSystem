@@ -26,13 +26,21 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
 
-        // Calculate cost preview when odometer reading changes
+        // Calculate cost preview when odometer reading, return date, or return time changes
         if (name === 'odometer_reading_end' && value && booking.pickup_details) {
             calculateCostPreview(value);
+        } else if ((name === 'actual_return_date' || name === 'actual_return_time') && formData.odometer_reading_end) {
+            // Recalculate with updated date/time
+            const updatedFormData = { ...formData, [name]: value };
+            calculateCostPreviewWithFormData(formData.odometer_reading_end, updatedFormData);
+        } else if (name === 'damage_cost' && formData.odometer_reading_end) {
+            // Recalculate when damage cost changes
+            const updatedFormData = { ...formData, [name]: value };
+            calculateCostPreviewWithFormData(formData.odometer_reading_end, updatedFormData);
         }
     };
 
-    const calculateCostPreview = (odometerEndParam) => {
+    const calculateCostPreviewWithFormData = (odometerEndParam, currentFormData) => {
         const odometerEnd = Number(odometerEndParam);
         const odometerStart = Number(booking.pickup_details.odometer_reading_start);
         if (Number.isNaN(odometerEnd) || Number.isNaN(odometerStart)) {
@@ -45,8 +53,8 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             return;
         }
 
-        const rawPickupDateISO = booking.pickup_details.requested_pickup_date || booking.pickup_details.actual_pickup_date;
-        const rawPickupTime = booking.pickup_details.requested_pickup_time || booking.pickup_details.actual_pickup_time || '';
+        const rawPickupDateISO = booking.pickup_details.actual_pickup_date || booking.requested_pickup_date;
+        const rawPickupTime = booking.pickup_details.actual_pickup_time || booking.requested_pickup_time || '';
 
         const pickupDateObj = new Date(rawPickupDateISO);
         if (isNaN(pickupDateObj.getTime())) {
@@ -79,8 +87,8 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             console.warn('Could not parse pickup time; using time present in pickup ISO', rawPickupTime);
         }
 
-        const returnDateStr = formData.actual_return_date;
-        const returnTimeStr = formData.actual_return_time;
+        const returnDateStr = currentFormData.actual_return_date;
+        const returnTimeStr = currentFormData.actual_return_time;
 
         let returnDateObj;
         if (returnDateStr && returnTimeStr) {
@@ -106,7 +114,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         const costPerDistance = distanceTraveled * pricePerKm;
         const costPerTime = durationHours * pricePerHour;
         const maxCost = Math.max(costPerDistance, costPerTime);
-        const damageCost = parseFloat(formData.damage_cost || 0) || 0;
+        const damageCost = parseFloat(currentFormData.damage_cost || 0) || 0;
         const totalCost = maxCost + damageCost;
 
         setCostBreakdown({
@@ -118,6 +126,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             damageCost,
             totalCost
         });
+    };
+
+    const calculateCostPreview = (odometerEndParam) => {
+        calculateCostPreviewWithFormData(odometerEndParam, formData);
     };
 
 

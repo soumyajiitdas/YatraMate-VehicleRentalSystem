@@ -174,10 +174,108 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     // Calculate distance traveled
     const distance_traveled = odometer_reading_end - booking.pickup_details.odometer_reading_start;
     
+    // Helper function to parse time string (handles both 12-hour AM/PM and 24-hour formats)
+    const parseTimeString = (timeStr) => {
+        if (!timeStr || typeof timeStr !== 'string') return null;
+        
+        const str = timeStr.trim().toUpperCase();
+        
+        // Handle 12-hour format with AM/PM
+        const ampmMatch = str.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/);
+        if (ampmMatch) {
+            let hours = parseInt(ampmMatch[1], 10);
+            const minutes = parseInt(ampmMatch[2], 10);
+            const modifier = ampmMatch[3];
+            
+            if (modifier === 'PM' && hours !== 12) hours += 12;
+            if (modifier === 'AM' && hours === 12) hours = 0;
+            
+            return { hours, minutes };
+        }
+        
+        // Handle 24-hour format (HH:MM or HH:MM:SS)
+        const hhmmMatch = str.match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
+        if (hhmmMatch) {
+            return {
+                hours: parseInt(hhmmMatch[1], 10),
+                minutes: parseInt(hhmmMatch[2], 10)
+            };
+        }
+        
+        return null;
+    };
+    
+    // Calculate duration in hours - properly handle dates and times
+    let pickupDateTime;
+    
+    // Get pickup date - could be from actual_pickup_date or requested_pickup_date
+    const rawPickupDate = booking.pickup_details.actual_pickup_date || booking.requested_pickup_date;
+    const rawPickupTime = booking.pickup_details.actual_pickup_time || booking.requested_pickup_time;
+    
+    // Create pickup DateTime
+    if (rawPickupDate) {
+        // Convert to Date object if it's not already
+        const dateObj = new Date(rawPickupDate);
+        
+        // Extract just the date components (year, month, day) and create a new date at midnight
+        const year = dateObj.getFullYear();
+        const month = dateObj.getMonth();
+        const day = dateObj.getDate();
+        pickupDateTime = new Date(year, month, day, 0, 0, 0, 0);
+        
+        // Parse and set the time component from the time string
+        const pickupTimeParts = parseTimeString(rawPickupTime);
+        if (pickupTimeParts) {
+            pickupDateTime.setHours(pickupTimeParts.hours, pickupTimeParts.minutes, 0, 0);
+        } else {
+            // If no time string or can't parse, try to use the time from the date object
+            pickupDateTime.setHours(dateObj.getHours(), dateObj.getMinutes(), 0, 0);
+        }
+        
+        console.log('Pickup DateTime:', {
+            rawPickupDate,
+            rawPickupTime,
+            parsedDateTime: pickupDateTime.toISOString(),
+            parsedLocal: pickupDateTime.toString()
+        });
+    } else {
+        return next(new AppError('Pickup date not found', 400));
+    }
+    
+    // Create return DateTime
+    let returnDateTime;
+    if (actual_return_date && actual_return_time) {
+        // Combine date and time properly using ISO format
+        returnDateTime = new Date(`${actual_return_date}T${actual_return_time}:00`);
+    } else if (actual_return_date) {
+        returnDateTime = new Date(actual_return_date);
+    } else {
+        returnDateTime = new Date();
+    }
+    
+    console.log('Return DateTime:', {
+        actual_return_date,
+        actual_return_time,
+        parsedDateTime: returnDateTime.toISOString(),
+        parsedLocal: returnDateTime.toString()
+    });
+    
+    // Validate dates
+    if (isNaN(pickupDateTime.getTime())) {
+        return next(new AppError('Invalid pickup date/time', 400));
+    }
+    if (isNaN(returnDateTime.getTime())) {
+        return next(new AppError('Invalid return date/time', 400));
+    }
+    
     // Calculate duration in hours
-    const pickupDateTime = new Date(`${booking.pickup_details.actual_pickup_date} ${booking.pickup_details.actual_pickup_time}`);
-    const returnDateTime = new Date(`${actual_return_date} ${actual_return_time}`);
-    const duration_hours = Math.ceil((returnDateTime - pickupDateTime) / (1000 * 60 * 60));
+    const msDiff = returnDateTime.getTime() - pickupDateTime.getTime();
+    const duration_hours = Math.ceil(msDiff / (1000 * 60 * 60));
+    
+    // Ensure duration is positive
+    if (duration_hours < 0) {
+        return next(new AppError('Return time cannot be before pickup time', 400));
+    }
     
     // Calculate costs
     const packageData = booking.package_id;
