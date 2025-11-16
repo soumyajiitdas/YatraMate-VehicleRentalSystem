@@ -15,6 +15,48 @@ const OfficeStaffDashboard = () => {
     const [showPickupModal, setShowPickupModal] = useState(false);
     const [showReturnModal, setShowReturnModal] = useState(false);
 
+    // Utility: parse various date string formats and return a local Date at 00:00
+    const parseDateLocal = (s) => {
+        if (!s || typeof s !== 'string') return null;
+        const str = s.trim();
+        // YYYY-MM-DD -> local date
+        const ymd = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (ymd) {
+            const y = parseInt(ymd[1], 10);
+            const m = parseInt(ymd[2], 10) - 1;
+            const d = parseInt(ymd[3], 10);
+            return new Date(y, m, d);
+        }
+        // ISO with time
+        if (str.includes('T')) {
+            const iso = new Date(str);
+            if (!isNaN(iso)) return new Date(iso.getFullYear(), iso.getMonth(), iso.getDate());
+        }
+        // DD/MM/YYYY or MM/DD/YYYY
+        const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (dmy) {
+            let a = parseInt(dmy[1], 10);
+            let b = parseInt(dmy[2], 10);
+            const y = parseInt(dmy[3], 10);
+            let day, month;
+            if (a > 12 && b <= 12) { day = a; month = b; }
+            else if (b > 12 && a <= 12) { day = b; month = a; }
+            else { day = a; month = b; }
+            return new Date(y, month - 1, day);
+        }
+        const nat = new Date(str);
+        return isNaN(nat) ? null : new Date(nat.getFullYear(), nat.getMonth(), nat.getDate());
+    };
+
+    const formatDateDDMMYYYY = (input) => {
+        const d = parseDateLocal(input);
+        if (!d) return '';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    };
+
     useEffect(() => {
         // Check if user is authenticated and is office staff
         if (!isAuthenticated || !user || user.role !== 'office_staff') {
@@ -241,10 +283,10 @@ const OfficeStaffDashboard = () => {
 
                                                 <div>
                                                     <p className="text-gray-500">Pickup Schedule</p>
-                                                    <p className="font-medium text-gray-900">
-                                                        {new Date(booking.requested_pickup_date).toLocaleDateString()}
+                                                    <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
+                                                        {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
                                                     </p>
-                                                    <p className="text-gray-600">{booking.requested_pickup_time}</p>
+                                                    <p className="text-gray-600" data-testid="pickup-schedule-time">{booking.pickup_details?.actual_pickup_time || booking.requested_pickup_time}</p>
                                                 </div>
 
                                                 {booking.package_id && (

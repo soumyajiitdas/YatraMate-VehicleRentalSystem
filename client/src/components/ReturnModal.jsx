@@ -4,8 +4,8 @@ import { API_ENDPOINTS } from '../config/api';
 const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         staff_id: JSON.parse(localStorage.getItem('user'))?.id || '',
-        actual_return_date: new Date().toISOString().split('T')[0],
-        actual_return_time: new Date().toTimeString().slice(0, 5),
+        actual_return_date: new Date().toISOString().split('T')[0], // HTML date input expects YYYY-MM-DD
+        actual_return_time: new Date().toTimeString().slice(0, 5),   // HH:MM 24h
         odometer_reading_end: '',
         vehicle_plate_number: booking.vehicle_id.registration_number,
         engine_number: booking.vehicle_id.engine_number || '',
@@ -19,6 +19,80 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const [errors, setErrors] = useState({});
     const [costBreakdown, setCostBreakdown] = useState(null);
 
+    // ---- Robust Local Date/Time Parsing Utilities (supports DD/MM/YYYY and YYYY-MM-DD and MM/DD/YYYY) ----
+    const parseTimeString = (t) => {
+        if (!t || typeof t !== 'string') return null;
+        const s = t.trim().toUpperCase();
+        const ampmMatch = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+        if (ampmMatch) {
+            let h = parseInt(ampmMatch[1], 10);
+            const m = parseInt(ampmMatch[2], 10);
+            const mod = ampmMatch[3];
+            if (mod === 'PM' && h !== 12) h += 12;
+            if (mod === 'AM' && h === 12) h = 0;
+            return { hours: h, minutes: m };
+        }
+        const hhmm = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+        if (hhmm) return { hours: parseInt(hhmm[1], 10), minutes: parseInt(hhmm[2], 10) };
+        return null;
+    };
+
+    const parseDateStringLocal = (s) => {
+        if (!s || typeof s !== 'string') return null;
+        const str = s.trim();
+        // Case: YYYY-MM-DD
+        const ymd = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (ymd) {
+            const y = parseInt(ymd[1], 10);
+            const m = parseInt(ymd[2], 10) - 1;
+            const d = parseInt(ymd[3], 10);
+            return new Date(y, m, d);
+        }
+        // Case: ISO with time
+        if (str.includes('T')) {
+            const iso = new Date(str);
+            if (!isNaN(iso)) {
+                // convert to local date parts (avoid UTC shifting when we later set time)
+                return new Date(iso.getFullYear(), iso.getMonth(), iso.getDate());
+            }
+        }
+        // Case: D/M/YYYY or M/D/YYYY with heuristic
+        const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (dmy) {
+            let a = parseInt(dmy[1], 10); // could be D or M
+            let b = parseInt(dmy[2], 10); // could be M or D
+            const y = parseInt(dmy[3], 10);
+            let day, month;
+            if (a > 12 && b <= 12) {
+                // definitely DD/MM
+                day = a; month = b;
+            } else if (b > 12 && a <= 12) {
+                // definitely MM/DD
+                day = b; month = a;
+            } else {
+                // ambiguous: default to DD/MM as per product requirement
+                day = a; month = b;
+            }
+            return new Date(y, month - 1, day);
+        }
+        // Fallback to native parser (last resort)
+        const nat = new Date(str);
+        return isNaN(nat) ? null : nat;
+    };
+
+    const combineLocalDateAndTime = (dateOnly, timeStr) => {
+        const t = parseTimeString(timeStr);
+        if (!dateOnly) return null;
+        const base = new Date(dateOnly.getFullYear(), dateOnly.getMonth(), dateOnly.getDate());
+        if (t) {
+            base.setHours(t.hours, t.minutes, 0, 0);
+        } else {
+            // If time not parsable, keep 00:00
+            base.setHours(0, 0, 0, 0);
+        }
+        return base;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -30,11 +104,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         if (name === 'odometer_reading_end' && value && booking.pickup_details) {
             calculateCostPreview(value);
         } else if ((name === 'actual_return_date' || name === 'actual_return_time') && formData.odometer_reading_end) {
-            // Recalculate with updated date/time
             const updatedFormData = { ...formData, [name]: value };
             calculateCostPreviewWithFormData(formData.odometer_reading_end, updatedFormData);
-        } else if (name === 'damage_cost' && formData.odometer_reading_end) {
-            // Recalculate when damage cost changes
+        } else if ((name === 'damage_cost' || name === 'vehicle_condition') && formData.odometer_reading_end) {
             const updatedFormData = { ...formData, [name]: value };
             calculateCostPreviewWithFormData(formData.odometer_reading_end, updatedFormData);
         }
@@ -53,73 +125,49 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             return;
         }
 
-        const rawPickupDateISO = booking.pickup_details.actual_pickup_date || booking.requested_pickup_date;
-        const rawPickupTime = booking.pickup_details.actual_pickup_time || booking.requested_pickup_time || '';
+        // Pickup date may be ISO (with timezone) or plain date or even dd/mm/yyyy from legacy
+        const rawPickupDate = booking?.pickup_details?.actual_pickup_date || booking?.requested_pickup_date;
+        const rawPickupTime = booking?.pickup_details?.actual_pickup_time || booking?.requested_pickup_time || '';
 
-        const pickupDateObj = new Date(rawPickupDateISO);
-        if (isNaN(pickupDateObj.getTime())) {
-            console.error('Invalid pickup date ISO', rawPickupDateISO);
+        const pickupDateOnly = parseDateStringLocal(typeof rawPickupDate === 'string' ? rawPickupDate : '');
+        if (!pickupDateOnly) {
+            console.error('Invalid pickup date', rawPickupDate);
+            return;
+        }
+        const pickupDateObj = combineLocalDateAndTime(pickupDateOnly, rawPickupTime) || pickupDateOnly;
+
+        // Return date/time from form (HTML date input gives YYYY-MM-DD)
+        const returnDateOnly = parseDateStringLocal(currentFormData.actual_return_date);
+        const returnDateObj = combineLocalDateAndTime(returnDateOnly, currentFormData.actual_return_time);
+        if (!returnDateObj || isNaN(returnDateObj.getTime())) {
+            console.error('Invalid return date/time', currentFormData.actual_return_date, currentFormData.actual_return_time);
             return;
         }
 
-        const parseTimeString = (t) => {
-            if (!t || typeof t !== 'string') return null;
-            const s = t.trim().toUpperCase();
-            // If contains AM/PM
-            const ampmMatch = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/);
-            if (ampmMatch) {
-                let h = parseInt(ampmMatch[1], 10);
-                const m = parseInt(ampmMatch[2], 10);
-                const mod = ampmMatch[3];
-                if (mod === 'PM' && h !== 12) h += 12;
-                if (mod === 'AM' && h === 12) h = 0;
-                return { hours: h, minutes: m };
-            }
-            const hhmm = s.match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
-            if (hhmm) return { hours: parseInt(hhmm[1], 10), minutes: parseInt(hhmm[2], 10) };
-            return null;
-        };
-
-        const pickupTimeParts = parseTimeString(rawPickupTime);
-        if (pickupTimeParts) {
-            pickupDateObj.setHours(pickupTimeParts.hours, pickupTimeParts.minutes, 0, 0);
-        } else {
-            console.warn('Could not parse pickup time; using time present in pickup ISO', rawPickupTime);
-        }
-
-        const returnDateStr = currentFormData.actual_return_date;
-        const returnTimeStr = currentFormData.actual_return_time;
-
-        let returnDateObj;
-        if (returnDateStr && returnTimeStr) {
-            returnDateObj = new Date(`${returnDateStr}T${returnTimeStr}:00`);
-        } else if (returnDateStr) {
-            returnDateObj = new Date(returnDateStr);
-        } else {
-            returnDateObj = new Date();    // fallback to now
-        }
-        if (isNaN(returnDateObj.getTime())) {
-            console.error('Invalid return date/time', { returnDateStr, returnTimeStr });
-            return;
-        }
-
-        const msDiff = returnDateObj.getTime() - pickupDateObj.getTime();
+        // Difference in minutes using local times
+        let msDiff = returnDateObj.getTime() - pickupDateObj.getTime();
         if (msDiff < 0) {
-            console.warn('Return time is before pickup time; duration negative', { msDiff });
+            console.warn('Return time is before pickup time; setting duration to 0 for preview');
+            msDiff = 0;
         }
-        const durationHours = Math.ceil(msDiff / (1000 * 60 * 60));
+        const minutes = Math.round(msDiff / 60000); // exact minutes
+        const durationHoursExact = minutes / 60;     // fractional hours
+        const durationH = Math.floor(minutes / 60);
+        const durationM = minutes % 60;
 
-        const pricePerKm = parseFloat(booking.package_id.price_per_km) || 0;
-        const pricePerHour = parseFloat(booking.package_id.price_per_hour) || 0;
+        const pricePerKm = parseFloat(booking?.package_id?.price_per_km) || 0;
+        const pricePerHour = parseFloat(booking?.package_id?.price_per_hour) || 0;
         const costPerDistance = distanceTraveled * pricePerKm;
-        const costPerTime = durationHours * pricePerHour;
+        const costPerTime = durationHoursExact * pricePerHour; // exact time-based pricing
         const maxCost = Math.max(costPerDistance, costPerTime);
         const damageCost = parseFloat(currentFormData.damage_cost || 0) || 0;
         const totalCost = maxCost + damageCost;
 
         setCostBreakdown({
             distanceTraveled,
-            durationHours,
+            durationHoursExact,
+            durationH,
+            durationM,
             costPerDistance,
             costPerTime,
             maxCost,
@@ -199,13 +247,14 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" data-testid="return-modal-overlay">
+            <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" data-testid="return-modal">
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900">Confirm Vehicle Return</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">Verify Vehicle Return</h2>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
+                        data-testid="return-modal-close-button"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -213,7 +262,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6" data-testid="return-form">
                     {/* Booking & Pickup Summary */}
                     <div className="bg-gray-50 rounded-lg p-4">
                         <h3 className="font-semibold text-gray-900 mb-3">Booking Information</h3>
@@ -249,6 +298,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                 value={formData.actual_return_date}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                data-testid="return-date-input"
                             />
                         </div>
                         <div>
@@ -261,6 +311,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                 value={formData.actual_return_time}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                data-testid="return-time-input"
                             />
                         </div>
                     </div>
@@ -278,9 +329,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                             placeholder="Enter current odometer reading in km"
                             className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${errors.odometer_reading_end ? 'border-red-500' : 'border-gray-200 focus:border-primary-500'
                                 }`}
+                            data-testid="odometer-end-input"
                         />
                         {errors.odometer_reading_end && (
-                            <p className="mt-1 text-sm text-red-600">{errors.odometer_reading_end}</p>
+                            <p className="mt-1 text-sm text-red-600" data-testid="odometer-end-error">{errors.odometer_reading_end}</p>
                         )}
                     </div>
 
@@ -301,9 +353,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     placeholder="Enter vehicle plate number"
                                     className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${errors.vehicle_plate_number ? 'border-red-500' : 'border-gray-200 focus:border-primary-500'
                                         }`}
+                                    data-testid="vehicle-plate-input"
                                 />
                                 {errors.vehicle_plate_number && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.vehicle_plate_number}</p>
+                                    <p className="mt-1 text-sm text-red-600" data-testid="vehicle-plate-error">{errors.vehicle_plate_number}</p>
                                 )}
                             </div>
 
@@ -319,9 +372,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     placeholder="Enter engine number"
                                     className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${errors.engine_number ? 'border-red-500' : 'border-gray-200 focus:border-primary-500'
                                         }`}
+                                    data-testid="engine-number-input"
                                 />
                                 {errors.engine_number && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.engine_number}</p>
+                                    <p className="mt-1 text-sm text-red-600" data-testid="engine-number-error">{errors.engine_number}</p>
                                 )}
                             </div>
 
@@ -337,9 +391,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     placeholder="Enter chassis number"
                                     className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${errors.chassis_number ? 'border-red-500' : 'border-gray-200 focus:border-primary-500'
                                         }`}
+                                    data-testid="chassis-number-input"
                                 />
                                 {errors.chassis_number && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.chassis_number}</p>
+                                    <p className="mt-1 text-sm text-red-600" data-testid="chassis-number-error">{errors.chassis_number}</p>
                                 )}
                             </div>
                         </div>
@@ -355,6 +410,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                             value={formData.vehicle_condition}
                             onChange={handleChange}
                             className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            data-testid="vehicle-condition-select"
                         >
                             <option value="perfect">Perfect - No Damage</option>
                             <option value="damaged">Damaged</option>
@@ -375,6 +431,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     onChange={handleChange}
                                     placeholder="Enter damage cost"
                                     className="w-full px-4 py-2 border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                    data-testid="damage-cost-input"
                                 />
                             </div>
 
@@ -390,9 +447,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     placeholder="Describe the damage in detail..."
                                     className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.damage_description ? 'border-red-500' : 'border-red-300 focus:border-red-500'
                                         }`}
+                                    data-testid="damage-description-textarea"
                                 />
                                 {errors.damage_description && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.damage_description}</p>
+                                    <p className="mt-1 text-sm text-red-600" data-testid="damage-description-error">{errors.damage_description}</p>
                                 )}
                             </div>
                         </div>
@@ -410,43 +468,44 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                             rows="2"
                             placeholder="Any additional notes about the return..."
                             className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            data-testid="return-notes-textarea"
                         />
                     </div>
 
                     {/* Cost Breakdown */}
                     {costBreakdown && (
-                        <div className="bg-green-50 rounded-lg p-4">
+                        <div className="bg-green-50 rounded-lg p-4" data-testid="cost-breakdown">
                             <h3 className="font-semibold text-green-900 mb-3">Cost Breakdown</h3>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-green-700">Distance Traveled:</span>
-                                    <span className="font-medium">{costBreakdown.distanceTraveled} km</span>
+                                    <span className="font-medium" data-testid="distance-traveled">{costBreakdown.distanceTraveled} km</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-green-700">Duration:</span>
-                                    <span className="font-medium">{costBreakdown.durationHours} hours</span>
+                                    <span className="font-medium" data-testid="duration-display">{costBreakdown.durationH} hr {costBreakdown.durationM} min</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-green-700">Cost (Distance-based):</span>
-                                    <span className="font-medium">₹{costBreakdown.costPerDistance.toFixed(2)}</span>
+                                    <span className="font-medium" data-testid="cost-distance">₹{costBreakdown.costPerDistance.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-green-700">Cost (Time-based):</span>
-                                    <span className="font-medium">₹{costBreakdown.costPerTime.toFixed(2)}</span>
+                                    <span className="font-medium" data-testid="cost-time">₹{costBreakdown.costPerTime.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-green-700">Max Cost (Charged):</span>
-                                    <span className="font-medium">₹{costBreakdown.maxCost.toFixed(2)}</span>
+                                    <span className="font-medium" data-testid="max-cost">₹{costBreakdown.maxCost.toFixed(2)}</span>
                                 </div>
                                 {costBreakdown.damageCost > 0 && (
                                     <div className="flex justify-between text-red-600">
                                         <span>Damage Cost:</span>
-                                        <span className="font-medium">₹{costBreakdown.damageCost.toFixed(2)}</span>
+                                        <span className="font-medium" data-testid="damage-cost">₹{costBreakdown.damageCost.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-lg font-bold text-green-900 pt-2 border-t-2 border-green-200">
                                     <span>Total Amount:</span>
-                                    <span>₹{costBreakdown.totalCost.toFixed(2)}</span>
+                                    <span data-testid="total-amount">₹{costBreakdown.totalCost.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -458,6 +517,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                             type="button"
                             onClick={onClose}
                             className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                            data-testid="cancel-return-button"
                         >
                             Cancel
                         </button>
@@ -465,8 +525,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                             type="submit"
                             disabled={loading || !costBreakdown}
                             className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            data-testid="confirm-return-submit-button"
                         >
-                            {loading ? 'Confirming...' : 'Confirm Return & Calculate Cost'}
+                            {loading ? 'Confirming...' : 'Confirm Return'}
                         </button>
                     </div>
                 </form>
