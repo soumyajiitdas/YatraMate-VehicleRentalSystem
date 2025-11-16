@@ -7,6 +7,7 @@ const router = express.Router();
 router.get('/grouped', vehicleController.getGroupedVehicles);
 router.get('/featured', vehicleController.getFeaturedVehicles);
 router.get('/vendor/:vendorId', vehicleController.getVehiclesByVendor);
+router.patch('/:id/toggle-feature', vehicleController.toggleFeatureVehicle);
 
 router
     .route('/')

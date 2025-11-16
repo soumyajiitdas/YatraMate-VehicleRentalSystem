@@ -96,10 +96,10 @@ const VehicleDetailsPage = () => {
   }
 
   const features = [
-    { icon: '🚗', label: 'Automatic', value: 'Transmission' },
-    { icon: '❄️', label: 'Air Conditioning', value: 'Climate Control' },
-    { icon: '🛡️', label: 'Insurance', value: 'Full Coverage' },
-    { icon: '⚡', label: 'Fuel Type', value: 'Petrol' },
+    { icon: '⚡', label: 'Performance', value: 'Smooth and reliable ride' },
+    { icon: '⛽', label: 'Mileage', value: 'High fuel efficiency' },
+    { icon: '❤️‍🩹', label: 'Insurance', value: 'Full insurance Coverage' },
+    {icon: '🛡️', label: 'Safety', value: 'Regularly serviced and well-maintained' },
   ];
 
   return (
@@ -220,7 +220,8 @@ const VehicleDetailsPage = () => {
               {/* Description */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-neutral-900 mb-3">Description</h3>
-                <p className="text-neutral-600 leading-relaxed">{vehicle.description}</p>
+                {/* TODO: here will be vehicle specific description */}
+                <p className="text-neutral-600 leading-relaxed">This vehicle is maintained to ensure a smooth, reliable, and comfortable riding experience. It undergoes regular servicing, safety checks, and quality inspections before every rental. Designed to deliver dependable performance on city roads as well as longer trips, it offers stable handling, efficient fuel usage, and a user-friendly ride experience. Clean interiors/exteriors, well-kept mechanical components, and a focus on safety make it suitable for both daily commuting and travel needs. Ideal for riders/drivers looking for a trustworthy and hassle-free rental option.</p>
               </div>
 
               {/* Features */}

@@ -11,6 +11,7 @@ const AdminDashboard = () => {
     const [vendors, setVendors] = useState([]);
     const [packages, setPackages] = useState([]);
     const [vehicleRequests, setVehicleRequests] = useState([]);
+    const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');          // 'user', 'vendor', 'package'
@@ -60,12 +61,21 @@ const AdminDashboard = () => {
                     setPackages(data.data.packages);
                 }
             } else if (activeTab === 'vehicle-requests') {
-                const response = await fetch(API_ENDPOINTS.vehicleRequests, {
+                // Fetch both vehicle requests and all vehicles for feature management
+                const requestsResponse = await fetch(API_ENDPOINTS.vehicleRequests, {
                     credentials: 'include'
                 });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    setVehicleRequests(data.data.requests);
+                const requestsData = await requestsResponse.json();
+                if (requestsData.status === 'success') {
+                    setVehicleRequests(requestsData.data.requests);
+                }
+
+                const vehiclesResponse = await fetch(API_ENDPOINTS.vehicles, {
+                    credentials: 'include'
+                });
+                const vehiclesData = await vehiclesResponse.json();
+                if (vehiclesData.status === 'success') {
+                    setVehicles(vehiclesData.data.vehicles);
                 }
             }
 
@@ -216,6 +226,27 @@ const AdminDashboard = () => {
         } catch (error) {
             console.error('Error rejecting request:', error);
             alert('Failed to reject request. Please try again.');
+        }
+    };
+
+    const handleToggleFeature = async (vehicleId) => {
+        try {
+            const response = await fetch(API_ENDPOINTS.toggleFeatureVehicle(vehicleId), {
+                method: 'PATCH',
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
+                alert('Vehicle feature status updated successfully!');
+                fetchData();
+            } else {
+                alert(data.message || 'Failed to toggle feature status. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error toggling feature:', error);
+            alert('Failed to toggle feature status. Please try again.');
         }
     };
 
@@ -384,7 +415,9 @@ const AdminDashboard = () => {
                         {activeTab === 'vehicle-requests' && (
                             <VehicleRequestsTable
                                 requests={vehicleRequests}
+                                vehicles={vehicles}
                                 onViewDetails={handleViewRequestDetails}
+                                onToggleFeature={handleToggleFeature}
                             />
                         )}
                     </>
@@ -1320,7 +1353,18 @@ const DeleteConfirmModal = ({ onConfirm, onCancel }) => {
 };
 
 // Vehicle Requests Table Component
-const VehicleRequestsTable = ({ requests, onViewDetails }) => {
+const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeature }) => {
+    // Calculate featured count
+    const featuredCount = vehicles.filter(v => v.is_featured).length;
+    const maxFeatured = 3;
+    const canAddMore = featuredCount < maxFeatured;
+
+    // Helper function to get vehicle info for approved request
+    const getVehicleForRequest = (request) => {
+        if (request.status !== 'approved') return null;
+        return vehicles.find(v => v.registration_number === request.registration_number);
+    };
+
     if (requests.length === 0) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
@@ -1331,6 +1375,19 @@ const VehicleRequestsTable = ({ requests, onViewDetails }) => {
 
     return (
         <>
+            {/* Featured Count Badge */}
+            <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="font-semibold text-blue-900">Featured Vehicles: {featuredCount}/{maxFeatured}</span>
+                </div>
+                {!canAddMore && (
+                    <span className="text-sm text-blue-700">Maximum featured vehicles reached</span>
+                )}
+            </div>
+
             {/* Desktop Table View */}
             <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -1341,98 +1398,170 @@ const VehicleRequestsTable = ({ requests, onViewDetails }) => {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {requests.map((request) => (
-                            <tr key={request._id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">{request.name}</div>
-                                    <div className="text-sm text-gray-500">{request.model_name}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
-                                    <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-600 capitalize">{request.type}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-600">{request.registration_number}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                        'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                        {request.status}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    {new Date(request.createdAt).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button
-                                        onClick={() => onViewDetails(request)}
-                                        className="text-blue-600 hover:text-blue-900"
-                                    >
-                                        View Details
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                        {requests.map((request) => {
+                            const vehicle = getVehicleForRequest(request);
+                            const isFeatured = vehicle?.is_featured || false;
+                            const canToggle = request.status === 'approved' && vehicle && (isFeatured || canAddMore);
+
+                            return (
+                                <tr key={request._id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm font-medium text-gray-900">{request.name}</div>
+                                        <div className="text-sm text-gray-500">{request.model_name}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
+                                        <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600 capitalize">{request.type}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-600">{request.registration_number}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                            request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                            'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                            {request.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {request.status === 'approved' && vehicle ? (
+                                            isFeatured ? (
+                                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                    Featured
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-gray-500">No</span>
+                                            )
+                                        ) : (
+                                            <span className="text-xs text-gray-400">-</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        {new Date(request.createdAt).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                        <button
+                                            onClick={() => onViewDetails(request)}
+                                            className="text-blue-600 hover:text-blue-900"
+                                        >
+                                            View
+                                        </button>
+                                        {request.status === 'approved' && vehicle && (
+                                            <button
+                                                onClick={() => onToggleFeature(vehicle._id)}
+                                                disabled={!canToggle}
+                                                className={`${
+                                                    canToggle
+                                                        ? isFeatured
+                                                            ? 'text-orange-600 hover:text-orange-900'
+                                                            : 'text-green-600 hover:text-green-900'
+                                                        : 'text-gray-400 cursor-not-allowed'
+                                                }`}
+                                                title={!canToggle && !isFeatured ? 'Maximum featured vehicles reached' : ''}
+                                            >
+                                                {isFeatured ? 'Unfeature' : 'Feature'}
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
-                {requests.map((request) => (
-                    <div key={request._id} className="bg-white rounded-lg shadow-sm p-4">
-                        <div className="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 className="font-semibold text-gray-900">{request.name}</h3>
-                                <p className="text-sm text-gray-600">{request.model_name}</p>
-                            </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
-                                request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                'bg-yellow-100 text-yellow-800'
-                            }`}>
-                                {request.status}
-                            </span>
-                        </div>
-                        
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">Vendor:</span>
-                                <span className="text-gray-900">{request.vendor_id?.name || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">Type:</span>
-                                <span className="text-gray-900 capitalize">{request.type}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">Registration:</span>
-                                <span className="text-gray-900">{request.registration_number}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-500">Submitted:</span>
-                                <span className="text-gray-900">{new Date(request.createdAt).toLocaleDateString()}</span>
-                            </div>
-                        </div>
+                {requests.map((request) => {
+                    const vehicle = getVehicleForRequest(request);
+                    const isFeatured = vehicle?.is_featured || false;
+                    const canToggle = request.status === 'approved' && vehicle && (isFeatured || canAddMore);
 
-                        <button
-                            onClick={() => onViewDetails(request)}
-                            className="w-full mt-4 px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
-                        >
-                            View Details
-                        </button>
-                    </div>
-                ))}
+                    return (
+                        <div key={request._id} className="bg-white rounded-lg shadow-sm p-4">
+                            <div className="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 className="font-semibold text-gray-900">{request.name}</h3>
+                                    <p className="text-sm text-gray-600">{request.model_name}</p>
+                                </div>
+                                <div className="flex flex-col items-end space-y-1">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                                        request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                        {request.status}
+                                    </span>
+                                    {request.status === 'approved' && vehicle && isFeatured && (
+                                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                            Featured
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500">Vendor:</span>
+                                    <span className="text-gray-900">{request.vendor_id?.name || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500">Type:</span>
+                                    <span className="text-gray-900 capitalize">{request.type}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500">Registration:</span>
+                                    <span className="text-gray-900">{request.registration_number}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500">Submitted:</span>
+                                    <span className="text-gray-900">{new Date(request.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2 mt-4 pt-3 border-t">
+                                <button
+                                    onClick={() => onViewDetails(request)}
+                                    className="flex-1 px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                                >
+                                    View Details
+                                </button>
+                                {request.status === 'approved' && vehicle && (
+                                    <button
+                                        onClick={() => onToggleFeature(vehicle._id)}
+                                        disabled={!canToggle}
+                                        className={`flex-1 px-3 py-2 text-sm rounded-lg ${
+                                            canToggle
+                                                ? isFeatured
+                                                    ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+                                                    : 'text-green-600 bg-green-50 hover:bg-green-100'
+                                                : 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                                        }`}
+                                    >
+                                        {isFeatured ? 'Unfeature' : 'Feature'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </>
     );

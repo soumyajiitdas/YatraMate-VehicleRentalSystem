@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     vehiclesFeatured: `${API_BASE_URL}/vehicles/featured`,
     vehicleById: (id) => `${API_BASE_URL}/vehicles/${id}`,
     vehiclesByVendor: (vendorId) => `${API_BASE_URL}/vehicles/vendor/${vendorId}`,
+    toggleFeatureVehicle: (id) => `${API_BASE_URL}/vehicles/${id}/toggle-feature`,
 
     // Booking endpoints
     bookings: `${API_BASE_URL}/bookings`,

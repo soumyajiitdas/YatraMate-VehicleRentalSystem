@@ -331,7 +331,7 @@ const OfficeStaffDashboard = () => {
                                                     onClick={() => handleReturn(booking)}
                                                     className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap"
                                                 >
-                                                    Confirm Return
+                                                    Verify Return
                                                 </button>
                                             )}
                                         </div>

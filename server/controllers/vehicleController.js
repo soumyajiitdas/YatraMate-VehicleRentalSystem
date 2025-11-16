@@ -75,7 +75,7 @@ exports.getGroupedVehicles = catchAsync(async (req, res, next) => {
     });
 });
 
-// Get featured vehicles (max 3)
+// Get featured vehicles (max 4)
 exports.getFeaturedVehicles = catchAsync(async (req, res, next) => {
     const featuredVehicles = await Vehicle.find({ is_featured: true });
 
@@ -123,7 +123,7 @@ exports.getFeaturedVehicles = catchAsync(async (req, res, next) => {
         }
     }
 
-    const groupedFeatured = Array.from(groupedMap.values()).slice(0, 3);
+    const groupedFeatured = Array.from(groupedMap.values()).slice(0, 4);
 
     res.status(200).json({
         status: 'success',
@@ -231,6 +231,35 @@ exports.getVehiclesByVendor = catchAsync(async (req, res, next) => {
         results: vehicles.length,
         data: {
             vehicles
+        }
+    });
+});
+
+// Toggle feature status for a vehicle
+exports.toggleFeatureVehicle = catchAsync(async (req, res, next) => {
+    const vehicle = await Vehicle.findById(req.params.id);
+
+    if (!vehicle) {
+        return next(new AppError('No vehicle found with that ID', 404));
+    }
+
+    // If trying to feature the vehicle, check the limit
+    if (!vehicle.is_featured) {
+        const featuredCount = await Vehicle.countDocuments({ is_featured: true });
+        
+        if (featuredCount >= 4) {
+            return next(new AppError('Maximum 4 vehicles can be featured at a time', 400));
+        }
+    }
+
+    // Toggle the feature status
+    vehicle.is_featured = !vehicle.is_featured;
+    await vehicle.save();
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            vehicle
         }
     });
 });
