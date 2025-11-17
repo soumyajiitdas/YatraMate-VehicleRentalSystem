@@ -1,36 +1,13 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
 import VehicleCardSkeleton from '../components/VehicleCardSkeleton';
 import { API_ENDPOINTS } from '../config/api';
-import { useAuth } from '../contexts/AuthContext';
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
   const [featuredVehicles, setFeaturedVehicles] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loadingVehicles, setLoadingVehicles] = useState(true);
-
-  // Redirect authenticated users to their respective dashboards
-  useEffect(() => {
-    if (!authLoading && user) {
-      switch (user.role) {
-        case 'admin':
-          navigate('/admin');
-          break;
-        case 'office_staff':
-          navigate('/office-staff');
-          break;
-        case 'vendor':
-          navigate('/vendor-dashboard');
-          break;
-        default:
-          // Regular users stay on homepage
-          break;
-      }
-    }
-  }, [user, authLoading, navigate]);
 
   // Fetch featured vehicles from API
   useEffect(() => {
@@ -219,7 +196,7 @@ const HomePage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             {loadingVehicles ? (
               // Show skeleton loaders while vehicles are loading
-              Array.from({ length: 3 }).map((_, index) => (
+              Array.from({ length: 3}).map((_, index) => (
                 <VehicleCardSkeleton key={index} />
               ))
             ) : (
