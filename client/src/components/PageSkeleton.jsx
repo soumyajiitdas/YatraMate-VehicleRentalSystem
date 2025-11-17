@@ -12,7 +12,7 @@ const PageSkeleton = () => {
 
                     {/* Cards Grid */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                        {[1, 2, 3].map((i) => (
                             <div key={i} className="bg-white rounded-2xl shadow-card p-6">
                                 <div className="h-48 bg-neutral-300 rounded-xl mb-4" />
                                 <div className="space-y-3">

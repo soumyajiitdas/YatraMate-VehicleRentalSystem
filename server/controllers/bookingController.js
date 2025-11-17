@@ -284,7 +284,7 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     
     // Final cost is the maximum of distance cost and time cost, plus damage cost
     const max_cost = Math.max(cost_per_distance, cost_per_time);
-    const final_cost = max_cost + (damage_cost || 0);
+    const final_cost = max_cost + (parseFloat(damage_cost) || 0);
     
     // Update return details
     booking.return_details = {
@@ -296,7 +296,7 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
         engine_number,
         chassis_number,
         vehicle_condition,
-        damage_cost: damage_cost || 0,
+        damage_cost: parseFloat(damage_cost) || 0,
         damage_description,
         return_notes
     };
@@ -305,7 +305,7 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     booking.duration_hours = duration_hours;
     booking.cost_per_distance = cost_per_distance;
     booking.cost_per_time = cost_per_time;
-    booking.damage_cost = damage_cost || 0;
+    booking.damage_cost = parseFloat(damage_cost) || 0;
     booking.final_cost = final_cost;
     booking.status = 'returned';
     
