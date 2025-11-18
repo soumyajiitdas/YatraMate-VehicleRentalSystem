@@ -311,8 +311,11 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     
     await booking.save();
     
-    // Update vehicle status back to available
+    // Update vehicle status back to available and update stats
     vehicle.availability_status = 'available';
+    vehicle.total_bookings = (vehicle.total_bookings || 0) + 1;
+    vehicle.total_distance_travelled = (vehicle.total_distance_travelled || 0) + distance_traveled;
+    vehicle.total_hours_booked = (vehicle.total_hours_booked || 0) + duration_hours;
     await vehicle.save();
     
     const populatedBooking = await Booking.findById(booking._id)
