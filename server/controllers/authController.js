@@ -5,6 +5,14 @@ const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+const requiresSecureCookies = (req) => {
+    const forwardedProtoHeader = req.headers['x-forwarded-proto'];
+    const isForwardedSecure =
+        forwardedProtoHeader && forwardedProtoHeader.split(',')[0] === 'https';
+
+    return req.secure || isForwardedSecure || process.env.NODE_ENV === 'production';
+};
+
 // Generate JWT token
 const signToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -13,17 +21,18 @@ const signToken = (id, role) => {
 };
 
 // Send token response
-const createSendToken = (user, statusCode, res, role = null) => {
+const createSendToken = (req, res, user, statusCode, role = null) => {
     const userRole = role || user.role;
     const token = signToken(user._id, userRole);
+    const useSecureCookies = requiresSecureCookies(req);
 
     const cookieOptions = {
         expires: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        secure: useSecureCookies,
         path: '/'
     };
 
@@ -75,7 +84,7 @@ exports.register = catchAsync(async (req, res, next) => {
         role: 'user'
     });
 
-    createSendToken(newUser, 201, res);
+    createSendToken(req, res, newUser, 201);
 });
 
 // Login user (all roles)
@@ -127,7 +136,7 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Your vendor account is pending verification', 401));
     }
 
-    createSendToken(user, 200, res, userRole);
+    createSendToken(req, res, user, 200, userRole);
 });
 
 // Get current logged in user
@@ -194,7 +203,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     user.password_hash = await bcrypt.hash(newPassword, 12);
     await user.save();
 
-    createSendToken(user, 200, res, req.user.role);
+    createSendToken(req, res, user, 200, req.user.role);
 });
 
 // Update profile
@@ -241,11 +250,13 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 
 // Logout user
 exports.logout = catchAsync(async (req, res, next) => {
+    const useSecureCookies = requiresSecureCookies(req);
+
     res.cookie('jwt', 'loggedout', {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        secure: useSecureCookies,
         path: '/'
     });
 

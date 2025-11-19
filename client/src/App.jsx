@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PageSkeleton from './components/PageSkeleton';
@@ -22,8 +22,29 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading, isAuthenticated } = useAuth();
   const hideNavbarRoutes = ['/admin', '/office-staff', '/vendor-dashboard'];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+  const redirectableRoutes = ['/', '/login', '/register', '/vendor'];
+
+  useEffect(() => {
+    if (loading || !isAuthenticated || !user) {
+      return;
+    }
+
+    const dashboardRoutes = {
+      admin: '/admin',
+      vendor: '/vendor-dashboard',
+      office_staff: '/office-staff'
+    };
+
+    const targetRoute = dashboardRoutes[user.role];
+
+    if (targetRoute && redirectableRoutes.includes(location.pathname) && location.pathname !== targetRoute) {
+      navigate(targetRoute, { replace: true });
+    }
+  }, [loading, isAuthenticated, user, location.pathname, navigate]);
 
   return (
     <div className="App">

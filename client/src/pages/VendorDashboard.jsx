@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
     const [vehicles, setVehicles] = useState([]);
     const [vendorInfo, setVendorInfo] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -33,6 +33,9 @@ const VendorDashboard = () => {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
+        if (authLoading) {
+            return;
+        }
         // Check if user is authenticated and is vendor
         if (!isAuthenticated || !user || user.role !== 'vendor') {
             navigate('/login');
@@ -41,7 +44,7 @@ const VendorDashboard = () => {
 
         fetchVendorInfo(user.id);
         fetchVehicles(user.id);
-    }, [navigate, isAuthenticated, user]);
+    }, [navigate, isAuthenticated, user, authLoading]);
 
     const fetchVendorInfo = async (vendorId) => {
         try {
@@ -256,6 +259,14 @@ const VendorDashboard = () => {
         await logout();
         navigate('/login');
     };
+
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+                <p className="text-neutral-600 text-lg font-medium">Loading dashboard...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-neutral-50">

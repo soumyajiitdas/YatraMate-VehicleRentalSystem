@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
     const [activeTab, setActiveTab] = useState('customers');
     const [users, setUsers] = useState([]);
     const [vendors, setVendors] = useState([]);
@@ -24,13 +24,16 @@ const AdminDashboard = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
 
     useEffect(() => {
+        if (authLoading) {
+            return;
+        }
         // Check if user is authenticated and is admin
         if (!isAuthenticated || !user || user.role !== 'admin') {
             navigate('/');
             return;
         }
         fetchData();
-    }, [activeTab, navigate, isAuthenticated, user]);
+    }, [activeTab, navigate, isAuthenticated, user, authLoading]);
 
     const fetchData = async () => {
         try {
@@ -254,6 +257,14 @@ const AdminDashboard = () => {
         await logout();
         navigate('/login');
     };
+
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-gray-600 text-lg font-medium">Loading dashboard...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 py-4 md:py-8">

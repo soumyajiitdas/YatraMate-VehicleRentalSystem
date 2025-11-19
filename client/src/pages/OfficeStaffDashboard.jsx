@@ -7,7 +7,7 @@ import ReturnModal from '../components/ReturnModal';
 
 const OfficeStaffDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
     const [activeTab, setActiveTab] = useState('pending');
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -58,13 +58,16 @@ const OfficeStaffDashboard = () => {
     };
 
     useEffect(() => {
+        if (authLoading) {
+            return;
+        }
         // Check if user is authenticated and is office staff
         if (!isAuthenticated || !user || user.role !== 'office_staff') {
             navigate('/');
             return;
         }
         fetchBookings();
-    }, [activeTab, navigate, isAuthenticated, user]);
+    }, [activeTab, navigate, isAuthenticated, user, authLoading]);
 
     const fetchBookings = async () => {
         try {
@@ -140,6 +143,14 @@ const OfficeStaffDashboard = () => {
             </span>
         );
     };
+
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-gray-600 text-lg font-medium">Loading dashboard...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 py-8">
