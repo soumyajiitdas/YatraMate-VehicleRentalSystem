@@ -101,6 +101,9 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         enum: ['unpaid', 'paid', 'refunded'],
         default: 'unpaid'
+    },
+    rejection_reason: {
+        type: String
     }
 }, { timestamps: true });
 

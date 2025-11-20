@@ -419,3 +419,46 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+// Reject booking (Office staff)
+exports.rejectBooking = catchAsync(async (req, res, next) => {
+    const { bookingId } = req.params;
+    const { rejection_reason } = req.body;
+
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+        return next(new AppError('No booking found with that ID', 404));
+    }
+    
+    if (booking.status !== 'booking_requested') {
+        return next(new AppError('Can only reject bookings in requested state', 400));
+    }
+
+    if (!rejection_reason || rejection_reason.trim() === '') {
+        return next(new AppError('Rejection reason is required', 400));
+    }
+
+    booking.status = 'cancelled';
+    booking.rejection_reason = rejection_reason;
+    await booking.save();
+    
+    // Update vehicle status back to available
+    const vehicle = await Vehicle.findById(booking.vehicle_id);
+    if (vehicle) {
+        vehicle.availability_status = 'available';
+        await vehicle.save();
+    }
+
+    const populatedBooking = await Booking.findById(booking._id)
+        .populate('vehicle_id')
+        .populate('package_id')
+        .populate('user_id', 'name email phone');
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            booking: populatedBooking
+        }
+    });
+});

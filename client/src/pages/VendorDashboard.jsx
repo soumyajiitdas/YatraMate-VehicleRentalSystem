@@ -245,10 +245,10 @@ const VendorDashboard = () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Vehicle deleted successfully!');
+                alert(data.message || 'Vehicle deleted successfully!');
                 fetchVehicles(user.id);
             } else {
-                alert('Error deleting vehicle');
+                alert(data.message || 'Error deleting vehicle');
             }
         } catch (error) {
             alert('Error deleting vehicle: ' + error.message);

@@ -62,7 +62,8 @@ const BookingsPage = () => {
           status: mapBackendStatus(booking.status),
           payment_status: booking.payment_status,
           pickup_details: booking.pickup_details,
-          return_details: booking.return_details
+          return_details: booking.return_details,
+          rejection_reason: booking.rejection_reason || null
         }));
         
         setBookings(transformedBookings);
@@ -238,19 +239,37 @@ const BookingsPage = () => {
                         </span>
                       </div>
 
+                      {/* Rejection Reason Display */}
+                      {booking.status === 'cancelled' && booking.rejection_reason && (
+                        <div className="mt-4 p-2 bg-red-50 border border-red-200 rounded-lg">
+                          <div className="flex items-start space-x-2">
+                            <svg className="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div className="flex-1">
+                              <p className="text-sm text-red-700" data-testid="rejection-reason-text"><span className='font-semibold text-red-900'>Rejection Reason: </span>{booking.rejection_reason}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex flex-wrap gap-3 pt-2">
-                        <button className="px-5 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all duration-200">
-                          View Details
-                        </button>
+                        <Link to="/vehicles/" >
+                          <button className="px-5 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all duration-200">
+                            View Details
+                          </button>
+                        </Link>
                         {booking.status === 'pending' && (
                           <button className="px-5 py-2 border-2 border-secondary-500 text-secondary-600 rounded-lg font-semibold hover:bg-secondary-50 transition-all duration-200">
                             Cancel Booking
                           </button>
                         )}
                         {booking.status === 'completed' && (
-                          <button className="px-5 py-2 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-all duration-200">
-                            Book Again
-                          </button>
+                          <Link to="/vehicles/ ">
+                            <button className="px-5 py-2 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-all duration-200">
+                              Book Again
+                            </button>
+                          </Link>
                         )}
                       </div>
                     </div>

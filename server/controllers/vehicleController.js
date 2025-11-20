@@ -1,5 +1,7 @@
 const Vehicle = require('../models/Vehicle');
 const Package = require('../models/Package');
+const Booking = require('../models/Booking');
+const VehicleRequest = require('../models/VehicleRequest');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -210,14 +212,37 @@ exports.updateVehicle = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteVehicle = catchAsync(async (req, res, next) => {
-    const vehicle = await Vehicle.findByIdAndDelete(req.params.id);
+    const vehicle = await Vehicle.findById(req.params.id);
 
     if (!vehicle) {
         return next(new AppError('No vehicle found with that ID', 404));
     }
 
-    res.status(204).json({
+    // Check if vehicle has active bookings
+    const activeBookings = await Booking.find({
+        vehicle_id: req.params.id,
+        status: { $in: ['booking_requested', 'picked_up'] }
+    });
+
+    if (activeBookings.length > 0) {
+        return next(new AppError('Cannot delete vehicle with active bookings. Please wait until all bookings are completed or cancelled.', 400));
+    }
+
+    // Delete the vehicle
+    await Vehicle.findByIdAndDelete(req.params.id);
+
+    // Delete related vehicle requests
+    await VehicleRequest.deleteMany({
+        $or: [
+            { vendor_id: vehicle.vendor_id, registration_number: vehicle.registration_number },
+            { vendor_id: vehicle.vendor_id, engine_number: vehicle.engine_number },
+            { vendor_id: vehicle.vendor_id, chassis_number: vehicle.chassis_number }
+        ]
+    });
+
+    res.status(200).json({
         status: 'success',
+        message: 'Vehicle deleted successfully',
         data: null
     });
 });

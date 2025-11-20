@@ -14,6 +14,9 @@ const OfficeStaffDashboard = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [showPickupModal, setShowPickupModal] = useState(false);
     const [showReturnModal, setShowReturnModal] = useState(false);
+    const [showRejectDialog, setShowRejectDialog] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [rejecting, setRejecting] = useState(false);
 
     // Utility: parse various date string formats and return a local Date at 00:00
     const parseDateLocal = (s) => {
@@ -117,6 +120,54 @@ const OfficeStaffDashboard = () => {
         setShowReturnModal(false);
         setSelectedBooking(null);
         fetchBookings();
+    };
+
+    const handleReject = (booking) => {
+        setSelectedBooking(booking);
+        setRejectionReason('');
+        setShowRejectDialog(true);
+    };
+
+    const handleRejectConfirm = async () => {
+        if (!rejectionReason || rejectionReason.trim() === '') {
+            alert('Please provide a rejection reason');
+            return;
+        }
+
+        try {
+            setRejecting(true);
+            const response = await fetch(API_ENDPOINTS.rejectBooking(selectedBooking._id), {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ rejection_reason: rejectionReason })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Booking rejected successfully');
+                setShowRejectDialog(false);
+                setSelectedBooking(null);
+                setRejectionReason('');
+                fetchBookings();
+            } else {
+                alert(data.message || 'Error rejecting booking');
+            }
+        } catch (error) {
+            console.error('Error rejecting booking:', error);
+            alert('Error rejecting booking: ' + error.message);
+        } finally {
+            setRejecting(false);
+        }
+    };
+
+    const handleRejectCancel = () => {
+        setShowRejectDialog(false);
+        setSelectedBooking(null);
+        setRejectionReason('');
     };
 
     const handleLogout = async () => {
@@ -329,18 +380,29 @@ const OfficeStaffDashboard = () => {
 
                                         <div className="lg:ml-6 flex flex-row lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2">
                                             {booking.status === 'booking_requested' && (
-                                                <button
-                                                    onClick={() => handlePickup(booking)}
-                                                    className="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
-                                                >
-                                                    Complete Pickup
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={() => handlePickup(booking)}
+                                                        className="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                                        data-testid="complete-pickup-btn"
+                                                    >
+                                                        Complete Pickup
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(booking)}
+                                                        className="flex-1 lg:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                                        data-testid="reject-booking-btn"
+                                                    >
+                                                        Reject Booking
+                                                    </button>
+                                                </>
                                             )}
 
                                             {booking.status === 'picked_up' && (
                                                 <button
                                                     onClick={() => handleReturn(booking)}
                                                     className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                                    data-testid="verify-return-btn"
                                                 >
                                                     Verify Return
                                                 </button>
@@ -369,6 +431,58 @@ const OfficeStaffDashboard = () => {
                     onClose={() => setShowReturnModal(false)}
                     onSuccess={handleReturnSuccess}
                 />
+            )}
+
+            {/* Rejection Dialog */}
+            {showRejectDialog && selectedBooking && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Reject Booking</h3>
+                        
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-2">
+                                Customer: <span className="font-medium text-gray-900">{selectedBooking.user_id.name}</span>
+                            </p>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Vehicle: <span className="font-medium text-gray-900">{selectedBooking.vehicle_id.name}</span>
+                            </p>
+                        </div>
+
+                        <div className="mb-6">
+                            <label htmlFor="rejection-reason" className="block text-sm font-medium text-gray-700 mb-2">
+                                Rejection Reason *
+                            </label>
+                            <textarea
+                                id="rejection-reason"
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                placeholder="Please provide a reason for rejecting this booking..."
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                                rows="4"
+                                data-testid="rejection-reason-input"
+                            />
+                        </div>
+
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={handleRejectCancel}
+                                disabled={rejecting}
+                                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                data-testid="cancel-reject-btn"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleRejectConfirm}
+                                disabled={rejecting || !rejectionReason.trim()}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-testid="confirm-reject-btn"
+                            >
+                                {rejecting ? 'Rejecting...' : 'Confirm Reject'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
