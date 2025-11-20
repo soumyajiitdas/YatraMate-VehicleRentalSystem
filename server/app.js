@@ -15,7 +15,8 @@ const vehicleRequestRouter = require('./routes/vehicleRequestRoutes');
 
 const app = express();
 
-app.set('trust proxy', 1);
+// Trust all proxies so secure cookies work correctly behind hosting load balancers
+app.set('trust proxy', true);
 
 app.use(cors({
     origin: ["https://yatramate.vercel.app", "http://localhost:5173"],

@@ -7,10 +7,19 @@ const AppError = require('../utils/appError');
 
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
-    const isForwardedSecure =
-        forwardedProtoHeader && forwardedProtoHeader.split(',')[0] === 'https';
+    const forwardedProtocols = forwardedProtoHeader
+        ? forwardedProtoHeader.split(',').map(proto => proto.trim())
+        : [];
+    const isForwardedSecure = forwardedProtocols.includes('https');
+    const originHeader = req.headers.origin || '';
+    const isOriginSecure = typeof originHeader === 'string' && originHeader.startsWith('https://');
 
-    return req.secure || isForwardedSecure || process.env.NODE_ENV === 'production';
+    return (
+        req.secure ||
+        isForwardedSecure ||
+        isOriginSecure ||
+        process.env.NODE_ENV === 'production'
+    );
 };
 
 // Generate JWT token
