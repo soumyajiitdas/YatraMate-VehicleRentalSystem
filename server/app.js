@@ -20,7 +20,10 @@ app.set('trust proxy', true);
 
 app.use(cors({
     origin: ["https://yatramate.vercel.app", "http://localhost:5173"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    optionsSuccessStatus: 200
 }));
 
 app.use(express.json());
