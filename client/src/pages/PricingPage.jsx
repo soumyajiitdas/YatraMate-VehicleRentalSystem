@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import { Link } from 'react-router-dom';
+import { FaMotorcycle, FaCarSide } from "react-icons/fa";
 
 const PricingPage = () => {
     const [packages, setPackages] = useState([]);
@@ -34,28 +35,23 @@ const PricingPage = () => {
         ? packages.filter(pkg => pkg.is_active)
         : packages.filter(pkg => pkg.vehicle_type === selectedType && pkg.is_active);
 
-
     const getVehicleIcon = (type) => {
         if (type === 'bike') {
             return (
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
+                <FaMotorcycle className="w-10 h-10" />
             );
         }
         return (
-            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <FaCarSide className="w-10 h-10" />
         );
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+            <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
-                    <p className="mt-4 text-neutral-600">Loading pricing packages...</p>
+                    <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-primary-600 mx-auto mb-4"></div>
+                    <p className="text-lg text-neutral-600 font-medium">Loading pricing packages...</p>
                 </div>
             </div>
         );
@@ -63,34 +59,45 @@ const PricingPage = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen text-center py-50">
-                <div className="inline-block p-8 bg-neutral-100 rounded-full mb-4">
-                    <svg className="w-16 h-16 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+            <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50 flex items-center justify-center py-20">
+                <div className="text-center max-w-md mx-auto px-4">
+                    <div className="inline-block p-10 bg-linear-to-br from-neutral-100 to-neutral-200 rounded-full mb-6">
+                        <svg className="w-20 h-20 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 className="text-3xl font-bold text-neutral-900 mb-3">Oops! Something went wrong</h3>
+                    <p className="text-neutral-600 mb-8 text-lg">We couldn't load the packages. Please try again later.</p>
+                    <Link
+                        to="/"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold hover:shadow-glow-lg transform hover:scale-105 transition-all duration-300"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Back to Home
+                    </Link>
                 </div>
-                <h3 className="text-2xl font-bold text-neutral-900 mb-2">No packages found</h3>
-                <p className="text-neutral-600 mb-10">Something went wrong at our end, try again after sometime...</p>
-                <Link
-                    to="/"
-                    className="px-6 py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
-                >
-                    Back to home
-                </Link>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-neutral-50">
+        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50">
             {/* Hero Section */}
-            <div className="bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white py-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white py-20 overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+                </div>
+                
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
+                        <h1 className="text-4xl md:text-5xl font-display font-bold mb-5">
                             Simple, Transparent Pricing
                         </h1>
-                        <p className="text-xl text-white/90 max-w-2xl mx-auto">
+                        <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
                             Choose the perfect package for your journey. No hidden fees, no surprises.
                         </p>
                     </div>
@@ -98,123 +105,149 @@ const PricingPage = () => {
             </div>
 
             {/* Filter Section */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+                <div className="bg-white rounded-2xl shadow-xl border border-neutral-100 p-3 inline-flex gap-2 mx-auto">
                     <button
                         onClick={() => setSelectedType('all')}
-                        className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${selectedType === 'all'
-                            ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
-                            }`}
+                        className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 ${
+                            selectedType === 'all'
+                                ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow transform scale-105'
+                                : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
+                        }`}
                     >
                         All Packages
                     </button>
                     <button
                         onClick={() => setSelectedType('bike')}
-                        className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${selectedType === 'bike'
-                            ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
-                            }`}
+                        className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center gap-2 ${
+                            selectedType === 'bike'
+                                ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow transform scale-105'
+                                : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
+                        }`}
                     >
+                        <FaMotorcycle className="w-5 h-5" />
                         Bikes
                     </button>
                     <button
                         onClick={() => setSelectedType('car')}
-                        className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 ${selectedType === 'car'
-                            ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
-                            }`}
+                        className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center gap-2 ${
+                            selectedType === 'car'
+                                ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow transform scale-105'
+                                : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
+                        }`}
                     >
+                        <FaCarSide className="w-5 h-5" />
                         Cars
                     </button>
                 </div>
             </div>
 
             {/* Packages Grid */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
                     {filteredPackages.map((pkg) => (
                         <div
                             key={pkg._id}
-                            className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+                            className="relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group transform hover:-translate-y-2"
                         >
+
                             {/* Header */}
-                            <div className="bg-linear-to-r from-primary-500 to-secondary-500 text-white p-6">
-                                <div className="flex justify-center mb-4">
-                                    {getVehicleIcon(pkg.vehicle_type)}
+                            <div className="relative bg-linear-to-br from-primary-500 via-secondary-500 to-primary-600 text-white p-8">
+                                <div className="absolute inset-0 opacity-20">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-2xl"></div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-center mb-2">{pkg.name}</h3>
-                                <p className="text-center text-white/90 text-sm">
-                                    {pkg.cc_range_min} - {pkg.cc_range_max} CC
-                                </p>
+                                <div className="relative">
+                                    <div className="flex justify-center mb-5">
+                                        <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                                            {getVehicleIcon(pkg.vehicle_type)}
+                                        </div>
+                                    </div>
+                                    <h3 className="text-3xl font-bold text-center mb-2">{pkg.name}</h3>
+                                    <div className="flex items-center justify-center gap-2 text-white/90 text-sm font-semibold">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <span>{pkg.cc_range_min} - {pkg.cc_range_max} CC</span>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Pricing Details */}
-                            <div className="p-6">
-                                <div className="space-y-4 mb-6">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-neutral-600">Per Hour</span>
-                                        <span className="text-2xl font-bold text-primary-600">
+                            <div className="p-8">
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    <div className="bg-linear-to-br from-primary-50 to-primary-100 rounded-2xl p-5 text-center">
+                                        <p className="text-xs text-neutral-600 font-bold uppercase tracking-wide mb-2">Per Hour</p>
+                                        <p className="text-3xl font-bold text-primary-600">
                                             ₹{pkg.price_per_hour}
-                                        </span>
+                                        </p>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-neutral-600">Per Kilometer</span>
-                                        <span className="text-2xl font-bold text-secondary-600">
+                                    <div className="bg-linear-to-br from-secondary-50 to-secondary-100 rounded-2xl p-5 text-center">
+                                        <p className="text-xs text-neutral-600 font-bold uppercase tracking-wide mb-2">Per KM</p>
+                                        <p className="text-3xl font-bold text-secondary-600">
                                             ₹{pkg.price_per_km}
-                                        </span>
+                                        </p>
                                     </div>
                                 </div>
 
                                 {pkg.description && (
-                                    <p className="text-neutral-600 text-sm mb-6 text-center">
+                                    <p className="text-neutral-600 text-sm mb-6 text-center leading-relaxed px-2">
                                         {pkg.description}
                                     </p>
                                 )}
 
-                                <div className="space-y-3">
-                                    <div className="flex items-center text-sm text-neutral-600">
-                                        <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>24/7 Support</span>
+                                <div className="space-y-3 mb-8">
+                                    <div className="flex items-center text-sm text-neutral-700">
+                                        <div className="shrink-0 w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                                            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <span className="font-medium">24/7 Customer Support</span>
                                     </div>
-                                    <div className="flex items-center text-sm text-neutral-600">
-                                        <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Free Cancellation</span>
+                                    <div className="flex items-center text-sm text-neutral-700">
+                                        <div className="shrink-0 w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                                            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <span className="font-medium">Free Cancellation</span>
                                     </div>
-                                    <div className="flex items-center text-sm text-neutral-600">
-                                        <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Insurance Included</span>
+                                    <div className="flex items-center text-sm text-neutral-700">
+                                        <div className="shrink-0 w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                                            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <span className="font-medium">Insurance Included</span>
                                     </div>
                                 </div>
+
+                                {/* CTA */}
+                                <Link to="/vehicles">
+                                    <button className="w-full py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold hover:shadow-glow-lg transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
+                                        View Vehicles
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        </svg>
+                                    </button>
+                                </Link>
                             </div>
 
-                            {/* CTA */}
-                            <div className="px-6 pb-6">
-                            <Link to="/vehicles">
-                                <button className="w-full py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200">
-                                    View Vehicles
-                                </button>
-                            </Link>
-                            </div>
+                            {/* Hover Effect Border */}
+                            <div className="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-primary-200 transition-all duration-500 pointer-events-none" />
                         </div>
                     ))}
                 </div>
 
                 {filteredPackages.length === 0 && (
-                    <div className="text-center py-20">
-                        <div className="inline-block p-8 bg-neutral-100 rounded-full mb-4">
-                            <svg className="w-16 h-16 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center py-24 bg-white rounded-3xl shadow-xl border border-neutral-100">
+                        <div className="inline-block p-10 bg-linear-to-br from-neutral-100 to-neutral-200 rounded-full mb-6">
+                            <svg className="w-20 h-20 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 className="text-2xl font-bold text-neutral-900 mb-2">No packages found</h3>
-                        <p className="text-neutral-600 mb-6">There are no packages listed for this selected category.</p>
+                        <h3 className="text-3xl font-bold text-neutral-900 mb-3">No packages available</h3>
+                        <p className="text-neutral-600 text-lg">There are no packages listed for this selected category.</p>
                     </div>
                 )}
             </div>

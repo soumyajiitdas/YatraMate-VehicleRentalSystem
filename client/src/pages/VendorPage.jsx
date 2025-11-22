@@ -143,38 +143,91 @@ const VendorPage = () => {
   };
 
   const benefits = [
-    { icon: '💰', title: 'Earn More', description: 'Increase your income by renting out your vehicles' },
-    { icon: '📊', title: 'Grow Business', description: 'Reach thousands of customers across India' },
-    { icon: '🔒', title: 'Secure Platform', description: 'Safe and secure transactions with insurance' },
-    { icon: '📱', title: 'Easy Management', description: 'Manage your fleet with our intuitive dashboard' },
+    { 
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ), 
+      title: 'Earn More', 
+      description: 'Increase your income by renting out your vehicles',
+      gradient: 'from-emerald-500 to-teal-500'
+    },
+    { 
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      ),
+      title: 'Grow Business', 
+      description: 'Reach thousands of customers across India',
+      gradient: 'from-blue-500 to-indigo-500'
+    },
+    { 
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      ),
+      title: 'Secure Platform', 
+      description: 'Safe and secure transactions with insurance',
+      gradient: 'from-purple-500 to-pink-500'
+    },
+    { 
+      icon: (
+        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      ),
+      title: 'Easy Management', 
+      description: 'Manage your fleet with our intuitive dashboard',
+      gradient: 'from-orange-500 to-red-500'
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50">
       {/* Hero Section */}
-      <section className="bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white py-20 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-display font-bold mb-6">
             Become a Vendor Partner
           </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
             Join YatraMate and start earning by listing your vehicles. Reach millions of customers and grow your business with us.
           </p>
         </div>
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-linear-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-display font-bold text-center text-neutral-900 mb-12">
-            Why Partner With Us?
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-display font-bold text-neutral-900 mb-4">
+              Why Partner With Us <span className='text-primary-600'>?</span>
+            </h2>
+            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+              Join thousands of successful vendors and unlock exclusive benefits
+            </p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
-              <div key={index} className="text-center">
-                <div className="text-5xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-bold text-neutral-900 mb-2">{benefit.title}</h3>
-                <p className="text-neutral-600">{benefit.description}</p>
+              <div 
+                key={index} 
+                className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500  p-5 sm:p-8 text-center transform hover:-translate-y-2"
+              >
+                <div className={`inline-flex items-center justify-center w-18 h-18 sm:h-20 sm:w-20 bg-linear-to-br ${benefit.gradient} rounded-2xl text-white mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg`}>
+                  {benefit.icon}
+                </div>
+                <h3 className="text-xl font-bold text-neutral-900 mb-3">{benefit.title}</h3>
+                <p className="text-neutral-600 leading-relaxed">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -182,54 +235,77 @@ const VendorPage = () => {
       </section>
 
       {/* Registration Form */}
-      <section className="mb-16 mt-6">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-card p-8 border border-primary-200">
-            <h2 className="text-3xl text-center font-display font-bold text-primary-500 mb-2">
-              Vendor Registration
-            </h2>
-            <p className="text-center text-neutral-600 mb-8">
-              Fill out the form below to register as a vendor.
-            </p>
+      <section className="py-20 mb-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-neutral-100">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center p-4 bg-linear-to-br from-primary-500 to-secondary-500 rounded-2xl mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h2 className="text-4xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-3">
+                Vendor Registration
+              </h2>
+              <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+                Fill out the form below to register as a vendor and start your journey with us.
+              </p>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name */}
               <div>
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                  Name *
+                <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                  <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Full Name *
                 </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
                     errors.name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                   }`}
-                  placeholder="Enter your name"
+                  placeholder="Enter your full name"
                 />
-                {errors.name && <p className="mt-1 text-sm text-secondary-600">{errors.name}</p>}
+                {errors.name && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.name}
+                </p>}
               </div>
 
               {/* Register as Organization Checkbox */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="is_organization"
-                  id="is_organization"
-                  checked={formData.is_organization}
-                  onChange={handleChange}
-                  className="w-5 h-5 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
-                />
-                <label htmlFor="is_organization" className="ml-2 text-sm font-semibold text-neutral-700">
-                  Register as a Company/Organization
-                </label>
+              <div className="bg-linear-to-br from-primary-50 to-secondary-50 rounded-xl p-5 border-2 border-primary-100">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="is_organization"
+                    id="is_organization"
+                    checked={formData.is_organization}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-primary-600 border-neutral-300 rounded focus:ring-primary-500 cursor-pointer"
+                  />
+                  <label htmlFor="is_organization" className="ml-3 text-sm font-bold text-neutral-800 cursor-pointer flex items-center gap-2">
+                    <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Register as a Company/Organization
+                  </label>
+                </div>
               </div>
 
               {/* Company Name (conditional) */}
               {formData.is_organization && (
-                <div>
-                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <div className="animate-slide-in">
+                  <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                    <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
                     Company/Organization Name *
                   </label>
                   <input
@@ -237,19 +313,27 @@ const VendorPage = () => {
                     name="company_name"
                     value={formData.company_name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
                       errors.company_name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                     }`}
                     placeholder="Enter company/organization name"
                   />
-                  {errors.company_name && <p className="mt-1 text-sm text-secondary-600">{errors.company_name}</p>}
+                  {errors.company_name && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.company_name}
+                  </p>}
                 </div>
               )}
 
               {/* Contact Number and Email */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                    <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
                     Contact Number *
                   </label>
                   <input
@@ -257,16 +341,24 @@ const VendorPage = () => {
                     name="contact_number"
                     value={formData.contact_number}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
                       errors.contact_number ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                     }`}
                     placeholder="+91 XXXXXXXXXX"
                   />
-                  {errors.contact_number && <p className="mt-1 text-sm text-secondary-600">{errors.contact_number}</p>}
+                  {errors.contact_number && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.contact_number}
+                  </p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                    <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
                     Email Address *
                   </label>
                   <input
@@ -274,25 +366,33 @@ const VendorPage = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
                       errors.email ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                     }`}
                     placeholder="your@email.com"
                   />
-                  {errors.email && <p className="mt-1 text-sm text-secondary-600">{errors.email}</p>}
+                  {errors.email && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email}
+                  </p>}
                 </div>
               </div>
 
               {/* ID Type */}
               <div>
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                  <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                  </svg>
                   ID Type *
                 </label>
                 <select
                   name="id_type"
                   value={formData.id_type}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm font-medium ${
                     errors.id_type ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                   }`}
                 >
@@ -300,50 +400,103 @@ const VendorPage = () => {
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>
-                {errors.id_type && <p className="mt-1 text-sm text-secondary-600">{errors.id_type}</p>}
+                {errors.id_type && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.id_type}
+                </p>}
               </div>
 
               {/* Document Upload (conditional on id_type) */}
               {formData.id_type && (
-                <div>
-                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <div className="animate-slide-in">
+                  <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                    <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
                     Upload Document *
                   </label>
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept="image/*,.pdf"
-                    className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200"
-                    disabled={uploadingDoc}
-                  />
-                  {uploadingDoc && <p className="mt-1 text-sm text-primary-600">Uploading...</p>}
-                  {documentUrl && <p className="mt-1 text-sm text-green-600">✓ Document uploaded successfully</p>}
-                  {errors.document && <p className="mt-1 text-sm text-secondary-600">{errors.document}</p>}
+                  <div className={`relative border-2 border-dashed rounded-xl p-6 transition-all duration-200 ${
+                    uploadingDoc ? 'border-primary-300 bg-primary-50' : documentUrl ? 'border-green-300 bg-green-50' : 'border-neutral-300 hover:border-primary-400 bg-neutral-50'
+                  }`}>
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      accept="image/*,.pdf"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingDoc}
+                    />
+                    <div className="text-center">
+                      {uploadingDoc ? (
+                        <div className="flex flex-col items-center">
+                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mb-3"></div>
+                          <p className="text-sm font-semibold text-primary-600">Uploading document...</p>
+                        </div>
+                      ) : documentUrl ? (
+                        <div className="flex flex-col items-center">
+                          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <p className="text-sm font-semibold text-green-600">Document uploaded successfully!</p>
+                          <p className="text-xs text-neutral-500 mt-1">Click to replace</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center">
+                          <svg className="w-12 h-12 text-neutral-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-sm font-semibold text-neutral-700 mb-1">Click to upload or drag and drop</p>
+                          <p className="text-xs text-neutral-500">PDF or Image (Max 10MB)</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {errors.document && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.document}
+                  </p>}
                 </div>
               )}
 
               {/* Address */}
               <div>
-                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                  <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                   Personal/Business Address *
                 </label>
                 <textarea
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  rows={3}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                  rows={4}
+                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm resize-none ${
                     errors.address ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                   }`}
-                  placeholder="Enter your address"
+                  placeholder="Enter your complete address"
                 />
-                {errors.address && <p className="mt-1 text-sm text-secondary-600">{errors.address}</p>}
+                {errors.address && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.address}
+                </p>}
               </div>
 
               {/* Password */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                    <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
                     Password *
                   </label>
                   <input
@@ -351,16 +504,24 @@ const VendorPage = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
                       errors.password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                     }`}
-                    placeholder="Enter password"
+                    placeholder="Create a strong password"
                   />
-                  {errors.password && <p className="mt-1 text-sm text-secondary-600">{errors.password}</p>}
+                  {errors.password && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.password}
+                  </p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
+                    <svg className="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
                     Confirm Password *
                   </label>
                   <input
@@ -368,22 +529,41 @@ const VendorPage = () => {
                     name="confirm_password"
                     value={formData.confirm_password}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
                       errors.confirm_password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                     }`}
-                    placeholder="Confirm password"
+                    placeholder="Confirm your password"
                   />
-                  {errors.confirm_password && <p className="mt-1 text-sm text-secondary-600">{errors.confirm_password}</p>}
+                  {errors.confirm_password && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.confirm_password}
+                  </p>}
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading || uploadingDoc}
-                className="w-full py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold text-lg hover:shadow-glow transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {loading ? 'Submitting...' : 'Register as Vendor'}
-              </button>
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={loading || uploadingDoc}
+                  className="w-full py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold text-lg hover:shadow-glow-lg transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      Register as Vendor
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
