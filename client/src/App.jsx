@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from
 import { Suspense, lazy, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
+import MobileNav from './components/MobileNav';
 import Footer from './components/Footer';
 import PageSkeleton from './components/PageSkeleton';
 import './App.css';
@@ -49,7 +50,7 @@ function AppContent() {
   return (
     <div className="App">
       {!shouldHideNavbar && <Navbar />}
-      <main>
+      <main className="pb-16 md:pb-0">
         <Suspense fallback={<PageSkeleton />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -67,6 +68,7 @@ function AppContent() {
           </Routes>
         </Suspense>
       </main>
+      {!shouldHideNavbar && <MobileNav />}
       {!shouldHideNavbar && <Footer />}
     </div>
   );

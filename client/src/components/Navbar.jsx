@@ -1,16 +1,13 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
-    setIsMenuOpen(false);
     navigate('/');
   };
 
@@ -57,13 +54,13 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Auth Buttons */}
+          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             {isAuthenticated ? (
               <>
                 <Link
                   to="/profile"
-                  className="flex items-center space-x-2 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center space-x-1 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                 >
                   <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -72,18 +69,24 @@ const Navbar = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-5 py-2 text-primary-500 hover:scale-105 font-medium transition-colors duration-200"
+                  className="flex items-center space-x-2 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                 >
-                  Logout
+                  <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span className="font-medium">Logout</span>
                 </button>
               </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="px-5 py-2 text-primary-500 hover:scale-105 font-medium transition-colors duration-200"
+                  className="flex items-center space-x-1 px-5 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                 >
-                  Login
+                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                  <span className='font-medium'>Login</span>
                 </Link>
                 <Link
                   to="/register"
@@ -95,79 +98,43 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-neutral-700 hover:bg-primary-50 transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-neutral-200 bg-white animate-fade-in">
-          <div className="px-4 py-4 space-y-2">
-            {navLinks.map((link) => (
+          {/* Mobile Auth Icons */}
+          <div className="flex md:hidden items-center space-x-2">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                  data-testid="mobile-profile-icon"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                  data-testid="mobile-logout-icon"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </>
+            ) : (
               <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                  isActive(link.path)
-                    ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white'
-                    : 'text-neutral-700 hover:bg-primary-50'
-                }`}
+                to="/login"
+                className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                data-testid="mobile-login-icon"
               >
-                {link.label}
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
               </Link>
-            ))}
-            <div className="pt-4 border-t border-neutral-200 space-y-2">
-              {isAuthenticated ? (
-                <>
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block px-4 py-3 text-neutral-700 hover:bg-primary-50 rounded-lg font-medium"
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 text-neutral-700 hover:bg-primary-50 rounded-lg font-medium"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block px-4 py-3 text-neutral-700 hover:bg-primary-50 rounded-lg font-medium"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block px-4 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold text-center"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              )}
-            </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 };

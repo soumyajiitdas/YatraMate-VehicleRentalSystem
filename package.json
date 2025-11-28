@@ -1,0 +1,36 @@
+{
+  "name": "yatramate",
+  "version": "2.0.1",
+  "description": "A vehicle rental system full stack application with full workflow",
+  "keywords": [
+    "nodejs",
+    "expressjs",
+    "reactjs",
+    "tailwindCSS",
+    "fullstack",
+    "app"
+  ],
+  "homepage": "https://github.com/soumyajiitdas/YatraMate-VehicleRentalSystem#readme",
+  "bugs": {
+    "url": "https://github.com/soumyajiitdas/YatraMate-VehicleRentalSystem/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soumyajiitdas/YatraMate-VehicleRentalSystem.git"
+  },
+  "license": "ISC",
+  "author": "soumyajit indrajit joy animesh",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "iclient": "cd client && npm install",
+    "iserver": "cd server && npm install",
+    "client":"cd client && npm run dev",
+    "server":"cd server && npm start",
+    "download":"concurrently \"npm run iclient\" \"npm run iserver\"",
+    "app":"concurrently \"npm run client\" \"npm run server\""
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
