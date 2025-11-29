@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BookingForm from '../components/BookingForm';
-import { FaMotorcycle, FaCarSide } from "react-icons/fa";
+import { Motorbike, Car, Sparkles } from 'lucide-react';
 import { API_ENDPOINTS } from '../config/api';
 
 const VehicleDetailsPage = () => {
@@ -43,7 +43,7 @@ const VehicleDetailsPage = () => {
 
       const payload = {
         vehicle_id: bookingData.vehicle_id,
-        start_location: bookingData.pickup_location,
+        Sparklest_location: bookingData.pickup_location,
         end_location: bookingData.dropoff_location,
         requested_pickup_date: pickupDate.toISOString(),
         requested_pickup_time: pickupTime
@@ -129,15 +129,16 @@ const VehicleDetailsPage = () => {
                 {/* Featured Badge and Availability Badge */}
                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                   {vehicle.is_featured && (
-                    <span className="px-4 py-2 rounded-full text-sm font-semibold bg-yellow-500/90 text-white backdrop-blur-sm">
-                      Featured
+                    <span className="flex items-center gap-1 px-3.5 py-2 rounded-full text-sm bg-amber-500 text-white backdrop-blur-lg">
+                      <Sparkles className="w-4 h-4 animate-pulse" />
+                      <span className='font-semibold'>Featured</span>
                     </span>
                   )}
                   <span className={`px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ml-auto ${vehicle.is_available_for_booking
-                      ? 'bg-green-500/90 text-white'
-                      : 'bg-neutral-500/90 text-white'
+                    ? 'bg-green-500/90 text-white'
+                    : 'bg-neutral-500/90 text-white'
                     }`}>
-                    {vehicle.is_available_for_booking ? 'Available' : 'Not Available'}
+                    {vehicle.is_available_for_booking ? '✓ Available' : '‼ Not Available'}
                   </span>
                 </div>
               </div>
@@ -150,8 +151,8 @@ const VehicleDetailsPage = () => {
                       key={index}
                       onClick={() => setSelectedImage(index)}
                       className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${selectedImage === index
-                          ? 'border-primary-500 ring-2 ring-primary-200'
-                          : 'border-neutral-200 hover:border-primary-300'
+                        ? 'border-primary-500 ring-2 ring-primary-200'
+                        : 'border-neutral-200 hover:border-primary-300'
                         }`}
                     >
                       <img
@@ -186,11 +187,11 @@ const VehicleDetailsPage = () => {
                     )}
                   </div>
                 </div>
-                <span className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-full text-sm font-bold shadow-md capitalize">
+                <span className="flex items-center gap-2 px-3.5 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-full text-sm font-semibold shadow-md capitalize">
                   {vehicle.type === 'car' ? (
-                    <FaCarSide className="w-5 h-5" />
+                    <Car className="w-6 h-6" />
                   ) : (
-                    <FaMotorcycle className="w-5 h-5" />
+                    <Motorbike className="w-6 h-6" />
                   )}
                   {vehicle.type}
                 </span>
@@ -205,25 +206,34 @@ const VehicleDetailsPage = () => {
               </div>
 
               {/* Pricing */}
-              <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-xl p-4 sm:p-6 mb-8 border-2 border-primary-200">
-                <h3 className="text-base sm:text-lg font-semibold text-neutral-900 mb-3 sm:mb-4">Rental Pricing</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm text-neutral-600 mb-1">Per Day</div>
-                    <div className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                      ₹{vehicle.price_per_day}
+              <div className="relative overflow-hidden rounded-2xl p-5 sm:p-7 mb-8 bg-linear-to-r from-primary-50 to-secondary-50 border border-primary-200 shadow-sm hover:shadow-lg transition-shadow">
+                <div class="absolute inset-0 pointer-events-none bg-white/40 opacity-40"></div>
+
+                <div class="relative">
+                  <h3 class="text-lg sm:text-xl font-semibold text-neutral-900 mb-4">
+                    Rental Pricing <span className='text-primary-500'>:</span>
+                  </h3>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                      <span class="text-sm text-neutral-600">Per Day</span>
+                      <span class="text-2xl sm:text-3xl font-extrabold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent tracking-tight">
+                        ₹{vehicle.price_per_day}
+                      </span>
                     </div>
-                  </div>
-                  {vehicle.price_per_km && (
-                    <div>
-                      <div className="text-sm text-neutral-600 mb-1">Per Kilometer</div>
-                      <div className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                        ₹{vehicle.price_per_km}
+
+                    {vehicle.price_per_km && (
+                      <div class="flex flex-col">
+                        <span class="text-sm text-neutral-600">Per Kilometer</span>
+                        <span class="text-2xl sm:text-3xl font-extrabold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent tracking-tight">
+                          ₹{vehicle.price_per_km}
+                        </span>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
+
 
               {/* Description */}
               <div className="mb-8 pb-8 border-b border-neutral-200">

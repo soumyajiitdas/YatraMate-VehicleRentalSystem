@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaCarSide, FaMotorcycle } from "react-icons/fa";
-import { FaLocationDot } from "react-icons/fa6";
+import { Car, Motorbike, MapPin } from 'lucide-react';
 
 const VehicleCard = ({ vehicle }) => {
   const {
@@ -30,17 +29,14 @@ const VehicleCard = ({ vehicle }) => {
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
         />
         
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-        
         {/* Top Badges */}
         <div className="absolute top-4 left-4 right-4 flex items-start justify-between z-10">
           {/* Type Badge */}
           <span className="p-2 rounded-full text-xs font-bold bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg backdrop-blur-sm">
             {type === 'car' ? (
-              <FaCarSide className="w-3.5 h-3.5 group-hover:animate-bounce" />
+              <Car className="w-4 h-4 group-hover:animate-bounce" />
             ) : (
-              <FaMotorcycle className="w-3.5 h-3.5 group-hover:animate-bounce" />
+              <Motorbike className="w-4 h-4 group-hover:animate-bounce" />
             )}
           </span>
           
@@ -77,7 +73,7 @@ const VehicleCard = ({ vehicle }) => {
         {/* Location Section */}
         <div className='mb-4'>
           <div className="flex items-center text-neutral-800 text-xs font-medium">
-            <FaLocationDot className="w-3.5 h-3.5 mr-2 text-primary-500" />
+            <MapPin className="w-4 h-4 mr-2 text-primary-500" />
             <span className="drop-shadow-lg">{location}</span>
           </div>
         </div>

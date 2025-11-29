@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import { Link } from 'react-router-dom';
-import { FaMotorcycle, FaCarSide } from "react-icons/fa";
+import { Motorbike, Car } from 'lucide-react';
 
 const PricingPage = () => {
     const [packages, setPackages] = useState([]);
@@ -38,11 +38,11 @@ const PricingPage = () => {
     const getVehicleIcon = (type) => {
         if (type === 'bike') {
             return (
-                <FaMotorcycle className="w-10 h-10" />
+                <Motorbike className="w-10 h-10" />
             );
         }
         return (
-            <FaCarSide className="w-10 h-10" />
+            <Car className="w-10 h-10" />
         );
     };
 
@@ -125,7 +125,7 @@ const PricingPage = () => {
                                 : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
                         }`}
                     >
-                        <FaMotorcycle className="w-5 h-5" />
+                        <Motorbike className="w-5 h-5" />
                         Bikes
                     </button>
                     <button
@@ -136,7 +136,7 @@ const PricingPage = () => {
                                 : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
                         }`}
                     >
-                        <FaCarSide className="w-5 h-5" />
+                        <Car className="w-5 h-5" />
                         Cars
                     </button>
                 </div>

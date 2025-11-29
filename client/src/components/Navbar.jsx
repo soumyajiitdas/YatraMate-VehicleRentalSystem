@@ -122,15 +122,23 @@ const Navbar = () => {
                 </button>
               </>
             ) : (
-              <Link
+              <>
+                <Link
                 to="/login"
-                className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                className="p-2 rounded-lg text-primary-600 bg-red-100 hover:-rotate-7 transition-colors duration-200"
                 data-testid="mobile-login-icon"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
               </Link>
+              <Link
+                  to="/register"
+                  className="px-4 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white text-sm rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
           </div>
         </div>

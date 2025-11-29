@@ -80,7 +80,7 @@ const Footer = () => {
           </div>
 
           {/* Services Links */}
-          <div>
+          <div className='hidden sm:block'>
             <h3 className="text-lg font-semibold mb-4 text-white">Services</h3>
             <ul className="space-y-2">
               {footerLinks.services.map((link) => (

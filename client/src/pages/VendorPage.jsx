@@ -39,8 +39,8 @@ const VendorPage = () => {
     if (!file) return;
 
     // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      alert('File size must be less than 10MB');
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size must be less than 2MB');
       return;
     }
 
@@ -449,7 +449,7 @@ const VendorPage = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                           </svg>
                           <p className="text-sm font-semibold text-neutral-700 mb-1">Click to upload or drag and drop</p>
-                          <p className="text-xs text-neutral-500">PDF or Image (Max 10MB)</p>
+                          <p className="text-xs text-neutral-500">PDF or Image (Max 2MB)</p>
                         </div>
                       )}
                     </div>
