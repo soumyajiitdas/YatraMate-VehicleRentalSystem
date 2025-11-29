@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
 import { API_ENDPOINTS } from '../config/api';
-import { Search, KeySquare, BadgeIndianRupee, CircleCheckBig, ClipboardCheck } from 'lucide-react';
+import { Search, CarFront, BadgeIndianRupee, CircleCheckBig, ClipboardCheck } from 'lucide-react';
 
 const VehiclesPage = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -100,7 +100,7 @@ const VehiclesPage = () => {
             {/* Type Filter */}
             <div>
               <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
-                <KeySquare className="w-4 h-4 mr-2 text-primary-500" />
+                <CarFront className="w-4 h-4 mr-2 text-primary-500" />
                 Vehicle Type
               </label>
               <select

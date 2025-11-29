@@ -20,6 +20,11 @@ const VendorDashboard = lazy(() => import('./pages/VendorDashboard'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const OfficeStaffDashboard = lazy(() => import('./pages/OfficeStaffDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AboutUsPage = lazy(() => import('./pages/AboutUsPage'));
+const FAQsPage = lazy(() => import('./pages/FAQsPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const HelpCenterPage = lazy(() => import('./pages/HelpCenterPage'));
 
 function AppContent() {
   const location = useLocation();
@@ -65,6 +70,11 @@ function AppContent() {
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/office-staff" element={<OfficeStaffDashboard />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/about" element={<AboutUsPage />} />
+            <Route path="/faq" element={<FAQsPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
           </Routes>
         </Suspense>
       </main>

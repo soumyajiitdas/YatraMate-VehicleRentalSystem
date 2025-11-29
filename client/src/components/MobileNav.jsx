@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { House, KeySquare, BadgeIndianRupee, ClipboardList, UserPlus} from 'lucide-react';
+import { House, CarFront, BadgeIndianRupee, ClipboardList, UserPlus} from 'lucide-react';
 
 const MobileNav = () => {
     const location = useLocation();
@@ -18,14 +18,7 @@ const MobileNav = () => {
             path: '/vehicles',
             label: 'Vehicles',
             icon: (
-                <KeySquare className="w-6 h-6" />
-            ),
-        },
-        {
-            path: '/pricing',
-            label: 'Pricing',
-            icon: (
-                <BadgeIndianRupee className="w-6 h-6" />
+                <CarFront className="w-6 h-6" />
             ),
         },
         {
@@ -33,6 +26,13 @@ const MobileNav = () => {
             label: 'Bookings',
             icon: (
                 <ClipboardList className="w-6 h-6" />
+            ),
+        },
+        {
+            path: '/pricing',
+            label: 'Pricing',
+            icon: (
+                <BadgeIndianRupee className="w-6 h-6" />
             ),
         },
         {

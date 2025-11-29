@@ -6,13 +6,13 @@ const Footer = () => {
   const footerLinks = {
     company: [
       { label: 'About Us', path: '/about' },
-      { label: 'Contact', path: '/contact' },
-      { label: 'Careers', path: '/careers' },
-      { label: 'Blog', path: '/blog' },
+      { label: 'Contact', path: '/help' },
+      { label: 'Careers', path: '/about' },
+      { label: 'Blog', path: '/about' },
     ],
     services: [
-      { label: 'Car Rentals', path: '/vehicles?type=car' },
-      { label: 'Bike Rentals', path: '/vehicles?type=bike' },
+      { label: 'Car Rentals', path: '/vehicles' },
+      { label: 'Bike Rentals', path: '/vehicles' },
       { label: 'Become a Vendor', path: '/vendor' },
       { label: 'Pricing', path: '/pricing' },
     ],
@@ -25,8 +25,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-linear-to-r from-neutral-900 via-neutral-800 to-neutral-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="bg-linear-to-r from-neutral-900 via-neutral-800 to-neutral-900 text-white mb-8 sm:mb-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="space-y-4">
@@ -115,21 +115,13 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-neutral-700">
+        <div className="pt-6 border-t border-neutral-700">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-neutral-400 text-xs sm:text-sm text-center md:text-left">
               © {currentYear} YatraMate. All rights reserved.
             </p>
-            <div className="flex items-center flex-wrap justify-center gap-4 sm:gap-6">
-              <Link to="/terms" className="text-neutral-400 hover:text-primary-400 text-xs sm:text-sm transition-colors duration-200">
-                Terms
-              </Link>
-              <Link to="/privacy" className="text-neutral-400 hover:text-primary-400 text-xs sm:text-sm transition-colors duration-200">
-                Privacy
-              </Link>
-              <Link to="/cookies" className="text-neutral-400 hover:text-primary-400 text-xs sm:text-sm transition-colors duration-200">
-                Cookies
-              </Link>
+            <div className="hidden text-neutral-400 text-sm sm:block">
+                Crafted with ❤️ and a vision to make vehicle rental affordable.
             </div>
           </div>
         </div>
