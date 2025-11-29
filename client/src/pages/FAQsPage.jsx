@@ -157,6 +157,23 @@ const FAQsPage = () => {
             Find answers to common questions about YatraMate's vehicle rental services
           </p>
         </div>
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top-left cluster */}
+          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+          {/* Center-right floating grouping */}
+          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+          {/* Bottom-right anchor cluster */}
+          <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
+        </div>
       </section>
 
       {/* FAQ Categories */}
@@ -169,7 +186,7 @@ const FAQsPage = () => {
                   {category.icon}
                 </div>
                 <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900">
-                  {category.category}
+                  {category.category} <span className='text-red-500'>:</span>
                 </h2>
               </div>
               <div className="space-y-4">
@@ -179,15 +196,15 @@ const FAQsPage = () => {
                   return (
                     <div 
                       key={faqIndex}
-                      className="bg-white rounded-xl shadow-md border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                      className="bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 rounded-xl shadow-md border border-primary-100 overflow-hidden hover:shadow-lg transition-shadow duration-200"
                     >
                       <button
                         onClick={() => toggleFAQ(globalIndex)}
                         data-testid={`faq-question-${globalIndex}`}
-                        className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-neutral-50 transition-colors duration-200"
+                        className="w-full px-6 py-5 text-left flex items-center justify-between"
                       >
                         <span className="text-lg font-semibold text-neutral-900 pr-4">
-                          {faq.question}
+                          <span className='text-red-500'>● </span>{faq.question}
                         </span>
                         <svg
                           className={`w-6 h-6 text-primary-600 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
@@ -232,7 +249,7 @@ const FAQsPage = () => {
             <a
               href="mailto:support@yatramate.com"
               data-testid="faq-email-support-btn"
-              className="inline-block bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold hover:bg-primary-800 transition-colors duration-200 border-2 border-white"
+              className="inline-block bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold hover:bg-secondary-700 transition-colors duration-200 border-2 border-white"
             >
               Email Support
             </a>

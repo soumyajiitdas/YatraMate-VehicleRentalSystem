@@ -23,7 +23,7 @@ const BookingsPage = () => {
     try {
       // Get user ID from AuthContext
       const userId = user?._id || user?.id;
-      
+
       if (!userId) {
         console.log('No user ID found');
         setLoading(false);
@@ -33,13 +33,13 @@ const BookingsPage = () => {
       const response = await fetch(API_ENDPOINTS.userBookings(userId), {
         credentials: 'include'
       });
-      
+
       if (!response.ok) {
         console.error('Failed to fetch bookings:', response.status, response.statusText);
         setLoading(false);
         return;
       }
-      
+
       const data = await response.json();
       console.log('Bookings data:', data);
 
@@ -65,7 +65,7 @@ const BookingsPage = () => {
           return_details: booking.return_details,
           rejection_reason: booking.rejection_reason || null
         }));
-        
+
         setBookings(transformedBookings);
       }
     } catch (error) {
@@ -116,17 +116,17 @@ const BookingsPage = () => {
     });
   };
 
-  const filteredBookings = filter === 'all' 
-    ? bookings 
+  const filteredBookings = filter === 'all'
+    ? bookings
     : bookings.filter(booking => booking.status === filter);
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-8">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-2">
-            My Bookings
+            My <span className='text-red-500'>Bookings</span>
           </h1>
           <p className="text-lg text-neutral-600">
             Track and manage your vehicle bookings
@@ -134,17 +134,16 @@ const BookingsPage = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white rounded-2xl shadow-card p-2 mb-8 overflow-x-auto">
+        <div className="bg-white border border-primary-200 rounded-2xl shadow-card p-2 mb-8 overflow-x-auto">
           <div className="flex space-x-2 min-w-max sm:min-w-0">
             {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((status) => (
               <button
                 key={status}
                 onClick={() => setFilter(status)}
-                className={`px-4 sm:px-6 py-2.5 rounded-xl font-medium text-sm sm:text-base capitalize transition-all duration-200 whitespace-nowrap ${
-                  filter === status
-                    ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                    : 'text-neutral-700 hover:bg-neutral-100'
-                }`}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl font-medium text-sm sm:text-base capitalize transition-all duration-200 whitespace-nowrap ${filter === status
+                  ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
+                  : 'text-neutral-700 sm:underline underline-offset-2 decoration-4 decoration-red-200 hover:bg-neutral-100 no-underline'
+                  }`}
               >
                 {status}
               </button>
@@ -275,6 +274,7 @@ const BookingsPage = () => {
                     </div>
                   </div>
                 </div>
+
               </div>
             ))}
           </div>
@@ -287,8 +287,8 @@ const BookingsPage = () => {
             </div>
             <h3 className="text-2xl font-bold text-neutral-900 mb-2">No bookings found</h3>
             <p className="text-neutral-600 mb-6">
-              {filter === 'all' 
-                ? "You haven't made any bookings yet. Start exploring vehicles!" 
+              {filter === 'all'
+                ? "You haven't made any bookings yet. Start exploring vehicles!"
                 : `No ${filter} bookings found.`}
             </p>
             <Link
@@ -302,6 +302,23 @@ const BookingsPage = () => {
             </Link>
           </div>
         )}
+      </div>
+      {/* Background Decorative Elements*/}
+      <div className="hidden absolute inset-0 pointer-events-none sm:block">
+        {/* Top-left cluster */}
+        <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+        {/* Center-right floating grouping */}
+        <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+        {/* Bottom-right anchor cluster */}
+        <div className="absolute -bottom-20 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute -bottom-14 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute -bottom-30 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
       </div>
     </div>
   );

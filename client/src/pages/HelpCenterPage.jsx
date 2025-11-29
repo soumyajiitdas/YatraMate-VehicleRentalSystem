@@ -149,28 +149,45 @@ const HelpCenterPage = () => {
             Get the support you need, whenever you need it
           </p>
         </div>
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top-left cluster */}
+          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+          {/* Center-right floating grouping */}
+          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+          {/* Bottom-right anchor cluster */}
+          <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
+        </div>
       </section>
 
       {/* Quick Links Section */}
       <section className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Quick Help</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Quick Help <span className='text-red-500'>:</span></h2>
             <p className="text-neutral-600">Browse these common topics to find quick answers</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {quickLinks.map((link, index) => (
               <Link
                 key={index}
                 to={link.path}
                 data-testid={`quick-link-${index}`}
-                className="bg-white p-6 rounded-xl shadow-md border border-neutral-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group"
+                className="bg-white p-4 sm:p-6 rounded-xl shadow-md border-2 border-primary-100 hover:border-primary-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group"
               >
                 <div className={`w-16 h-16 bg-linear-to-r ${link.color} rounded-lg flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   {link.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">{link.title}</h3>
-                <p className="text-neutral-600 text-sm">{link.description}</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">{link.title}</h3>
+                <p className="text-neutral-600 text:xs sm:text-sm">{link.description}</p>
               </Link>
             ))}
           </div>
@@ -178,25 +195,25 @@ const HelpCenterPage = () => {
       </section>
 
       {/* Contact Methods Section */}
-      <section className="py-12 md:py-16 bg-white">
+      <section className="py-12 md:py-16 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Contact Us</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Contact Us <span className='text-red-500'>:</span></h2>
             <p className="text-neutral-600">Multiple ways to reach our support team</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {contactMethods.map((method, index) => (
               <a
                 key={index}
                 href={method.link}
                 data-testid={`contact-method-${index}`}
-                className="bg-linear-to-br from-neutral-50 to-white p-6 rounded-xl shadow-md border border-neutral-200 hover:shadow-lg transition-all duration-300 hover:border-primary-300 group text-center"
+                className="bg-linear-to-br from-neutral-50 to-white p-4 sm:p-6 rounded-xl shadow-md border-2 border-neutral-200 hover:shadow-lg transition-all duration-300 hover:border-primary-300 group text-center"
               >
                 <div className="w-14 h-14 bg-linear-to-r from-primary-500 to-secondary-600 rounded-full flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   {method.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">{method.title}</h3>
-                <p className="text-neutral-600 text-sm">{method.value}</p>
+                <h3 className="text-md sm:text-lg font-semibold text-neutral-900 mb-2">{method.title}</h3>
+                <p className="text-neutral-600 text-xs sm:text-sm">{method.value}</p>
               </a>
             ))}
           </div>
@@ -207,16 +224,16 @@ const HelpCenterPage = () => {
       <section className="py-12 md:py-16 bg-linear-to-b from-white to-neutral-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Send Us a Message</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Send Us a Message <span className='text-red-500'>:</span></h2>
             <p className="text-neutral-600">Fill out the form below and we'll get back to you within 24 hours</p>
           </div>
 
-          <div className="bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-neutral-200">
+          <div className="bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 p-8 md:p-10 rounded-2xl shadow-xl border-2 border-primary-100">
             <form onSubmit={handleSubmit} data-testid="contact-form">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-neutral-700 mb-2">
-                    Full Name *
+                  <label htmlFor="name" className="block text-md font-semibold text-neutral-700 mb-2">
+                    Full Name <span className='text-red-500'>*</span>
                   </label>
                   <input
                     type="text"
@@ -226,13 +243,13 @@ const HelpCenterPage = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="John Doe"
+                    className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Your Name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-neutral-700 mb-2">
-                    Email Address *
+                  <label htmlFor="email" className="block text-md font-semibold text-neutral-700 mb-2">
+                    Email Address <span className='text-red-500'>*</span>
                   </label>
                   <input
                     type="email"
@@ -242,16 +259,16 @@ const HelpCenterPage = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="john@example.com"
+                    className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                    placeholder="your.mail@example.com"
                   />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-neutral-700 mb-2">
-                    Phone Number
+                  <label htmlFor="phone" className="block text-md font-semibold text-neutral-700 mb-2">
+                    Phone Number <span className='text-red-500'>*</span>
                   </label>
                   <input
                     type="tel"
@@ -260,13 +277,13 @@ const HelpCenterPage = () => {
                     data-testid="contact-form-phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="+91 98765 43210"
+                    className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                    placeholder="+91 ***** *****"
                   />
                 </div>
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-semibold text-neutral-700 mb-2">
-                    Subject *
+                  <label htmlFor="subject" className="block text-md font-semibold text-neutral-700 mb-2">
+                    Subject <span className='text-red-500'>*</span>
                   </label>
                   <select
                     id="subject"
@@ -289,8 +306,8 @@ const HelpCenterPage = () => {
               </div>
 
               <div className="mb-6">
-                <label htmlFor="message" className="block text-sm font-semibold text-neutral-700 mb-2">
-                  Message *
+                <label htmlFor="message" className="block text-md font-semibold text-neutral-700 mb-2">
+                  Message <span className='text-red-500'>*</span>
                 </label>
                 <textarea
                   id="message"
@@ -300,7 +317,7 @@ const HelpCenterPage = () => {
                   onChange={handleChange}
                   required
                   rows="6"
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 resize-none"
+                  className="w-full px-4 py-3 border bg-white border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 resize-none"
                   placeholder="Please describe your issue or question in detail..."
                 />
               </div>
@@ -370,7 +387,7 @@ const HelpCenterPage = () => {
             <Link
               to="/vehicles"
               data-testid="help-browse-vehicles-link"
-              className="inline-block bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold hover:bg-primary-800 transition-colors duration-200 border-2 border-white"
+              className="inline-block bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold hover:bg-secondary-700 transition-colors duration-200 border-2 border-white"
             >
               Browse Vehicles
             </Link>

@@ -187,7 +187,7 @@ const PrivacyPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-primary-50">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
       {/* Hero Section */}
       <section className="relative pt-20 pb-12 md:pt-28 md:pb-16 overflow-hidden bg-linear-to-r from-secondary-600 via-primary-600 to-secondary-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -201,7 +201,7 @@ const PrivacyPage = () => {
             Your privacy is important to us. Learn how we collect, use, and protect your information.
           </p>
           <p className="text-sm text-primary-200 mt-4">
-            Last Updated: January 2024
+            Last Updated: November 2025
           </p>
         </div>
       </section>
@@ -209,8 +209,8 @@ const PrivacyPage = () => {
       {/* Introduction */}
       <section className="py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-linear-to-br from-secondary-50 to-primary-50 border-l-4 border-secondary-600 p-6 rounded-r-xl mb-12">
-            <h2 className="text-2xl font-bold text-neutral-900 mb-3">Our Commitment to Your Privacy</h2>
+          <div className="bg-red-100 border-l-4 border-secondary-600 p-6 rounded-r-xl mb-12">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-3">Our Commitment to Your Privacy <span className='text-red-600'>:</span></h2>
             <p className="text-neutral-700 leading-relaxed mb-3">
               At YatraMate, we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our vehicle rental services.
             </p>
@@ -236,7 +236,7 @@ const PrivacyPage = () => {
                 <div className="space-y-4 ml-0 md:ml-16">
                   {section.content.map((item, itemIndex) => (
                     <div key={itemIndex}>
-                      <h3 className="text-lg font-semibold text-neutral-800 mb-2">{item.subtitle}</h3>
+                      <h3 className="text-lg font-semibold text-neutral-800 mb-2"><span className='text-red-500'>●</span> {item.subtitle}</h3>
                       <p className="text-neutral-700 leading-relaxed">{item.text}</p>
                     </div>
                   ))}
@@ -262,7 +262,7 @@ const PrivacyPage = () => {
               <a
                 href="mailto:privacy@yatramate.com"
                 data-testid="privacy-email-btn"
-                className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-secondary-600 transition-colors duration-200 border-2 border-white text-center"
+                className="inline-block bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-secondary-700 transition-colors duration-200 border-2 border-white text-center"
               >
                 Email: privacy@yatramate.com
               </a>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { CircleUser, ClipboardList, LockKeyhole, LogOut } from 'lucide-react';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -118,30 +119,30 @@ const ProfilePage = () => {
   }
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    )},
-    { id: 'bookings', label: 'My Bookings', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-      </svg>
-    )},
-    { id: 'security', label: 'Security', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
-    )},
+    {
+      id: 'profile', label: 'Profile', icon: (
+        <CircleUser className="w-5 h-5" />
+      )
+    },
+    {
+      id: 'bookings', label: 'My Bookings', icon: (
+        <ClipboardList className="w-5 h-5" />
+      )
+    },
+    {
+      id: 'security', label: 'Security', icon: (
+        <LockKeyhole className="w-5 h-5" />
+      )
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-8">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-2">
-            My Account
+            My <span className='text-red-500'>Account</span>
           </h1>
           <p className="text-lg text-neutral-600">
             Manage your profile and preferences
@@ -152,17 +153,16 @@ const ProfilePage = () => {
           {/* Sidebar - Horizontal on mobile, vertical on desktop */}
           <div className="lg:col-span-1">
             {/* Mobile: Horizontal scroll tabs */}
-            <div className="lg:hidden bg-white rounded-2xl shadow-card p-4 mb-6 overflow-x-auto">
+            <div className="lg:hidden bg-white border-2 border-primary-200 rounded-2xl shadow-card p-4 mb-6 overflow-x-auto">
               <div className="flex space-x-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`shrink-0 flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                        : 'text-neutral-700 bg-neutral-100'
-                    }`}
+                    className={`rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${activeTab === tab.id
+                        ? 'shrink-0 flex items-center space-x-2 px-4 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
+                        : 'p-3 text-neutral-700 bg-neutral-100'
+                      }`}
                   >
                     {tab.icon}
                     <span className={`${activeTab === tab.id ? '' : 'hidden sm:block'}`}>{tab.label}</span>
@@ -170,27 +170,24 @@ const ProfilePage = () => {
                 ))}
                 <button
                   onClick={handleLogout}
-                  className="shrink-0 flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm text-secondary-600 bg-secondary-50 transition-all duration-200 whitespace-nowrap"
+                  className="shrink-0 flex items-center space-x-0 sm:space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm text-secondary-600 bg-secondary-50 transition-all duration-200 whitespace-nowrap"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <LogOut className="w-5 h-5" />
                   <span className='hidden sm:block'>Logout</span>
                 </button>
               </div>
             </div>
-            
+
             {/* Desktop: Vertical sidebar */}
-            <div className="hidden lg:block bg-white rounded-2xl shadow-card p-6 space-y-2">
+            <div className="hidden lg:block bg-white border-2 border-primary-200 rounded-2xl shadow-card p-6 space-y-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    activeTab === tab.id
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${activeTab === tab.id
                       ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
                       : 'text-neutral-700 hover:bg-neutral-100'
-                  }`}
+                    }`}
                 >
                   {tab.icon}
                   <span>{tab.label}</span>
@@ -200,9 +197,7 @@ const ProfilePage = () => {
                 onClick={handleLogout}
                 className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-secondary-600 hover:bg-secondary-50 transition-all duration-200"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <LogOut className="w-5 h-5" />
                 <span>Logout</span>
               </button>
             </div>
@@ -211,7 +206,7 @@ const ProfilePage = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {activeTab === 'profile' && (
-              <div className="bg-white rounded-2xl shadow-card p-8 space-y-6">
+              <div className="bg-white border-2 border-primary-200 rounded-2xl shadow-card p-8 space-y-6">
                 {/* Profile Header */}
                 <div className="pb-6 border-b border-neutral-200">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -314,22 +309,29 @@ const ProfilePage = () => {
             )}
 
             {activeTab === 'bookings' && (
-              <div className="bg-white rounded-2xl shadow-card p-8">
-                <h2 className="text-2xl font-bold text-neutral-900 mb-6">Booking History</h2>
-                <p className="text-neutral-600 mb-4">View all your bookings on the bookings page.</p>
+              <div className="bg-white border-2 border-primary-200 rounded-2xl shadow-card p-6 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-4 sm:mb-6">
+                  Booking History <span className='text-red-500'>:</span>
+                </h2>
+
+                <p className="text-neutral-600 text-sm sm:text-base mb-4">
+                  View all your bookings on the bookings page.
+                </p>
+
                 <button
                   onClick={() => navigate('/bookings')}
-                  className="px-6 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200"
+                  className="w-full sm:w-auto px-5 py-3 sm:px-6 sm:py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200 text-sm sm:text-base"
                 >
                   Go to Bookings
                 </button>
               </div>
+
             )}
 
             {activeTab === 'security' && (
-              <div className="bg-white rounded-2xl shadow-card p-8 space-y-6">
-                <h2 className="text-2xl font-bold text-neutral-900 mb-4">Security Settings</h2>
-                
+              <div className="bg-white border-2 border-primary-200 rounded-2xl shadow-card p-8 space-y-6">
+                <h2 className="text-2xl font-bold text-neutral-900 mb-4">Security Settings <span className='text-red-500'>:</span></h2>
+
                 <div className="space-y-5">
                   <div>
                     <label className="block text-sm font-semibold text-neutral-700 mb-2">
@@ -384,6 +386,23 @@ const ProfilePage = () => {
             )}
           </div>
         </div>
+      </div>
+      {/* Background Decorative Elements */}
+      <div className="hidden absolute inset-0 pointer-events-none sm:block">
+        {/* Top-left cluster */}
+        <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+        {/* Center-right floating grouping */}
+        <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+        {/* Bottom-right anchor cluster */}
+        <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+        <div className="absolute -bottom-15 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
       </div>
     </div>
   );

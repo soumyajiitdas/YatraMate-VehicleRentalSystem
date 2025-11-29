@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import { Link } from 'react-router-dom';
-import { Motorbike, Car } from 'lucide-react';
+import { PackageSearch, Motorbike, Car } from 'lucide-react';
 
 const PricingPage = () => {
     const [packages, setPackages] = useState([]);
@@ -48,7 +48,7 @@ const PricingPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50 flex items-center justify-center">
+            <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-primary-600 mx-auto mb-4"></div>
                     <p className="text-lg text-neutral-600 font-medium">Loading pricing packages...</p>
@@ -59,7 +59,7 @@ const PricingPage = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50 flex items-center justify-center py-20">
+            <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 flex items-center justify-center py-20">
                 <div className="text-center max-w-md mx-auto px-4">
                     <div className="inline-block p-10 bg-linear-to-br from-neutral-100 to-neutral-200 rounded-full mb-6">
                         <svg className="w-20 h-20 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,13 +83,13 @@ const PricingPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50">
+        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
             {/* Hero Section */}
             <div className="relative bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white py-20 overflow-hidden">
                 {/* Decorative elements */}
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+                <div className="absolute inset-0 opacity-40 hidden sm:block">
+                    <div className="absolute top-10 left-10 w-72 h-72 bg-yellow-500 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-500 rounded-full blur-3xl"></div>
                 </div>
                 
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -109,20 +109,21 @@ const PricingPage = () => {
                 <div className="bg-white rounded-2xl shadow-xl border border-neutral-100 p-3 inline-flex gap-2 mx-auto">
                     <button
                         onClick={() => setSelectedType('all')}
-                        className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 ${
+                        className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center gap-2 ${
                             selectedType === 'all'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow transform scale-105'
-                                : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
+                                : 'bg-transparent underline underline-offset-2 decoration-4 decoration-red-200 text-neutral-700 hover:bg-neutral-50'
                         }`}
                     >
-                        All Packages
+                        <PackageSearch className="w-5 h-5" />
+                        All <span className='hidden sm:inline'>Pricing</span>
                     </button>
                     <button
                         onClick={() => setSelectedType('bike')}
                         className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center gap-2 ${
                             selectedType === 'bike'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow transform scale-105'
-                                : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
+                                : 'bg-transparent underline underline-offset-2 decoration-4 decoration-red-200 text-neutral-700 hover:bg-neutral-50'
                         }`}
                     >
                         <Motorbike className="w-5 h-5" />
@@ -133,7 +134,7 @@ const PricingPage = () => {
                         className={`px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center gap-2 ${
                             selectedType === 'car'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow transform scale-105'
-                                : 'bg-transparent text-neutral-700 hover:bg-neutral-50'
+                                : 'bg-transparent underline underline-offset-2 decoration-4 decoration-red-200 text-neutral-700 hover:bg-neutral-50'
                         }`}
                     >
                         <Car className="w-5 h-5" />

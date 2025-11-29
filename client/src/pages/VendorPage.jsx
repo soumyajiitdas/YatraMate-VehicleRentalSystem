@@ -143,59 +143,58 @@ const VendorPage = () => {
   };
 
   const benefits = [
-    { 
+    {
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-      ), 
-      title: 'Earn More', 
+      ),
+      title: 'Earn More',
       description: 'Increase your income by renting out your vehicles',
       gradient: 'from-emerald-500 to-teal-500'
     },
-    { 
+    {
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
       ),
-      title: 'Grow Business', 
+      title: 'Grow Business',
       description: 'Reach thousands of customers across India',
       gradient: 'from-blue-500 to-indigo-500'
     },
-    { 
+    {
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
-      title: 'Secure Platform', 
+      title: 'Secure Platform',
       description: 'Safe and secure transactions with insurance',
       gradient: 'from-purple-500 to-pink-500'
     },
-    { 
+    {
       icon: (
-        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
         </svg>
       ),
-      title: 'Easy Management', 
+      title: 'Easy Management',
       description: 'Manage your fleet with our intuitive dashboard',
       gradient: 'from-orange-500 to-red-500'
     },
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
       {/* Hero Section */}
       <section className="relative bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white py-20 overflow-hidden">
         {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 opacity-40 hidden sm:block">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-yellow-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-500 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-display font-bold mb-6">
             Become a Vendor Partner
@@ -219,14 +218,14 @@ const VendorPage = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, index) => (
-              <div 
-                key={index} 
-                className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500  p-5 sm:p-8 text-center transform hover:-translate-y-2"
+              <div
+                key={index}
+                className="group bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 border-2 border-primary-200 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 p-5 sm:p-8 text-center transform hover:-translate-y-2"
               >
-                <div className={`inline-flex items-center justify-center w-18 h-18 sm:h-20 sm:w-20 bg-linear-to-br ${benefit.gradient} rounded-2xl text-white mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg`}>
+                <div className={`inline-flex items-center justify-center w-16 h-16 sm:h-20 sm:w-20 bg-linear-to-br ${benefit.gradient} rounded-2xl text-white mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg`}>
                   {benefit.icon}
                 </div>
-                <h3 className="text-xl font-bold text-neutral-900 mb-3">{benefit.title}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-neutral-900 mb-3">{benefit.title}</h3>
                 <p className="text-neutral-600 leading-relaxed">{benefit.description}</p>
               </div>
             ))}
@@ -237,14 +236,14 @@ const VendorPage = () => {
       {/* Registration Form */}
       <section className="py-20 mb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-neutral-100">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-red-200">
             <div className="text-center mb-10">
               <div className="inline-flex items-center justify-center p-4 bg-linear-to-br from-primary-500 to-secondary-500 rounded-2xl mb-4">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h2 className="text-4xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-3">
+              <h2 className="text-4xl font-display font-bold text-gray-900 mb-3">
                 Vendor Registration
               </h2>
               <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
@@ -266,9 +265,8 @@ const VendorPage = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
-                    errors.name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                  }`}
+                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    }`}
                   placeholder="Enter your full name"
                 />
                 {errors.name && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
@@ -313,9 +311,8 @@ const VendorPage = () => {
                     name="company_name"
                     value={formData.company_name}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
-                      errors.company_name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                    }`}
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.company_name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                      }`}
                     placeholder="Enter company/organization name"
                   />
                   {errors.company_name && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
@@ -341,9 +338,8 @@ const VendorPage = () => {
                     name="contact_number"
                     value={formData.contact_number}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
-                      errors.contact_number ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                    }`}
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.contact_number ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                      }`}
                     placeholder="+91 XXXXXXXXXX"
                   />
                   {errors.contact_number && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
@@ -366,9 +362,8 @@ const VendorPage = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
-                      errors.email ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                    }`}
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.email ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                      }`}
                     placeholder="your@email.com"
                   />
                   {errors.email && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
@@ -392,9 +387,8 @@ const VendorPage = () => {
                   name="id_type"
                   value={formData.id_type}
                   onChange={handleChange}
-                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm font-medium ${
-                    errors.id_type ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                  }`}
+                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm font-medium ${errors.id_type ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    }`}
                 >
                   {getIdTypeOptions().map(option => (
                     <option key={option.value} value={option.value}>{option.label}</option>
@@ -417,9 +411,8 @@ const VendorPage = () => {
                     </svg>
                     Upload Document *
                   </label>
-                  <div className={`relative border-2 border-dashed rounded-xl p-6 transition-all duration-200 ${
-                    uploadingDoc ? 'border-primary-300 bg-primary-50' : documentUrl ? 'border-green-300 bg-green-50' : 'border-neutral-300 hover:border-primary-400 bg-neutral-50'
-                  }`}>
+                  <div className={`relative border-2 border-dashed rounded-xl p-6 transition-all duration-200 ${uploadingDoc ? 'border-primary-300 bg-primary-50' : documentUrl ? 'border-green-300 bg-green-50' : 'border-neutral-300 hover:border-primary-400 bg-neutral-50'
+                    }`}>
                     <input
                       type="file"
                       onChange={handleFileChange}
@@ -477,9 +470,8 @@ const VendorPage = () => {
                   value={formData.address}
                   onChange={handleChange}
                   rows={4}
-                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm resize-none ${
-                    errors.address ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                  }`}
+                  className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm resize-none ${errors.address ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                    }`}
                   placeholder="Enter your complete address"
                 />
                 {errors.address && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
@@ -504,9 +496,8 @@ const VendorPage = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
-                      errors.password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                    }`}
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                      }`}
                     placeholder="Create a strong password"
                   />
                   {errors.password && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
@@ -529,9 +520,8 @@ const VendorPage = () => {
                     name="confirm_password"
                     value={formData.confirm_password}
                     onChange={handleChange}
-                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${
-                      errors.confirm_password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                    }`}
+                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.confirm_password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                      }`}
                     placeholder="Confirm your password"
                   />
                   {errors.confirm_password && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">

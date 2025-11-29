@@ -1,3 +1,4 @@
+import { MapPinned } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -32,9 +33,7 @@ const Footer = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2 group">
               <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+                <MapPinned className="w-5 h-5 text-white" />
               </div>
               <span className="text-2xl font-display font-bold text-white">
                 YatraMate
@@ -64,7 +63,7 @@ const Footer = () => {
 
           {/* Company Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Company</h3>
+            <h3 className="text-lg font-semibold mb-4 text-primary-400">Company</h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.path}>
@@ -81,7 +80,7 @@ const Footer = () => {
 
           {/* Services Links */}
           <div className='hidden sm:block'>
-            <h3 className="text-lg font-semibold mb-4 text-white">Services</h3>
+            <h3 className="text-lg font-semibold mb-4 text-primary-400">Services</h3>
             <ul className="space-y-2">
               {footerLinks.services.map((link) => (
                 <li key={link.path}>
@@ -98,7 +97,7 @@ const Footer = () => {
 
           {/* Support Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Support</h3>
+            <h3 className="text-lg font-semibold mb-4 text-primary-400">Support</h3>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.path}>
@@ -118,7 +117,7 @@ const Footer = () => {
         <div className="pt-6 border-t border-neutral-700">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-neutral-400 text-xs sm:text-sm text-center md:text-left">
-              © {currentYear} YatraMate. All rights reserved.
+              <span className='text-primary-400'>©</span> {currentYear} YatraMate. All rights reserved.
             </p>
             <div className="hidden text-neutral-400 text-sm sm:block">
                 Crafted with ❤️ and a vision to make vehicle rental affordable.

@@ -67,12 +67,12 @@ const VehiclesPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-neutral-50 py-10">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-10 text-center">
-          <h1 className="text-4xl sm:text-5xl font-display font-bold mb-3 bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-            Explore Our Fleet
+          <h1 className="text-4xl sm:text-5xl font-display font-bold mb-3 text-neutral-800">
+            Explore <span className='text-red-500'>Our Fleet</span>
           </h1>
           <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
             Discover the perfect vehicle for your journey from our premium collection
@@ -80,7 +80,7 @@ const VehiclesPage = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-3xl shadow-xl border border-neutral-100 p-6 sm:p-8 mb-10">
+        <div className="bg-white rounded-3xl shadow-xl border border-primary-200 p-6 sm:p-8 mb-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Search */}
             <div>
@@ -232,6 +232,23 @@ const VehiclesPage = () => {
           </div>
         )}
       </div>
+      {/* Background Decorative Elements */}
+      <div className="hidden absolute inset-0 pointer-events-none sm:block">
+          {/* Top-left cluster */}
+          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+          {/* Center-right floating grouping */}
+          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+          {/* Bottom-right anchor cluster */}
+          <div className="absolute -bottom-20 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-14 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-30 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
+        </div>
     </div>
   );
 };

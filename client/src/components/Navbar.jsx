@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { MapPinned, CircleUser, LogIn, LogOut  } from 'lucide-react';
 
 const Navbar = () => {
   const location = useLocation();
@@ -28,9 +29,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+              <MapPinned className="w-5 h-5 text-white" />
             </div>
             <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
               YatraMate
@@ -60,20 +59,16 @@ const Navbar = () => {
               <>
                 <Link
                   to="/profile"
-                  className="flex items-center space-x-1 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                 >
-                  <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <CircleUser className="w-5 h-5 text-primary-500" />
                   <span className="font-medium">Profile</span>
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                 >
-                  <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <LogOut className="w-5 h-5 text-primary-500" />
                   <span className="font-medium">Logout</span>
                 </button>
               </>
@@ -81,11 +76,9 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="flex items-center space-x-1 px-5 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-5 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                 >
-                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
+                  <LogIn className="w-5 h-5 text-primary-500" />
                   <span className='font-medium'>Login</span>
                 </Link>
                 <Link
@@ -101,26 +94,13 @@ const Navbar = () => {
           {/* Mobile Auth Icons */}
           <div className="flex md:hidden items-center space-x-2">
             {isAuthenticated ? (
-              <>
                 <Link
                   to="/profile"
-                  className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-colors duration-200"
+                  className="p-2 rounded-lg text-primary-600 bg-red-100"
                   data-testid="mobile-profile-icon"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <CircleUser className="w-6 h-6" />
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 rounded-lg text-primary-600 hover:bg-primary-50 transition-colors duration-200"
-                  data-testid="mobile-logout-icon"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </button>
-              </>
             ) : (
               <>
                 <Link
@@ -143,6 +123,23 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      {/* Background Decorative Elements */}
+        <div className="hidden absolute inset-0 pointer-events-none overflow-hidden sm:block">
+          {/* Top-left cluster */}
+          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+          {/* Center-right floating grouping */}
+          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+          {/* Bottom-right anchor cluster */}
+          <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
+        </div>
     </nav>
   );
 };

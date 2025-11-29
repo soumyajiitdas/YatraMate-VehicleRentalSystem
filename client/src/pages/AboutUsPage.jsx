@@ -92,13 +92,13 @@ const AboutUsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-primary-50">
+    <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
       {/* Hero Section */}
       <section className="relative pt-20 pb-16 md:pt-28 md:pb-24 overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-primary-500/10 via-transparent to-secondary-500/10" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 
+            <h1
               data-testid="about-page-title"
               className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-neutral-900 mb-6"
             >
@@ -108,6 +108,23 @@ const AboutUsPage = () => {
               Your trusted companion for seamless vehicle rentals. We're on a mission to make transportation accessible, affordable, and convenient for everyone.
             </p>
           </div>
+        </div>
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top-left cluster */}
+          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
+
+          {/* Center-right floating grouping */}
+          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
+
+          {/* Bottom-right anchor cluster */}
+          <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
+          <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
         </div>
       </section>
 
@@ -121,7 +138,7 @@ const AboutUsPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               </div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-4">Our Mission</h2>
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-4">Our Mission <span className='text-red-500'>:</span></h2>
               <p className="text-neutral-700 leading-relaxed">
                 To democratize transportation by providing easy access to quality vehicles at affordable prices. We believe everyone deserves the freedom to explore without barriers.
               </p>
@@ -134,7 +151,7 @@ const AboutUsPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-4">Our Vision</h2>
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-4">Our Vision <span className='text-red-500'>:</span></h2>
               <p className="text-neutral-700 leading-relaxed">
                 To become the most trusted and preferred vehicle rental platform across the nation, setting new standards in customer service and innovation.
               </p>
@@ -144,23 +161,23 @@ const AboutUsPage = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-16 md:py-20 bg-linear-to-b from-white to-neutral-50">
+      <section className="py-16 md:py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Our Core Values</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Our Core Values <span className='text-red-500'>:</span></h2>
             <p className="text-neutral-600 max-w-2xl mx-auto">The principles that guide everything we do</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div 
+              <div
                 key={index}
-                className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-neutral-100 hover:border-primary-200 group"
+                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-neutral-100 hover:border-primary-200 group"
               >
-                <div className="w-16 h-16 bg-linear-to-br from-primary-100 to-secondary-100 rounded-lg flex items-center justify-center mb-4 text-primary-600 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-linear-to-br from-primary-100 to-secondary-100 rounded-lg flex items-center justify-center mb-4 text-primary-600 group-hover:scale-110 transition-transform duration-300">
                   {value.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">{value.title}</h3>
-                <p className="text-neutral-600 text-sm leading-relaxed">{value.description}</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">{value.title}</h3>
+                <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
@@ -171,7 +188,7 @@ const AboutUsPage = () => {
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Our Journey</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Our Journey <span className='text-red-500'>:</span></h2>
             <p className="text-neutral-600 max-w-2xl mx-auto">Key milestones in our growth story</p>
           </div>
           <div className="relative">
@@ -180,7 +197,7 @@ const AboutUsPage = () => {
               {milestones.map((milestone, index) => (
                 <div key={index} className={`flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col md:gap-8`}>
                   <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-center`}>
-                    <div className="bg-white p-6 rounded-xl shadow-lg border border-neutral-200 inline-block">
+                    <div className="bg-red-50 p-6 rounded-xl shadow-lg border border-neutral-200 inline-block">
                       <div className="text-3xl font-bold text-primary-600 mb-2">{milestone.year}</div>
                       <h3 className="text-xl font-semibold text-neutral-900 mb-2">{milestone.title}</h3>
                       <p className="text-neutral-600">{milestone.description}</p>
@@ -196,58 +213,58 @@ const AboutUsPage = () => {
       </section>
 
       {/* Meet the Developers Section */}
-      <section className="py-16 md:py-20 bg-linear-to-b from-neutral-50 to-white">
+      <section className="py-16 md:py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Meet the Developers</h2>
-            <p className="text-neutral-600 max-w-2xl mx-auto">The talented team behind YatraMate</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Meet the Developers <span className='text-red-500'>:</span></h2>
+            <p className="text-neutral-600 max-w-2xl mx-auto">The developer team behind YatraMate</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {developers.map((dev, index) => (
-              <div 
+              <div
                 key={index}
                 data-testid={`developer-card-${index}`}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden border border-neutral-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
               >
                 <div className="bg-linear-to-br from-primary-500 to-secondary-600 p-6 text-center">
-                  <img 
-                    src={dev.avatar} 
+                  <img
+                    src={dev.avatar}
                     alt={dev.name}
-                    className="w-32 h-32 rounded-full border-4 border-white shadow-xl mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
+                    className="w-20 h-20 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-xl mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
                   />
-                  <h3 className="text-xl font-semibold text-white mb-1">{dev.name}</h3>
-                  <p className="text-primary-100 text-sm">{dev.role}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-1">{dev.name}</h3>
+                  <p className="text-primary-100 text-xs sm:text-sm">{dev.role}</p>
                 </div>
-                <div className="p-6">
-                  <div className="flex justify-center space-x-4">
-                    <a 
+                <div className="p-3 sm:p-4">
+                  <div className="flex justify-center space-x-2 sm:space-x-4">
+                    <a
                       href={`https://github.com/${dev.github}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       data-testid={`developer-github-${index}`}
-                      className="w-10 h-10 bg-neutral-100 hover:bg-neutral-900 text-neutral-700 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200"
+                      className="w-10 h-10 bg-neutral-100 hover:bg-neutral-900 text-neutral-700 hover:text-white border-2 border-red-100 rounded-lg flex items-center justify-center transition-all duration-200"
                       aria-label={`${dev.name}'s GitHub`}
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
                       </svg>
                     </a>
-                    <a 
+                    <a
                       href={`https://linkedin.com/in/${dev.linkedin}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       data-testid={`developer-linkedin-${index}`}
-                      className="w-10 h-10 bg-neutral-100 hover:bg-blue-600 text-neutral-700 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200"
+                      className="w-10 h-10 bg-neutral-100 hover:bg-blue-600 text-neutral-700 hover:text-white border-2 border-red-100 rounded-lg flex items-center justify-center transition-all duration-200"
                       aria-label={`${dev.name}'s LinkedIn`}
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
                     </a>
-                    <a 
+                    <a
                       href={`mailto:${dev.email}`}
                       data-testid={`developer-email-${index}`}
-                      className="w-10 h-10 bg-neutral-100 hover:bg-primary-600 text-neutral-700 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200"
+                      className="w-10 h-10 bg-neutral-100 hover:bg-primary-600 text-neutral-700 hover:text-white border-2 border-red-100 rounded-lg flex items-center justify-center transition-all duration-200"
                       aria-label={`Email ${dev.name}`}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,7 +284,7 @@ const AboutUsPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">Ready to Start Your Journey?</h2>
           <p className="text-xl text-primary-100 mb-8">Join thousands of happy customers who trust YatraMate for their travel needs</p>
-          <Link 
+          <Link
             to="/vehicles"
             data-testid="about-browse-vehicles-btn"
             className="inline-block bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-neutral-50 transition-colors duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"

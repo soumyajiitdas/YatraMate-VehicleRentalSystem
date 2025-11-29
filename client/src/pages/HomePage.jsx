@@ -69,10 +69,10 @@ const HomePage = () => {
   ];
 
   const stats = [
-    { label: 'Happy Customers', value: '10,000+' },
-    { label: 'Vehicles Available', value: '500+' },
-    { label: 'Cities Covered', value: '50+' },
-    { label: 'Years Experience', value: '5+' },
+    { label: 'Happy Customers', value: '1000+' },
+    { label: 'Vehicles Available', value: '10+' },
+    { label: 'Cities Covered', value: '3+' },
+    { label: 'Years Experience', value: '2+' },
   ];
 
   const howItWorks = [
@@ -170,8 +170,8 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 text-white overflow-hidden">
       {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl animate-bounce-slow" />
+        <div className="absolute inset-0 opacity-30 hidden sm:block">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-accent-400 rounded-full blur-3xl animate-bounce-slow" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-400 rounded-full blur-3xl animate-bounce-slow" style={{ animationDelay: '1s' }} />
         </div>
 
@@ -228,12 +228,18 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
+            {/* Scroll Indicator */}
+                <div className="hidden sm:block absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+                    <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+                        <div className="w-1 h-3 bg-orange-300 rounded-full mt-2"></div>
+                    </div>
+                </div>
           </div>
         </div>
       </section>
 
       {/* Vehicle Categories */}
-      <section className="py-20 bg-neutral-50">
+      <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
@@ -273,7 +279,7 @@ const HomePage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-red-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
@@ -317,8 +323,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Enhanced Features Section */}
-      <section className="py-20 bg-linear-to-br from-neutral-50 via-white to-neutral-50">
+      {/* Features Section */}
+      <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4">
@@ -421,7 +427,7 @@ const HomePage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-secondary-100 text-secondary-600 rounded-full text-sm font-semibold mb-4">
