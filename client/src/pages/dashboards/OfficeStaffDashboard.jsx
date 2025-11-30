@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { API_ENDPOINTS } from '../config/api';
-import PickupModal from '../components/PickupModal';
-import ReturnModal from '../components/ReturnModal';
+import { useAuth } from '../../contexts/AuthContext';
+import { API_ENDPOINTS } from '../../config/api';
+import PickupModal from '../../components/PickupModal';
+import ReturnModal from '../../components/ReturnModal';
+import { MapPinned } from 'lucide-react';
 
 const OfficeStaffDashboard = () => {
     const navigate = useNavigate();
@@ -204,23 +205,26 @@ const OfficeStaffDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8 md:mb-12">
                     {/* Mobile and Desktop Layout */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
                         {/* Logo - Left on desktop, top on mobile */}
-                        <div className="flex items-center justify-between md:justify-start">
+                        <div className="flex items-center justify-between md:justify-start mb-6">
                             <div className="flex items-center space-x-2 group">
                                 <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
+                                    <MapPinned className="w-6 h-6 text-white" />
                                 </div>
-                                <span className="text-xl md:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                                    YatraMate
-                                </span>
+                                <div className='flex flex-col'>
+                                    <span className="text-xl md:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                                        YatraMate
+                                    </span>
+                                    <p className='text-xs text-gray-500 font-medium -mt-1'>
+                                        Travel made effortless <span className='text-red-500 font-bold'>~</span>
+                                    </p>
+                                </div>
                             </div>
                             {/* Logout button - visible on mobile only */}
                             <button
@@ -235,7 +239,7 @@ const OfficeStaffDashboard = () => {
 
                         {/* Title - Center */}
                         <div className='text-center md:flex-1'>
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Office Staff Dashboard</h1>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Office Staff <span className='text-red-600'>Dashboard</span></h1>
                             <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Manage vehicle pickups and returns</p>
                         </div>
 
@@ -253,7 +257,7 @@ const OfficeStaffDashboard = () => {
                 </div>
 
                 {/* Tabs */}
-                <div className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+                <div className="bg-white border border-primary-200 rounded-lg shadow-sm mb-6 overflow-hidden">
                     <div className="border-b border-gray-200">
                         <nav className="flex -mb-px overflow-x-auto">
                             <button
@@ -299,7 +303,7 @@ const OfficeStaffDashboard = () => {
                     </div>
                 ) : bookings.length === 0 ? (
                     <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                         </svg>
                         <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings</h3>
@@ -435,10 +439,10 @@ const OfficeStaffDashboard = () => {
 
             {/* Rejection Dialog */}
             {showRejectDialog && selectedBooking && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Reject Booking</h3>
-                        
+                <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-4">
+                    <div className="bg-white border-2 border-primary-200 rounded-lg shadow-xl max-w-md w-full p-6">
+                        <h3 className="text-xl font-bold text-red-600 mb-4">Reject Booking</h3>
+
                         <div className="mb-4">
                             <p className="text-sm text-gray-600 mb-2">
                                 Customer: <span className="font-medium text-gray-900">{selectedBooking.user_id.name}</span>
@@ -450,7 +454,7 @@ const OfficeStaffDashboard = () => {
 
                         <div className="mb-6">
                             <label htmlFor="rejection-reason" className="block text-sm font-medium text-gray-700 mb-2">
-                                Rejection Reason *
+                                Rejection Reason <span className='text-red-500'>*</span>
                             </label>
                             <textarea
                                 id="rejection-reason"

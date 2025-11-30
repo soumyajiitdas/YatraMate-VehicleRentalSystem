@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { API_ENDPOINTS } from '../config/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { API_ENDPOINTS } from '../../config/api';
+import { MapPinned } from 'lucide-react';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
@@ -100,14 +101,14 @@ const VendorDashboard = () => {
 
     const handleFileChange = (e) => {
         const { name, files: selectedFiles } = e.target;
-        
+
         if (name === 'vehicle_images') {
             // Validate file count (max 5 images)
             if (selectedFiles.length > 5) {
                 alert('Maximum 5 images allowed');
                 return;
             }
-            
+
             // Validate file sizes
             const validFiles = Array.from(selectedFiles).filter(file => {
                 if (file.size > 1024 * 1024) {
@@ -116,7 +117,7 @@ const VendorDashboard = () => {
                 }
                 return true;
             });
-            
+
             setFiles(prev => ({ ...prev, vehicle_images: validFiles }));
         } else {
             // Single file validation
@@ -269,7 +270,7 @@ const VendorDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-neutral-50">
+        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                 {/* Header */}
                 <div className="mb-8 sm:mb-12">
@@ -277,13 +278,17 @@ const VendorDashboard = () => {
                     <div className="flex justify-between items-center mb-6">
                         <div className="flex items-center space-x-2 group">
                             <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
+                                <MapPinned className="w-6 h-6 text-white" />
                             </div>
-                            <span className="text-xl sm:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                                YatraMate
-                            </span>
+                            <div className='flex flex-col'>
+                                <span className="text-xl sm:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                                    YatraMate
+                                </span>
+                                <p className='text-xs text-gray-500 font-medium -mt-1'>
+                                    Travel made effortless <span className='text-red-500 font-bold'>~</span>
+                                </p>
+                            </div>
+
                         </div>
                         <button
                             onClick={handleLogout}
@@ -295,20 +300,20 @@ const VendorDashboard = () => {
                             <span className="hidden sm:inline">Logout</span>
                         </button>
                     </div>
-                    
+
                     {/* Dashboard title and vendor info */}
                     <div className="text-center">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">Vendor Dashboard</h1>
-                        <p className="text-base sm:text-lg text-gray-600 mb-2">Manage, add and delete your listed vehicles.</p>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Vendor <span className='text-red-600'>Dashboard</span></h1>
+                        <p className="mt-1 md:mt-2 text-base sm:text-lg text-gray-600">Manage, add and delete your listed vehicles.</p>
                     </div>
                 </div>
             </div>
-            
+
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
                 {/* Actions */}
                 <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">My Vehicles</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-neutral-900"><span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Vehicles</span> <span className='text-red-600'>:</span></h2>
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
                         className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
@@ -320,10 +325,10 @@ const VendorDashboard = () => {
                 {/* Add Vehicle Form */}
                 {showAddForm && (
                     <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-8 animate-fade-in">
-                        <h3 className="text-lg sm:text-xl font-bold text-neutral-900 mb-4">Add New Vehicle Request</h3>
+                        <h3 className="text-xl sm:text-2xl text-center font-bold text-neutral-900 mb-4">Vehicle <span className='text-red-500'>Request</span></h3>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Vehicle Name *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Vehicle Name <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="name"
@@ -335,7 +340,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Model Name *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Model Name <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="model_name"
@@ -347,7 +352,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Type *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Type <span className='text-red-500'>*</span></label>
                                 <select
                                     name="type"
                                     value={formData.type}
@@ -361,7 +366,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Brand *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Brand <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="brand"
@@ -374,7 +379,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Location *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Location <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="location"
@@ -387,7 +392,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Registration Number *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Registration Number <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="registration_number"
@@ -399,7 +404,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine Number *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine Number <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="engine_number"
@@ -411,7 +416,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Chassis Number (VIN) *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Chassis Number (VIN) <span className='text-red-500'>*</span></label>
                                 <input
                                     type="text"
                                     name="chassis_number"
@@ -423,7 +428,7 @@ const VendorDashboard = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine CC *</label>
+                                <label className="block text-sm font-medium text-neutral-700 mb-1">Engine CC <span className='text-red-500'>*</span></label>
                                 <input
                                     type="number"
                                     name="cc_engine"
@@ -450,7 +455,7 @@ const VendorDashboard = () => {
                             {/* File Uploads */}
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">
-                                    RC Document * <span className="text-xs text-gray-500">(Max 1MB)</span>
+                                    RC Document <span className='text-red-500'>*</span> <span className="text-xs text-gray-500">(Max 1MB)</span>
                                 </label>
                                 <input
                                     type="file"
@@ -464,7 +469,7 @@ const VendorDashboard = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">
-                                    Insurance Document * <span className="text-xs text-gray-500">(Max 1MB)</span>
+                                    Insurance Document <span className='text-red-500'>*</span> <span className="text-xs text-gray-500">(Max 1MB)</span>
                                 </label>
                                 <input
                                     type="file"
@@ -478,7 +483,7 @@ const VendorDashboard = () => {
 
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">
-                                    Vehicle Images * <span className="text-xs text-gray-500">(5 images: 4 sides + interior, each max 1MB)</span>
+                                    Vehicle Images <span className='text-red-500'>*</span> <span className="text-xs text-gray-500">(5 images: 4 sides + interior, each max 1MB)</span>
                                 </label>
                                 <input
                                     type="file"
@@ -535,8 +540,8 @@ const VendorDashboard = () => {
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs sm:text-sm text-neutral-600">Status:</span>
                                         <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${vehicle.availability_status === 'available' ? 'bg-green-100 text-green-700' :
-                                                vehicle.availability_status === 'booked' ? 'bg-red-100 text-red-700' :
-                                                    'bg-yellow-100 text-yellow-700'
+                                            vehicle.availability_status === 'booked' ? 'bg-red-100 text-red-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {vehicle.availability_status}
                                         </span>

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { MapPinned, CircleUser, LogIn, LogOut  } from 'lucide-react';
+import { MapPinned, CircleUser, LogIn, LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const location = useLocation();
@@ -29,11 +29,17 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-              <MapPinned className="w-5 h-5 text-white" />
+              <MapPinned className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              YatraMate
-            </span>
+            <div className='flex flex-col'>
+              <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                YatraMate
+              </span>
+              <p className='text-xs text-gray-500 font-medium -mt-1'>
+                Travel made effortless <span className='text-red-500 font-bold'>~</span>
+              </p>
+            </div>
+
           </Link>
 
           {/* Desktop Navigation */}
@@ -42,11 +48,10 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive(link.path)
-                    ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                    : 'text-neutral-700 hover:bg-primary-50 hover:text-primary-600'
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isActive(link.path)
+                  ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
+                  : 'text-neutral-700 hover:bg-primary-50 hover:text-primary-600'
+                  }`}
               >
                 {link.label}
               </Link>
@@ -94,25 +99,25 @@ const Navbar = () => {
           {/* Mobile Auth Icons */}
           <div className="flex md:hidden items-center space-x-2">
             {isAuthenticated ? (
-                <Link
-                  to="/profile"
-                  className="p-2 rounded-lg text-primary-600 bg-red-100"
-                  data-testid="mobile-profile-icon"
-                >
-                  <CircleUser className="w-6 h-6" />
-                </Link>
+              <Link
+                to="/profile"
+                className="p-2 rounded-lg text-primary-600 bg-red-100"
+                data-testid="mobile-profile-icon"
+              >
+                <CircleUser className="w-6 h-6" />
+              </Link>
             ) : (
               <>
                 <Link
-                to="/login"
-                className="p-2 rounded-lg text-primary-600 bg-red-100 hover:-rotate-7 transition-colors duration-200"
-                data-testid="mobile-login-icon"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-              </Link>
-              <Link
+                  to="/login"
+                  className="p-2 rounded-lg text-primary-600 bg-red-100 hover:-rotate-7 transition-colors duration-200"
+                  data-testid="mobile-login-icon"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                </Link>
+                <Link
                   to="/register"
                   className="px-4 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white text-sm rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
                 >
@@ -123,23 +128,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      {/* Background Decorative Elements */}
-        <div className="hidden absolute inset-0 pointer-events-none overflow-hidden sm:block">
-          {/* Top-left cluster */}
-          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
-
-          {/* Center-right floating grouping */}
-          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
-
-          {/* Bottom-right anchor cluster */}
-          <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
-        </div>
     </nav>
   );
 };

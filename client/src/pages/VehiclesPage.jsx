@@ -232,23 +232,6 @@ const VehiclesPage = () => {
           </div>
         )}
       </div>
-      {/* Background Decorative Elements */}
-      <div className="hidden absolute inset-0 pointer-events-none sm:block">
-          {/* Top-left cluster */}
-          <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
-
-          {/* Center-right floating grouping */}
-          <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
-
-          {/* Bottom-right anchor cluster */}
-          <div className="absolute -bottom-20 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute -bottom-14 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
-          <div className="absolute -bottom-30 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
-        </div>
     </div>
   );
 };

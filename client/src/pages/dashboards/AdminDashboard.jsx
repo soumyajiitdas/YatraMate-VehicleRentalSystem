@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { API_ENDPOINTS } from '../config/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { API_ENDPOINTS } from '../../config/api';
+import { MapPinned } from 'lucide-react';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -267,23 +268,27 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-4 md:py-8">
+        <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-4 md:py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8 md:mb-12">
                     {/* Mobile and Desktop Layout */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
                         {/* Logo - Left on desktop, top on mobile */}
-                        <div className="flex items-center justify-between md:justify-start">
+                        <div className="flex items-center justify-between md:justify-start mb-6">
                             <div className="flex items-center space-x-2 group">
                                 <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-                                    <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
+                                    <MapPinned className='w-6 h-6 text-white' />
                                 </div>
-                                <span className="text-xl md:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                                    YatraMate
-                                </span>
+                                <div className='flex flex-col'>
+                                    <span className="text-xl md:text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                                        YatraMate
+                                    </span>
+                                    <p className='text-xs text-gray-500 font-medium -mt-1'>
+                                        Travel made effortless <span className='text-red-500 font-bold'>~</span>
+                                    </p>
+                                </div>
+
                             </div>
                             {/* Logout button - visible on mobile only */}
                             <button
@@ -298,7 +303,7 @@ const AdminDashboard = () => {
 
                         {/* Title - Center */}
                         <div className='text-center md:flex-1'>
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Admin <span className='text-red-600'>Dashboard</span></h1>
                             <p className="mt-1 md:mt-2 text-sm md:text-base text-gray-600">Manage users, vendors, and packages</p>
                         </div>
 
@@ -316,7 +321,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Tabs */}
-                <div className="bg-white rounded-lg shadow-sm mb-6 overflow-x-auto">
+                <div className="bg-white border border-primary-200 rounded-lg shadow-sm mb-6 overflow-x-auto">
                     <div className="border-b border-gray-200">
                         <nav className="flex -mb-px min-w-max md:min-w-0">
                             <button
@@ -386,7 +391,7 @@ const AdminDashboard = () => {
                 {/* Content */}
                 {loading ? (
                     <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
                     </div>
                 ) : (
                     <>
@@ -490,7 +495,7 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetail
     if (users.length === 0) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
-                <p className="text-gray-500">No {type} found.</p>
+                <p className="text-red-500">No {type} found.</p>
             </div>
         );
     }
@@ -601,7 +606,7 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetail
                                     </span>
                                 )}
                             </div>
-                            
+
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Phone:</span>
@@ -664,7 +669,7 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
     if (vendors.length === 0) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
-                <p className="text-gray-500">No vendors found.</p>
+                <p className="text-red-500">No vendors found.</p>
             </div>
         );
     }
@@ -672,7 +677,7 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
     return (
         <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-x-auto">
+            <div className="hidden md:block bg-white border border-primary-200 rounded-lg shadow-sm overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -705,9 +710,8 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                                     <div className="text-sm text-gray-600 capitalize">{vendor.id_type?.replace('_', ' ')}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
+                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
                                         {vendor.is_verified ? 'Verified' : 'Pending'}
                                     </span>
                                 </td>
@@ -755,7 +759,7 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                                 {vendor.is_verified ? 'Verified' : 'Pending'}
                             </span>
                         </div>
-                        
+
                         <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                                 <span className="text-gray-500">Email:</span>
@@ -810,7 +814,7 @@ const PackagesTable = ({ packages, onEdit, onDelete }) => {
     if (packages.length === 0) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
-                <p className="text-gray-500">No packages found.</p>
+                <p className="text-red-500">No packages found.</p>
             </div>
         );
     }
@@ -888,7 +892,7 @@ const PackagesTable = ({ packages, onEdit, onDelete }) => {
                                 {pkg.is_active ? 'Active' : 'Inactive'}
                             </span>
                         </div>
-                        
+
                         <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                                 <span className="text-gray-500">CC Range:</span>
@@ -1012,7 +1016,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                     role: formData.role,
                     is_active: formData.is_active
                 };
-                
+
                 // Only include password if it's provided (for create or update)
                 if (formData.password_hash) {
                     body.password = formData.password_hash;
@@ -1077,10 +1081,10 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 md:p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-2 md:p-4">
+            <div className="bg-white border-2 border-primary-200 rounded-xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
                 <div className="p-4 md:p-6">
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
+                    <h2 className="text-xl md:text-2xl font-bold text-red-600 mb-4 md:mb-6">
                         {item ? 'Edit' : 'Create'} {type === 'package' ? 'Package' : type === 'vendor' ? 'Vendor' : 'Office Staff'}
                     </h2>
 
@@ -1094,7 +1098,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         required
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     />
                                 </div>
 
@@ -1104,7 +1108,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         <select
                                             value={formData.vehicle_type}
                                             onChange={(e) => setFormData({ ...formData, vehicle_type: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         >
                                             <option value="bike">Bike</option>
                                             <option value="car">Car</option>
@@ -1116,7 +1120,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         <select
                                             value={formData.is_active}
                                             onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'true' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         >
                                             <option value="true">Active</option>
                                             <option value="false">Inactive</option>
@@ -1132,7 +1136,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             required
                                             value={formData.cc_range_min}
                                             onChange={(e) => setFormData({ ...formData, cc_range_min: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -1143,7 +1147,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             required
                                             value={formData.cc_range_max}
                                             onChange={(e) => setFormData({ ...formData, cc_range_max: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
@@ -1157,7 +1161,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             required
                                             value={formData.price_per_hour}
                                             onChange={(e) => setFormData({ ...formData, price_per_hour: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -1169,7 +1173,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             required
                                             value={formData.price_per_km}
                                             onChange={(e) => setFormData({ ...formData, price_per_km: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
@@ -1180,7 +1184,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                         rows="3"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     />
                                 </div>
                             </>
@@ -1193,7 +1197,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         required
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     />
                                 </div>
 
@@ -1205,7 +1209,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             required
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -1217,7 +1221,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             value={formData.password_hash}
                                             onChange={(e) => setFormData({ ...formData, password_hash: e.target.value })}
                                             placeholder={item ? "Leave blank to keep current" : ""}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
@@ -1229,7 +1233,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             type="tel"
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         />
                                     </div>
 
@@ -1238,7 +1242,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         <select
                                             value={formData.is_active}
                                             onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'true' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         >
                                             <option value="true">Active</option>
                                             <option value="false">Inactive</option>
@@ -1252,14 +1256,14 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                         value={formData.address}
                                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                         rows="2"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     />
                                 </div>
 
                                 {type === 'vendor' && (
                                     <>
                                         <div className="border-t pt-4 mt-4">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Vendor Details</h3>
+                                            <h3 className="text-lg font-semibold text-red-600 mb-4">Vendor Details</h3>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
@@ -1269,7 +1273,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                                         required
                                                         value={formData.company_name}
                                                         onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                                     />
                                                 </div>
 
@@ -1280,7 +1284,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                                         required
                                                         value={formData.vendor_name}
                                                         onChange={(e) => setFormData({ ...formData, vendor_name: e.target.value })}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                                     />
                                                 </div>
                                             </div>
@@ -1293,7 +1297,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                                         required
                                                         value={formData.contact_number}
                                                         onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                                     />
                                                 </div>
 
@@ -1302,7 +1306,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                                     <select
                                                         value={formData.is_verified}
                                                         onChange={(e) => setFormData({ ...formData, is_verified: e.target.value === 'true' })}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                                     >
                                                         <option value="true">Verified</option>
                                                         <option value="false">Not Verified</option>
@@ -1325,7 +1329,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                             >
                                 {item ? 'Update' : 'Create'}
                             </button>
@@ -1340,9 +1344,9 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
 // Delete Confirmation Modal
 const DeleteConfirmModal = ({ onConfirm, onCancel }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 backdrop-blur-md border-2 border-primary-200 bg-opacity-50 flex items-center justify-center z-150 p-4">
             <div className="bg-white rounded-lg max-w-md w-full p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Delete</h3>
+                <h3 className="text-lg font-semibold text-red-600 mb-4">Confirm Delete</h3>
                 <p className="text-gray-600 mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
                 <div className="flex justify-end space-x-3">
                     <button
@@ -1379,7 +1383,7 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
     if (requests.length === 0) {
         return (
             <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
-                <p className="text-gray-500">No vehicle requests found.</p>
+                <p className="text-red-500">No vehicle requests found.</p>
             </div>
         );
     }
@@ -1437,11 +1441,10 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                         <div className="text-sm text-gray-600">{request.registration_number}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                            'bg-yellow-100 text-yellow-800'
-                                        }`}>
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                    'bg-yellow-100 text-yellow-800'
+                                            }`}>
                                             {request.status}
                                         </span>
                                     </td>
@@ -1475,13 +1478,12 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                             <button
                                                 onClick={() => onToggleFeature(vehicle._id)}
                                                 disabled={!canToggle}
-                                                className={`${
-                                                    canToggle
+                                                className={`${canToggle
                                                         ? isFeatured
                                                             ? 'text-orange-600 hover:text-orange-900'
                                                             : 'text-green-600 hover:text-green-900'
                                                         : 'text-gray-400 cursor-not-allowed'
-                                                }`}
+                                                    }`}
                                                 title={!canToggle && !isFeatured ? 'Maximum featured vehicles reached' : ''}
                                             >
                                                 {isFeatured ? 'Unfeature' : 'Feature'}
@@ -1510,11 +1512,10 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                     <p className="text-sm text-gray-600">{request.model_name}</p>
                                 </div>
                                 <div className="flex flex-col items-end space-y-1">
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
-                                        request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                        'bg-yellow-100 text-yellow-800'
-                                    }`}>
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                        }`}>
                                         {request.status}
                                     </span>
                                     {request.status === 'approved' && vehicle && isFeatured && (
@@ -1527,7 +1528,7 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Vendor:</span>
@@ -1558,13 +1559,12 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                     <button
                                         onClick={() => onToggleFeature(vehicle._id)}
                                         disabled={!canToggle}
-                                        className={`flex-1 px-3 py-2 text-sm rounded-lg ${
-                                            canToggle
+                                        className={`flex-1 px-3 py-2 text-sm rounded-lg ${canToggle
                                                 ? isFeatured
                                                     ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
                                                     : 'text-green-600 bg-green-50 hover:bg-green-100'
                                                 : 'text-gray-400 bg-gray-100 cursor-not-allowed'
-                                        }`}
+                                            }`}
                                     >
                                         {isFeatured ? 'Unfeature' : 'Feature'}
                                     </button>
@@ -1581,11 +1581,11 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
 // Vendor Details Modal
 const VendorDetailsModal = ({ vendor, onClose }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-4">
+            <div className="bg-white border-2 border-primary-200 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Vendor Details</h2>
+                        <h2 className="text-2xl font-bold text-red-600">Vendor Details</h2>
                         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1618,9 +1618,8 @@ const VendorDetailsModal = ({ vendor, onClose }) => {
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Verification Status</label>
                                 <p className="mt-1">
-                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
+                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${vendor.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
                                         {vendor.is_verified ? 'Verified' : 'Pending'}
                                     </span>
                                 </p>
@@ -1635,11 +1634,11 @@ const VendorDetailsModal = ({ vendor, onClose }) => {
                         <div>
                             <label className="text-sm font-medium text-gray-500 mb-2 block">Uploaded Document</label>
                             {vendor.document_url ? (
-                                <a 
-                                    href={vendor.document_url} 
-                                    target="_blank" 
+                                <a
+                                    href={vendor.document_url}
+                                    target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                                 >
                                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1669,11 +1668,11 @@ const VendorDetailsModal = ({ vendor, onClose }) => {
 // Vehicle Request Details Modal
 const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-4">
+            <div className="bg-white border-2 border-primary-200 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Vehicle Request Details</h2>
+                        <h2 className="text-2xl font-bold text-red-600">Vehicle Request Details</h2>
                         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1735,11 +1734,10 @@ const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) =
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Status</label>
                                 <p className="mt-1">
-                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                        'bg-yellow-100 text-yellow-800'
-                                    }`}>
+                                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                        }`}>
                                         {request.status}
                                     </span>
                                 </p>
@@ -1753,22 +1751,22 @@ const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) =
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="text-sm font-medium text-gray-500 block mb-2">RC Document</label>
-                                <a 
-                                    href={request.rc_document} 
-                                    target="_blank" 
+                                <a
+                                    href={request.rc_document}
+                                    target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                    className="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm"
                                 >
                                     View RC Document
                                 </a>
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-gray-500 block mb-2">Insurance Document</label>
-                                <a 
-                                    href={request.insurance_document} 
-                                    target="_blank" 
+                                <a
+                                    href={request.insurance_document}
+                                    target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                    className="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm"
                                 >
                                     View Insurance Document
                                 </a>
@@ -1781,17 +1779,17 @@ const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) =
                         <h3 className="font-semibold text-gray-900 text-lg">Vehicle Images</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             {request.vehicle_images?.map((image, index) => (
-                                <a 
-                                    key={index} 
-                                    href={image} 
-                                    target="_blank" 
+                                <a
+                                    key={index}
+                                    href={image}
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="block"
                                 >
-                                    <img 
-                                        src={image} 
-                                        alt={`Vehicle ${index + 1}`} 
-                                        className="w-full h-32 object-cover rounded-lg border border-gray-300 hover:border-blue-500 transition-colors"
+                                    <img
+                                        src={image}
+                                        alt={`Vehicle ${index + 1}`}
+                                        className="w-full h-32 object-cover rounded-lg border border-gray-300 hover:border-red-500 transition-colors"
                                     />
                                 </a>
                             ))}

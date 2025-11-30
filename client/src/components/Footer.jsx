@@ -35,9 +35,15 @@ const Footer = () => {
               <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
                 <MapPinned className="w-5 h-5 text-white" />
               </div>
+              <div className='flex flex-col'>
               <span className="text-2xl font-display font-bold text-white">
                 YatraMate
               </span>
+              <p className='text-xs text-gray-400 font-medium -mt-1'>
+                Travel made effortless <span className='text-primary-400 font-bold'>~</span>
+              </p>
+              </div>
+              
             </Link>
             <p className="text-neutral-300 text-sm leading-relaxed">
               Your trusted companion for car and bike rentals. Explore the journey with freedom and flexibility.
@@ -120,7 +126,7 @@ const Footer = () => {
               <span className='text-primary-400'>©</span> {currentYear} YatraMate. All rights reserved.
             </p>
             <div className="hidden text-neutral-400 text-sm sm:block">
-                Crafted with ❤️ and a vision to make vehicle rental affordable.
+                Crafted with ❤️ and a commitment to making vehicle rentals easy and affordable.
             </div>
           </div>
         </div>

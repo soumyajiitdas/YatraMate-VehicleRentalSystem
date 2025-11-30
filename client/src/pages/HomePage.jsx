@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
 import VehicleCardSkeleton from '../components/VehicleCardSkeleton';
 import { API_ENDPOINTS } from '../config/api';
+import { ChartNoAxesGantt, Motorbike, Sparkles, Star, Users } from 'lucide-react';
 
 const HomePage = () => {
   const [featuredVehicles, setFeaturedVehicles] = useState([]);
@@ -159,12 +160,6 @@ const HomePage = () => {
     },
   ];
 
-  const trustBadges = [
-    { icon: '🔒', text: 'Secure Payments' },
-    { icon: '🛡️', text: 'Fully Insured' },
-    { icon: '⭐', text: '5-Star Rated' },
-  ];
-
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Hero Section */}
@@ -179,11 +174,13 @@ const HomePage = () => {
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-6 sm:space-y-8 animate-slide-in">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold">
-                <span className="text-xl">🚗</span>
-                <span>Your Journey Starts Here</span>
+              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                <ChartNoAxesGantt className="w-4 h-4" />
+                <span className='text-sm'>Your Journey Starts Here</span>
+                <Motorbike className="w-6 h-6 animate-pulse" />
+                
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
+              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
                 Rent Cars & Bikes
                 <span className="block mt-2 bg-linear-to-r from-accent-300 to-accent-100 bg-clip-text text-transparent">
                   Anytime, Anywhere
@@ -328,7 +325,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4">
-              Why Choose Us
+              🤔 Why Choose Us
             </div>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
               Why Choose YatraMate <span className='text-primary-600'>?</span>
@@ -374,7 +371,11 @@ const HomePage = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12">
             <div className="mb-6 sm:mb-0">
               <div className="inline-block px-4 py-2 bg-accent-100 text-accent-600 rounded-full text-sm font-semibold mb-3">
-                Popular Choices
+                <div className='flex items-center space-x-1'>
+                  <Star className="w-4 h-4 animate-pulse" />
+                  <span>Popular Choices</span>
+                </div>
+                
               </div>
               <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-2">
                 Featured Vehicles <span className='text-primary-500'>:</span>
@@ -431,7 +432,11 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-secondary-100 text-secondary-600 rounded-full text-sm font-semibold mb-4">
-              Customer Reviews
+              <div className='flex items-center space-x-2'>
+              <Users className="w-4 h-4 animate-pulse" />
+                <span>Customer Reviews</span>
+              </div>
+              
             </div>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
               What Our Customers Say <span className='text-primary-600'>:</span>
@@ -534,7 +539,11 @@ const HomePage = () => {
             <div className="space-y-8">
               <div>
                 <div className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4">
-                  Premium Features
+                  <div className='flex items-center space-x-2'>
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    <span>Premium Features</span>
+                  </div>
+                  
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
                   Experience Premium Features
