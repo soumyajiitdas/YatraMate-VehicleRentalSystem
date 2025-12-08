@@ -249,13 +249,36 @@ exports.deleteVehicle = catchAsync(async (req, res, next) => {
 
 // Get vehicles by vendor ID
 exports.getVehiclesByVendor = catchAsync(async (req, res, next) => {
+    const Booking = require('../models/Booking');
     const vehicles = await Vehicle.find({ vendor_id: req.params.vendorId });
+
+    // Calculate total earnings for each vehicle
+    const vehiclesWithEarnings = await Promise.all(
+        vehicles.map(async (vehicle) => {
+            const vehicleObj = vehicle.toObject();
+            
+            // Get all completed bookings for this vehicle
+            const bookings = await Booking.find({
+                vehicle_id: vehicle._id,
+                status: 'returned',
+                payment_status: 'paid'
+            });
+            
+            // Calculate total earnings
+            const totalEarnings = bookings.reduce((sum, booking) => {
+                return sum + (booking.final_cost || 0);
+            }, 0);
+            
+            vehicleObj.total_earnings = totalEarnings;
+            return vehicleObj;
+        })
+    );
 
     res.status(200).json({
         status: 'success',
-        results: vehicles.length,
+        results: vehiclesWithEarnings.length,
         data: {
-            vehicles
+            vehicles: vehiclesWithEarnings
         }
     });
 });

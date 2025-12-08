@@ -987,6 +987,16 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                     }
     );
 
+    const handlePhoneChange = (e, fieldName) => {
+        const value = e.target.value;
+        // Remove any non-digit characters
+        const digitsOnly = value.replace(/[^\d]/g, '');
+        // Ensure +91 prefix is always present and limit to 10 digits
+        if (digitsOnly.length <= 10) {
+            setFormData({ ...formData, [fieldName]: digitsOnly ? `+91${digitsOnly}` : '' });
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -1229,12 +1239,19 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                        <input
-                                            type="tel"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        />
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                <span className="text-gray-700 font-medium">+91</span>
+                                            </div>
+                                            <input
+                                                type="tel"
+                                                value={formData.phone.replace('+91', '')}
+                                                onChange={(e) => handlePhoneChange(e, 'phone')}
+                                                className="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                                placeholder="9876543210"
+                                                maxLength="10"
+                                            />
+                                        </div>
                                     </div>
 
                                     <div>
@@ -1292,13 +1309,20 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                                                    <input
-                                                        type="tel"
-                                                        required
-                                                        value={formData.contact_number}
-                                                        onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                    />
+                                                    <div className="relative">
+                                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                            <span className="text-gray-700 font-medium">+91</span>
+                                                        </div>
+                                                        <input
+                                                            type="tel"
+                                                            required
+                                                            value={formData.contact_number.replace('+91', '')}
+                                                            onChange={(e) => handlePhoneChange(e, 'contact_number')}
+                                                            className="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                                            placeholder="9876543210"
+                                                            maxLength="10"
+                                                        />
+                                                    </div>
                                                 </div>
 
                                                 <div>

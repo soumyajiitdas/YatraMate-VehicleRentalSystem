@@ -25,9 +25,24 @@ const VendorPage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let finalValue = type === 'checkbox' ? checked : value;
+    
+    // Handle contact_number with automatic +91 prefix
+    if (name === 'contact_number') {
+      // Remove any non-digit characters
+      const digitsOnly = value.replace(/[^\d]/g, '');
+      // Ensure +91 prefix is always present and limit to 10 digits
+      if (digitsOnly.length <= 10) {
+        finalValue = digitsOnly ? `+91${digitsOnly}` : '';
+      } else {
+        // Prevent more than 10 digits after +91
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: finalValue
     }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -76,7 +91,11 @@ const VendorPage = () => {
     if (formData.is_organization && !formData.company_name) {
       newErrors.company_name = 'Company/Organization name is required';
     }
-    if (!formData.contact_number) newErrors.contact_number = 'Contact number is required';
+    if (!formData.contact_number) {
+      newErrors.contact_number = 'Contact number is required';
+    } else if (!/^\+91[0-9]{10}$/.test(formData.contact_number)) {
+      newErrors.contact_number = 'Contact number must be 10 digits';
+    }
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.id_type) newErrors.id_type = 'ID type is required';
@@ -333,15 +352,21 @@ const VendorPage = () => {
                     </svg>
                     Contact Number *
                   </label>
-                  <input
-                    type="tel"
-                    name="contact_number"
-                    value={formData.contact_number}
-                    onChange={handleChange}
-                    className={`w-full px-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.contact_number ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                      }`}
-                    placeholder="+91 XXXXXXXXXX"
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                      <span className="text-neutral-700 font-medium">+91</span>
+                    </div>
+                    <input
+                      type="tel"
+                      name="contact_number"
+                      value={formData.contact_number.replace('+91', '')}
+                      onChange={handleChange}
+                      className={`w-full pl-16 pr-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.contact_number ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                        }`}
+                      placeholder="9876543210"
+                      maxLength="10"
+                    />
+                  </div>
                   {errors.contact_number && <p className="mt-2 text-sm text-secondary-600 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />

@@ -18,9 +18,24 @@ const RegisterPage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let finalValue = type === 'checkbox' ? checked : value;
+    
+    // Handle phone number with automatic +91 prefix
+    if (name === 'phone') {
+      // Remove any non-digit characters except +
+      const digitsOnly = value.replace(/[^\d]/g, '');
+      // Ensure +91 prefix is always present
+      if (digitsOnly.length <= 10) {
+        finalValue = digitsOnly ? `+91${digitsOnly}` : '';
+      } else {
+        // Prevent more than 10 digits after +91
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: finalValue
     }));
     // Clear error when user starts typing
     if (errors[name]) {
@@ -39,8 +54,8 @@ const RegisterPage = () => {
     }
     if (!formData.phone) {
       newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[0-9]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Phone number is invalid';
+    } else if (!/^\+91[0-9]{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be 10 digits';
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -156,17 +171,23 @@ const RegisterPage = () => {
               <label htmlFor="phone" className="block text-sm font-semibold text-neutral-700 mb-2">
                 Phone Number
               </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
-                  errors.phone ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-                }`}
-                placeholder="Enter your phone number"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                  <span className="text-neutral-700 font-medium">+91</span>
+                </div>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone.replace('+91', '')}
+                  onChange={handleChange}
+                  className={`w-full pl-14 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
+                    errors.phone ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+                  }`}
+                  placeholder="9876543210"
+                  maxLength="10"
+                />
+              </div>
               {errors.phone && <p className="mt-1 text-sm text-secondary-600">{errors.phone}</p>}
             </div>
 

@@ -557,9 +557,13 @@ const VendorDashboard = () => {
                                                 <p className="text-neutral-600">Total Hours</p>
                                                 <p className="font-bold text-neutral-900">{vehicle.total_hours_booked || 0} hrs</p>
                                             </div>
-                                            <div className="col-span-2">
+                                            <div>
                                                 <p className="text-neutral-600">Total Bookings</p>
                                                 <p className="font-bold text-neutral-900">{vehicle.total_bookings || 0}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-neutral-600">Total Earnings</p>
+                                                <p className="font-bold text-green-600">₹{vehicle.total_earnings?.toLocaleString('en-IN') || 0}</p>
                                             </div>
                                         </div>
                                     </div>
