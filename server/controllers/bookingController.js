@@ -102,6 +102,29 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         return next(new AppError('Booking is not in requested state', 400));
     }
     
+    // Generate unique Bill ID in format: BILL-YYYYMMDD-XXXXX
+    const generateBillId = async () => {
+        const today = new Date();
+        const dateStr = today.getFullYear() + 
+                       String(today.getMonth() + 1).padStart(2, '0') + 
+                       String(today.getDate()).padStart(2, '0');
+        
+        // Find the count of bills created today
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const todayEnd = new Date(todayStart);
+        todayEnd.setDate(todayEnd.getDate() + 1);
+        
+        const todayBillsCount = await Booking.countDocuments({
+            bill_id: { $regex: `^BILL-${dateStr}-` },
+            createdAt: { $gte: todayStart, $lt: todayEnd }
+        });
+        
+        const sequenceNumber = String(todayBillsCount + 1).padStart(5, '0');
+        return `BILL-${dateStr}-${sequenceNumber}`;
+    };
+    
+    const billId = await generateBillId();
+    
     // Update pickup details
     booking.pickup_details = {
         staff_id,
@@ -113,6 +136,7 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         pickup_notes
     };
     
+    booking.bill_id = billId;
     booking.status = 'picked_up';
     await booking.save();
     
@@ -144,8 +168,14 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
         vehicle_condition,
         damage_cost,
         damage_description,
-        return_notes
+        return_notes,
+        amount_paid
     } = req.body;
+    
+    // Validate amount_paid is provided
+    if (!amount_paid || amount_paid <= 0) {
+        return next(new AppError('Amount paid is required and must be greater than 0', 400));
+    }
     
     const booking = await Booking.findById(bookingId)
         .populate('vehicle_id')
@@ -298,7 +328,8 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
         vehicle_condition,
         damage_cost: parseFloat(damage_cost) || 0,
         damage_description,
-        return_notes
+        return_notes,
+        amount_paid: parseFloat(amount_paid)
     };
     
     booking.distance_traveled_km = distance_traveled;

@@ -39,6 +39,13 @@ const bookingSchema = new mongoose.Schema({
         required: true
     },
     
+    // Bill ID generated on pickup confirmation
+    bill_id: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    
     // Pickup details (filled by office staff)
     pickup_details: {
         staff_id: {
@@ -77,7 +84,11 @@ const bookingSchema = new mongoose.Schema({
             default: 0
         },
         damage_description: String,
-        return_notes: String
+        return_notes: String,
+        amount_paid: {
+            type: Number,
+            required: false
+        }
     },
     
     // Cost calculation

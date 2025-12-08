@@ -13,7 +13,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         vehicle_condition: 'perfect',
         damage_cost: 0,
         damage_description: '',
-        return_notes: ''
+        return_notes: '',
+        payment_done: false,
+        amount_paid: ''
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -94,8 +96,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        const newValue = type === 'checkbox' ? checked : value;
+        setFormData(prev => ({ ...prev, [name]: newValue }));
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -204,6 +207,14 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
         if (formData.vehicle_condition === 'damaged' && !formData.damage_description) {
             newErrors.damage_description = 'Damage description is required';
+        }
+
+        if (!formData.payment_done) {
+            newErrors.payment_done = 'Payment confirmation is required';
+        }
+
+        if (!formData.amount_paid || formData.amount_paid <= 0) {
+            newErrors.amount_paid = 'Amount paid is required and must be greater than 0';
         }
 
         setErrors(newErrors);
@@ -511,6 +522,61 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                         </div>
                     )}
 
+                    {/* Payment Collection Section */}
+                    <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
+                        <h3 className="font-semibold text-blue-900 mb-4">Payment Collection *</h3>
+                        
+                        <div className="space-y-4">
+                            {/* Payment Done Checkbox */}
+                            <div className="flex items-start">
+                                <input
+                                    type="checkbox"
+                                    id="payment_done"
+                                    name="payment_done"
+                                    checked={formData.payment_done}
+                                    onChange={handleChange}
+                                    className="mt-1 w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                    data-testid="payment-done-checkbox"
+                                />
+                                <label htmlFor="payment_done" className="ml-3 text-sm font-medium text-gray-900 cursor-pointer">
+                                    I confirm that payment has been collected from the customer
+                                </label>
+                            </div>
+                            {errors.payment_done && (
+                                <p className="text-sm text-red-600" data-testid="payment-done-error">{errors.payment_done}</p>
+                            )}
+
+                            {/* Amount Paid Input */}
+                            <div>
+                                <label htmlFor="amount_paid" className="block text-sm font-semibold text-gray-900 mb-2">
+                                    Amount Paid (₹) *
+                                </label>
+                                <input
+                                    type="number"
+                                    id="amount_paid"
+                                    name="amount_paid"
+                                    value={formData.amount_paid}
+                                    onChange={handleChange}
+                                    placeholder="Enter the amount paid by customer"
+                                    min="0"
+                                    step="0.01"
+                                    className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                        errors.amount_paid ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'
+                                    }`}
+                                    data-testid="amount-paid-input"
+                                />
+                                {errors.amount_paid && (
+                                    <p className="mt-1 text-sm text-red-600" data-testid="amount-paid-error">{errors.amount_paid}</p>
+                                )}
+                                {costBreakdown && (
+                                    <p className="mt-2 text-xs text-gray-600">
+                                        Suggested amount based on calculation: ₹{costBreakdown.totalCost.toFixed(2)}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Action Buttons */}
                     <div className="flex space-x-4 pt-4 border-t border-gray-200">
                         <button
@@ -523,7 +589,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                         </button>
                         <button
                             type="submit"
-                            disabled={loading || !costBreakdown}
+                            disabled={loading || !costBreakdown || !formData.payment_done || !formData.amount_paid}
                             className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             data-testid="confirm-return-submit-button"
                         >

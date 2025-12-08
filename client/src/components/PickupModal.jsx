@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
+import BillModal from './BillModal';
 
 const PickupModal = ({ booking, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
+    const [showBillModal, setShowBillModal] = useState(false);
+    const [confirmedBooking, setConfirmedBooking] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -62,8 +65,8 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
             const data = await response.json();
 
             if (data.status === 'success') {
-                alert('Vehicle pickup confirmed successfully!');
-                onSuccess();
+                setConfirmedBooking(data.data.booking);
+                setShowBillModal(true);
             } else {
                 alert(data.message || 'Failed to confirm pickup');
             }
@@ -75,9 +78,22 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
         }
     };
 
+    const handleBillClose = () => {
+        setShowBillModal(false);
+        onSuccess();
+    };
+
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 z-150 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <>
+            {showBillModal && confirmedBooking && (
+                <BillModal 
+                    booking={confirmedBooking} 
+                    onClose={handleBillClose} 
+                />
+            )}
+            
+            <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 z-150 flex items-center justify-center p-4">
+                <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-gray-900">Confirm <span className='text-red-600'>Vehicle Pickup</span></h2>
                     <button
@@ -236,6 +252,7 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
                 </form>
             </div>
         </div>
+        </>
     );
 };
 

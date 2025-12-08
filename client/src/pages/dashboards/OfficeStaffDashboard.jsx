@@ -379,6 +379,27 @@ const OfficeStaffDashboard = () => {
                                                         <p className="font-medium text-xl text-green-600">₹{booking.final_cost.toFixed(2)}</p>
                                                     </div>
                                                 )}
+
+                                                {booking.bill_id && (
+                                                    <div>
+                                                        <p className="text-gray-500">Bill ID</p>
+                                                        <p className="font-medium text-blue-600" data-testid="bill-id-display">{booking.bill_id}</p>
+                                                    </div>
+                                                )}
+
+                                                {booking.pickup_details?.staff_id && (
+                                                    <div>
+                                                        <p className="text-gray-500">Pickup Staff</p>
+                                                        <p className="font-medium text-gray-900" data-testid="pickup-staff-name">{booking.pickup_details.staff_id.name}</p>
+                                                    </div>
+                                                )}
+
+                                                {booking.return_details?.staff_id && (
+                                                    <div>
+                                                        <p className="text-gray-500">Return Staff</p>
+                                                        <p className="font-medium text-gray-900" data-testid="return-staff-name">{booking.return_details.staff_id.name}</p>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 

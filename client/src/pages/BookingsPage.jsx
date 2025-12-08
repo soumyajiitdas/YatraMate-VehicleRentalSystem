@@ -233,9 +233,6 @@ const BookingsPage = () => {
                         <span className={`px-4 py-1.5 rounded-full text-sm font-semibold capitalize ${getStatusColor(booking.status)}`}>
                           {booking.status}
                         </span>
-                        <span className={`px-4 py-1.5 rounded-full text-sm font-semibold capitalize ${getPaymentStatusColor(booking.payment_status)}`}>
-                          {booking.payment_status}
-                        </span>
                       </div>
 
                       {/* Rejection Reason Display */}
