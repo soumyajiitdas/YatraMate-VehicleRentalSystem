@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Phone } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -88,21 +89,11 @@ const LoginPage = () => {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-6 animate-fade-in">
           {/* Logo and Title */}
-          <div className="text-center">
-            <Link to="/" className="inline-flex items-center justify-center space-x-2 mb-4">
-              <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-3 rounded-xl">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                YatraMate
-              </span>
-            </Link>
-            <h2 className="text-3xl font-display font-bold text-neutral-900 mb-2">
-              Welcome Back!
+          <div className="text-center p-3 sm:p-2">
+            <h2 className="text-4xl font-display font-bold text-neutral-900 mb-2">
+              Welcome <span className='text-red-500'>Back!</span>
             </h2>
-            <p className="text-neutral-600">
+            <p className="text-neutral-600 text-md">
               Sign in to continue your journey
             </p>
           </div>
@@ -257,10 +248,8 @@ const LoginPage = () => {
               <span className="text-sm font-medium text-neutral-700">Google</span>
             </button>
             <button className="flex items-center justify-center px-4 py-3 border-2 border-neutral-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all duration-200">
-              <svg className="w-5 h-5 mr-2" fill="#1877F2" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-              <span className="text-sm font-medium text-neutral-700">Facebook</span>
+              <Phone className='w-4.5 h-4.5 mr-2 text-red-600'/>
+              <span className="text-sm font-medium text-neutral-700">Mobile No.</span>
             </button>
           </div>
 

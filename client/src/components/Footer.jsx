@@ -89,7 +89,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-primary-400">Services</h3>
             <ul className="space-y-2">
               {footerLinks.services.map((link) => (
-                <li key={link.path}>
+                <li key={link.label}>
                   <Link
                     to={link.path}
                     className="text-neutral-300 hover:text-primary-400 transition-colors duration-200 text-sm"

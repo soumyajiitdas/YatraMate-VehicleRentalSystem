@@ -56,7 +56,7 @@ const BillModal = ({ booking, onClose }) => {
             <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-                    <h2 className="text-2xl font-bold text-gray-900">Vehicle Pickup <span className='text-green-600'>Bill</span></h2>
+                    <h2 className="text-2xl font-bold text-gray-900">Vehicle <span className='text-red-600'>Pickup Bill</span></h2>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"

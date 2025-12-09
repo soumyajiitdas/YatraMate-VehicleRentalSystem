@@ -204,7 +204,7 @@ const FAQsPage = () => {
                         className="w-full px-6 py-5 text-left flex items-center justify-between"
                       >
                         <span className="text-lg font-semibold text-neutral-900 pr-4">
-                          <span className='text-red-500'>● </span>{faq.question}
+                          {faq.question}
                         </span>
                         <svg
                           className={`w-6 h-6 text-primary-600 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}

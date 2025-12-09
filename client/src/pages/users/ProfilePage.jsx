@@ -195,7 +195,7 @@ const ProfilePage = () => {
               ))}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-secondary-600 hover:bg-secondary-50 transition-all duration-200"
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-secondary-500 bg-red-50 hover:scale-104 transition-all duration-200"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>

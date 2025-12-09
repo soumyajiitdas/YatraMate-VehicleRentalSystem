@@ -363,7 +363,7 @@ const VendorPage = () => {
                       onChange={handleChange}
                       className={`w-full pl-16 pr-5 py-3.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 text-sm ${errors.contact_number ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                         }`}
-                      placeholder="9876543210"
+                      placeholder="0000000000"
                       maxLength="10"
                     />
                   </div>

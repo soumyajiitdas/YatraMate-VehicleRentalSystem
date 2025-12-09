@@ -64,24 +64,23 @@ const Navbar = () => {
               <>
                 <Link
                   to="/profile"
-                  className="flex items-center space-x-2 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-4 py-2 text-neutral-800 bg-red-50 rounded-lg hover:text-primary-600 transition-colors duration-200"
                 >
                   <CircleUser className="w-5 h-5 text-primary-500" />
                   <span className="font-medium">Profile</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 px-4 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-4 py-2 text-neutral-800 bg-red-50 rounded-lg hover:scale-105 transition-all duration-200"
                 >
                   <LogOut className="w-5 h-5 text-primary-500" />
-                  <span className="font-medium">Logout</span>
                 </button>
               </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="flex items-center space-x-2 px-5 py-2 text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center space-x-2 px-5 py-2 text-neutral-800 bg-red-100 rounded-lg hover:text-primary-600 transition-colors duration-200 hover:bg-red-50"
                 >
                   <LogIn className="w-5 h-5 text-primary-500" />
                   <span className='font-medium'>Login</span>
