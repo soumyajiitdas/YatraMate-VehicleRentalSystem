@@ -72,7 +72,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-primary-400">Company</h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
-                <li key={link.path}>
+                <li key={link.label}>
                   <Link
                     to={link.path}
                     className="text-neutral-300 hover:text-primary-400 transition-colors duration-200 text-sm"
@@ -106,7 +106,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-primary-400">Support</h3>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
-                <li key={link.path}>
+                <li key={link.label}>
                   <Link
                     to={link.path}
                     className="text-neutral-300 hover:text-primary-400 transition-colors duration-200 text-sm"

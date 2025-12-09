@@ -20,15 +20,16 @@ const BillModal = ({ booking, onClose }) => {
             const element = billRef.current;
             if (!element) return;
 
-            // Wait for images to load properly (if any)
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            // Wait for any rendering to complete
+            await new Promise((resolve) => setTimeout(resolve, 300));
 
             const canvas = await html2canvas(element, {
                 scale: 2,
                 logging: false,
                 useCORS: true,
-                backgroundColor: '#ffffff', // Ensure white background
-                allowTaint: true,
+                backgroundColor: '#ffffff',
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
             });
 
             const imgData = canvas.toDataURL('image/png');
@@ -51,183 +52,294 @@ const BillModal = ({ booking, onClose }) => {
 
     if (!booking) return null;
 
+    const billStyles = {
+        container: {
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '30px',
+            backgroundColor: '#ffffff',
+            fontFamily: 'Arial, sans-serif',
+        },
+        header: {
+            textAlign: 'center',
+            borderBottom: '3px solid #000',
+            paddingBottom: '20px',
+            marginBottom: '30px',
+        },
+        companyName: {
+            fontSize: '32px',
+            fontWeight: 'bold',
+            margin: '0 0 5px 0',
+            color: '#000',
+        },
+        companyTagline: {
+            fontSize: '14px',
+            margin: '5px 0',
+            color: '#333',
+        },
+        billInfo: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '30px',
+        },
+        infoBlock: {
+            flex: 1,
+        },
+        label: {
+            fontSize: '12px',
+            color: '#666',
+            marginBottom: '5px',
+        },
+        value: {
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '#000',
+        },
+        section: {
+            marginBottom: '25px',
+            border: '1px solid #000',
+            padding: '15px',
+        },
+        sectionTitle: {
+            fontSize: '16px',
+            fontWeight: 'bold',
+            marginBottom: '15px',
+            color: '#000',
+            textTransform: 'uppercase',
+            borderBottom: '2px solid #000',
+            paddingBottom: '8px',
+        },
+        row: {
+            display: 'flex',
+            marginBottom: '10px',
+        },
+        rowLabel: {
+            flex: '0 0 150px',
+            fontSize: '13px',
+            color: '#333',
+            fontWeight: '500',
+        },
+        rowValue: {
+            flex: 1,
+            fontSize: '13px',
+            color: '#000',
+            fontWeight: '400',
+        },
+        footer: {
+            marginTop: '40px',
+            paddingTop: '20px',
+            borderTop: '3px solid #000',
+            textAlign: 'center',
+        },
+        footerText: {
+            fontSize: '11px',
+            marginBottom: '50px',
+            color: '#666',
+            margin: '5px 0',
+        },
+    };
+
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 z-200 flex items-center justify-center p-4" data-testid="bill-modal-overlay">
-            <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-                    <h2 className="text-2xl font-bold text-gray-900">Vehicle <span className='text-red-600'>Pickup Bill</span></h2>
+        <div style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            zIndex: 1000,
+        }} data-testid="bill-modal-overlay">
+            <div style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                maxWidth: '900px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflow: 'auto',
+            }}>
+                {/* Modal Header */}
+                <div style={{
+                    position: 'sticky',
+                    top: 0,
+                    backgroundColor: '#ffffff',
+                    borderBottom: '1px solid #ddd',
+                    padding: '20px 30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    zIndex: 10,
+                }}>
+                    <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#000', margin: 0 }}>
+                        Vehicle <span className='text-red-500'>Pickup Bill</span> 
+                    </h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            color: '#666',
+                        }}
                         data-testid="bill-modal-close-btn"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        ×
                     </button>
                 </div>
 
                 {/* Bill Content */}
-                <div ref={billRef} className="p-8 bg-white">
+                <div ref={billRef} style={billStyles.container}>
                     {/* Company Header */}
-                    <div className="text-center mb-6 border-b-2 border-gray-300 pb-4">
-                        <h1 className="text-3xl font-bold text-primary-600">YatraMate</h1>
-                        <p className="text-sm text-gray-600">Vehicle Rental Services</p>
-                        <p className="text-xs text-gray-500 mt-1">Travel made effortless</p>
+                    <div style={billStyles.header}>
+                        <h1 style={billStyles.companyName}>YatraMate Rental Services</h1>
+                        <p style={{ fontSize: '16px', margin: '5px 0', color: '#666' }}>Travel made effortless ~</p>
                     </div>
 
                     {/* Bill ID and Date */}
-                    <div className="flex justify-between mb-6">
-                        <div>
-                            <p className="text-sm text-gray-600">Bill ID</p>
-                            <p className="text-lg font-bold text-gray-900" data-testid="bill-id">{booking.bill_id}</p>
+                    <div style={billStyles.billInfo}>
+                        <div style={billStyles.infoBlock}>
+                            <div style={billStyles.label}>Bill ID</div>
+                            <div style={billStyles.value} data-testid="bill-id">{booking.bill_id}</div>
                         </div>
-                        <div className="text-right">
-                            <p className="text-sm text-gray-600">Date</p>
-                            <p className="text-lg font-semibold text-gray-900">{formatDate(booking.pickup_details?.actual_pickup_date)}</p>
+                        <div style={{ ...billStyles.infoBlock, textAlign: 'right' }}>
+                            <div style={billStyles.label}>Date</div>
+                            <div style={billStyles.value}>{formatDate(booking.pickup_details?.actual_pickup_date)}</div>
                         </div>
                     </div>
 
                     {/* Customer Details */}
-                    <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Customer Details</h3>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                                <span className="text-gray-600">Name:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.user_id?.name}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Email:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.user_id?.email}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Phone:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.user_id?.phone}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">ID Proof:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase()}</span>
+                    <div style={billStyles.section}>
+                        <div style={billStyles.sectionTitle}>Customer Details</div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Name:</div>
+                            <div style={billStyles.rowValue}>{booking.user_id?.name || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Email:</div>
+                            <div style={billStyles.rowValue}>{booking.user_id?.email || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Phone:</div>
+                            <div style={billStyles.rowValue}>{booking.user_id?.phone || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>ID Proof:</div>
+                            <div style={billStyles.rowValue}>
+                                {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'}
                             </div>
                         </div>
                     </div>
 
                     {/* Vehicle Details */}
-                    <div className="mb-6 bg-blue-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Vehicle Details</h3>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                                <span className="text-gray-600">Vehicle:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.name} - {booking.vehicle_id?.model_name}</span>
+                    <div style={billStyles.section}>
+                        <div style={billStyles.sectionTitle}>Vehicle Details</div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Vehicle:</div>
+                            <div style={billStyles.rowValue}>
+                                {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
                             </div>
-                            <div>
-                                <span className="text-gray-600">Type:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.type}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Registration No:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.registration_number}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Engine CC:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.cc_engine}cc</span>
-                            </div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Type:</div>
+                            <div style={billStyles.rowValue}>{booking.vehicle_id?.type || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Registration No:</div>
+                            <div style={billStyles.rowValue}>{booking.vehicle_id?.registration_number || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Engine CC:</div>
+                            <div style={billStyles.rowValue}>{booking.vehicle_id?.cc_engine || 'N/A'}cc</div>
                         </div>
                     </div>
 
                     {/* Pickup Details */}
-                    <div className="mb-6 bg-green-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Pickup Details</h3>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                                <span className="text-gray-600">Pickup Date:</span>
-                                <span className="ml-2 font-medium text-gray-900">{formatDate(booking.pickup_details?.actual_pickup_date)}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Pickup Time:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.actual_pickup_time}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">From:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.start_location}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">To:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.end_location}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Odometer Start:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.odometer_reading_start} km</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Vehicle Plate:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.vehicle_plate_number}</span>
+                    <div style={billStyles.section}>
+                        <div style={billStyles.sectionTitle}>Pickup Details</div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Pickup Date:</div>
+                            <div style={billStyles.rowValue}>
+                                {formatDate(booking.pickup_details?.actual_pickup_date)}
                             </div>
                         </div>
-                    </div>
-
-                    {/* Package & Pricing */}
-                    <div className="mb-6 bg-yellow-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Package & Pricing</h3>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                                <span className="text-gray-600">Package:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.package_id?.name}</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Rate per Hour:</span>
-                                <span className="ml-2 font-medium text-gray-900">₹{booking.package_id?.price_per_hour}/hr</span>
-                            </div>
-                            <div>
-                                <span className="text-gray-600">Rate per KM:</span>
-                                <span className="ml-2 font-medium text-gray-900">₹{booking.package_id?.price_per_km}/km</span>
-                            </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Pickup Time:</div>
+                            <div style={billStyles.rowValue}>{booking.pickup_details?.actual_pickup_time || 'N/A'}</div>
                         </div>
-                    </div>
-
-                    {/* Staff Details */}
-                    <div className="mb-6 bg-purple-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Staff Details</h3>
-                        <div className="text-sm">
-                            <span className="text-gray-600">Confirmed By:</span>
-                            <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.staff_id?.name || 'N/A'}</span>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>From:</div>
+                            <div style={billStyles.rowValue}>{booking.start_location || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>To:</div>
+                            <div style={billStyles.rowValue}>{booking.end_location || 'N/A'}</div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>Odometer Start:</div>
+                            <div style={billStyles.rowValue}>{booking.pickup_details?.odometer_reading_start || 'N/A'} km</div>
                         </div>
                     </div>
 
                     {/* Notes */}
                     {booking.pickup_details?.pickup_notes && (
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Notes</h3>
-                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{booking.pickup_details.pickup_notes}</p>
+                        <div style={billStyles.section}>
+                            <div style={billStyles.sectionTitle}>Notes</div>
+                            <p style={{ fontSize: '13px', color: '#333', margin: 0 }}>
+                                {booking.pickup_details.pickup_notes}
+                            </p>
                         </div>
                     )}
 
                     {/* Footer */}
-                    <div className="border-t-2 border-gray-300 pt-4 mt-6">
-                        <p className="text-xs text-gray-500 text-center">
-                            This is a computer-generated bill. Final charges will be calculated upon vehicle return.
-                        </p>
-                        <p className="text-xs text-gray-500 text-center mt-2">
-                            Thank you for choosing YatraMate!
+                    <div style={billStyles.footer}>
+                        <p style={billStyles.footerText}>
+                            Final charges will be calculated upon vehicle return. Thank you for choosing YatraMate!
                         </p>
                     </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex space-x-4">
+                <div style={{
+                    position: 'sticky',
+                    bottom: 0,
+                    backgroundColor: '#ffffff',
+                    borderTop: '1px solid #ddd',
+                    padding: '20px 30px',
+                    display: 'flex',
+                    gap: '15px',
+                }}>
                     <button
                         onClick={downloadPDF}
-                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                        style={{
+                            flex: 1,
+                            padding: '12px 24px',
+                            backgroundColor: '#f00',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontSize: '15px',
+                        }}
                         data-testid="download-pdf-btn"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>Download PDF</span>
+                        Download PDF
                     </button>
                     <button
                         onClick={onClose}
-                        className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                        style={{
+                            flex: 1,
+                            padding: '12px 24px',
+                            backgroundColor: '#fff',
+                            color: '#f00',
+                            border: '2px solid #f00',
+                            borderRadius: '6px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            fontSize: '15px',
+                        }}
                         data-testid="close-bill-btn"
                     >
                         Close
