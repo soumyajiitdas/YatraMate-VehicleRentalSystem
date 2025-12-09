@@ -339,6 +339,7 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     booking.damage_cost = parseFloat(damage_cost) || 0;
     booking.final_cost = final_cost;
     booking.status = 'returned';
+    booking.payment_status = 'paid';          // Set payment status to paid
     
     await booking.save();
     

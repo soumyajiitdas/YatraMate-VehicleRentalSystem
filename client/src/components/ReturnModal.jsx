@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const ReturnModal = ({ booking, onClose, onSuccess }) => {
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
-        staff_id: JSON.parse(localStorage.getItem('user'))?.id || '',
-        actual_return_date: new Date().toISOString().split('T')[0], // HTML date input expects YYYY-MM-DD
+        staff_id: user?.id || '',
+        actual_return_date: new Date().toISOString().split('T')[0], // input expects YYYY-MM-DD
         actual_return_time: new Date().toTimeString().slice(0, 5),   // HH:MM 24h
         odometer_reading_end: '',
         vehicle_plate_number: booking.vehicle_id.registration_number,
@@ -21,7 +23,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const [errors, setErrors] = useState({});
     const [costBreakdown, setCostBreakdown] = useState(null);
 
-    // ---- Robust Local Date/Time Parsing Utilities (supports DD/MM/YYYY and YYYY-MM-DD and MM/DD/YYYY) ----
+    // ---- Local Date/Time Parsing Utilities (supports DD/MM/YYYY and YYYY-MM-DD and MM/DD/YYYY) ----
     const parseTimeString = (t) => {
         if (!t || typeof t !== 'string') return null;
         const s = t.trim().toUpperCase();
@@ -61,23 +63,19 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         // Case: D/M/YYYY or M/D/YYYY with heuristic
         const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
         if (dmy) {
-            let a = parseInt(dmy[1], 10); // could be D or M
-            let b = parseInt(dmy[2], 10); // could be M or D
+            let a = parseInt(dmy[1], 10);
+            let b = parseInt(dmy[2], 10);
             const y = parseInt(dmy[3], 10);
             let day, month;
             if (a > 12 && b <= 12) {
-                // definitely DD/MM
                 day = a; month = b;
             } else if (b > 12 && a <= 12) {
-                // definitely MM/DD
                 day = b; month = a;
             } else {
-                // ambiguous: default to DD/MM as per product requirement
                 day = a; month = b;
             }
             return new Date(y, month - 1, day);
         }
-        // Fallback to native parser (last resort)
         const nat = new Date(str);
         return isNaN(nat) ? null : nat;
     };
@@ -128,7 +126,6 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             return;
         }
 
-        // Pickup date may be ISO (with timezone) or plain date or even dd/mm/yyyy from legacy
         const rawPickupDate = booking?.pickup_details?.actual_pickup_date || booking?.requested_pickup_date;
         const rawPickupTime = booking?.pickup_details?.actual_pickup_time || booking?.requested_pickup_time || '';
 
@@ -153,15 +150,15 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             console.warn('Return time is before pickup time; setting duration to 0 for preview');
             msDiff = 0;
         }
-        const minutes = Math.round(msDiff / 60000); // exact minutes
-        const durationHoursExact = minutes / 60;     // fractional hours
+        const minutes = Math.round(msDiff / 60000);
+        const durationHoursExact = minutes / 60;
         const durationH = Math.floor(minutes / 60);
         const durationM = minutes % 60;
 
         const pricePerKm = parseFloat(booking?.package_id?.price_per_km) || 0;
         const pricePerHour = parseFloat(booking?.package_id?.price_per_hour) || 0;
         const costPerDistance = distanceTraveled * pricePerKm;
-        const costPerTime = durationHoursExact * pricePerHour; // exact time-based pricing
+        const costPerTime = durationHoursExact * pricePerHour; // time-based pricing
         const maxCost = Math.max(costPerDistance, costPerTime);
         const damageCost = parseFloat(currentFormData.damage_cost || 0) || 0;
         const totalCost = maxCost + damageCost;
@@ -215,6 +212,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
         if (!formData.amount_paid || formData.amount_paid <= 0) {
             newErrors.amount_paid = 'Amount paid is required and must be greater than 0';
+        } else if (costBreakdown && Math.abs(parseFloat(formData.amount_paid) - costBreakdown.totalCost) > 1) {
+            // Allow 1 Rupee difference for rounding
+            newErrors.amount_paid = `Amount paid must match total calculated amount (₹${costBreakdown.totalCost.toFixed(2)})`;
         }
 
         setErrors(newErrors);
@@ -228,10 +228,15 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
         setLoading(true);
         try {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const staffId = user?.id;
+            if (!staffId) {
+                alert('Staff ID not found. Please logout and login again.');
+                return;
+            }
+
             const payload = {
                 ...formData,
-                staff_id: user._id || user.id
+                staff_id: staffId
             };
 
             const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {

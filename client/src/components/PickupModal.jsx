@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import BillModal from './BillModal';
+import { useAuth } from '../contexts/AuthContext';
 
 const PickupModal = ({ booking, onClose, onSuccess }) => {
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
-        staff_id: JSON.parse(localStorage.getItem('user'))?.id || '',
+        staff_id: user?.id || '',
         actual_pickup_date: new Date(booking.requested_pickup_date).toISOString().split('T')[0],
         actual_pickup_time: booking.requested_pickup_time,
         odometer_reading_start: '',
@@ -49,10 +51,16 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
 
         setLoading(true);
         try {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const staffId = user?.id;
+
+            if (!staffId) {
+                alert('Staff ID not found. Please logout and login again.');
+                return;
+            }
+
             const payload = {
                 ...formData,
-                staff_id: user._id || user.id
+                staff_id: staffId
             };
 
             const response = await fetch(API_ENDPOINTS.confirmPickup(booking._id), {

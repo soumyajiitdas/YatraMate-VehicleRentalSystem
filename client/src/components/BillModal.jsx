@@ -6,8 +6,9 @@ const BillModal = ({ booking, onClose }) => {
     const billRef = useRef(null);
 
     const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-IN', {
+        return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString('en-IN', {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
@@ -17,10 +18,17 @@ const BillModal = ({ booking, onClose }) => {
     const downloadPDF = async () => {
         try {
             const element = billRef.current;
+            if (!element) return;
+
+            // Wait for images to load properly (if any)
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
             const canvas = await html2canvas(element, {
                 scale: 2,
                 logging: false,
-                useCORS: true
+                useCORS: true,
+                backgroundColor: '#ffffff', // Ensure white background
+                allowTaint: true,
             });
 
             const imgData = canvas.toDataURL('image/png');
@@ -41,11 +49,13 @@ const BillModal = ({ booking, onClose }) => {
         }
     };
 
+    if (!booking) return null;
+
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 z-150 flex items-center justify-center p-4" data-testid="bill-modal-overlay">
+        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 z-200 flex items-center justify-center p-4" data-testid="bill-modal-overlay">
             <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
                     <h2 className="text-2xl font-bold text-gray-900">Vehicle Pickup <span className='text-green-600'>Bill</span></h2>
                     <button
                         onClick={onClose}
@@ -75,7 +85,7 @@ const BillModal = ({ booking, onClose }) => {
                         </div>
                         <div className="text-right">
                             <p className="text-sm text-gray-600">Date</p>
-                            <p className="text-lg font-semibold text-gray-900">{formatDate(booking.pickup_details.actual_pickup_date)}</p>
+                            <p className="text-lg font-semibold text-gray-900">{formatDate(booking.pickup_details?.actual_pickup_date)}</p>
                         </div>
                     </div>
 
@@ -85,19 +95,19 @@ const BillModal = ({ booking, onClose }) => {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <span className="text-gray-600">Name:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.user_id.name}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.user_id?.name}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Email:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.user_id.email}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.user_id?.email}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Phone:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.user_id.phone}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.user_id?.phone}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">ID Proof:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details.id_proof_type.replace('_', ' ').toUpperCase()}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase()}</span>
                             </div>
                         </div>
                     </div>
@@ -108,19 +118,19 @@ const BillModal = ({ booking, onClose }) => {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <span className="text-gray-600">Vehicle:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id.name} - {booking.vehicle_id.model_name}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.name} - {booking.vehicle_id?.model_name}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Type:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id.type}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.type}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Registration No:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id.registration_number}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.registration_number}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Engine CC:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id.cc_engine}cc</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.vehicle_id?.cc_engine}cc</span>
                             </div>
                         </div>
                     </div>
@@ -131,11 +141,11 @@ const BillModal = ({ booking, onClose }) => {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <span className="text-gray-600">Pickup Date:</span>
-                                <span className="ml-2 font-medium text-gray-900">{formatDate(booking.pickup_details.actual_pickup_date)}</span>
+                                <span className="ml-2 font-medium text-gray-900">{formatDate(booking.pickup_details?.actual_pickup_date)}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Pickup Time:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details.actual_pickup_time}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.actual_pickup_time}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">From:</span>
@@ -147,11 +157,11 @@ const BillModal = ({ booking, onClose }) => {
                             </div>
                             <div>
                                 <span className="text-gray-600">Odometer Start:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details.odometer_reading_start} km</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.odometer_reading_start} km</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Vehicle Plate:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details.vehicle_plate_number}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.vehicle_plate_number}</span>
                             </div>
                         </div>
                     </div>
@@ -162,15 +172,15 @@ const BillModal = ({ booking, onClose }) => {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <span className="text-gray-600">Package:</span>
-                                <span className="ml-2 font-medium text-gray-900">{booking.package_id.name}</span>
+                                <span className="ml-2 font-medium text-gray-900">{booking.package_id?.name}</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Rate per Hour:</span>
-                                <span className="ml-2 font-medium text-gray-900">₹{booking.package_id.price_per_hour}/hr</span>
+                                <span className="ml-2 font-medium text-gray-900">₹{booking.package_id?.price_per_hour}/hr</span>
                             </div>
                             <div>
                                 <span className="text-gray-600">Rate per KM:</span>
-                                <span className="ml-2 font-medium text-gray-900">₹{booking.package_id.price_per_km}/km</span>
+                                <span className="ml-2 font-medium text-gray-900">₹{booking.package_id?.price_per_km}/km</span>
                             </div>
                         </div>
                     </div>
@@ -180,12 +190,12 @@ const BillModal = ({ booking, onClose }) => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">Staff Details</h3>
                         <div className="text-sm">
                             <span className="text-gray-600">Confirmed By:</span>
-                            <span className="ml-2 font-medium text-gray-900">{booking.pickup_details.staff_id?.name || 'N/A'}</span>
+                            <span className="ml-2 font-medium text-gray-900">{booking.pickup_details?.staff_id?.name || 'N/A'}</span>
                         </div>
                     </div>
 
                     {/* Notes */}
-                    {booking.pickup_details.pickup_notes && (
+                    {booking.pickup_details?.pickup_notes && (
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">Notes</h3>
                             <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{booking.pickup_details.pickup_notes}</p>
