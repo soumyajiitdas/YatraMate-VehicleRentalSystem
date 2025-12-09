@@ -327,7 +327,7 @@ const OfficeStaffDashboard = () => {
                                                 {getStatusBadge(booking.status)}
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                                 <div>
                                                     <p className="text-gray-500">Customer</p>
                                                     <p className="font-medium text-gray-900">{booking.user_id.name}</p>
@@ -348,7 +348,7 @@ const OfficeStaffDashboard = () => {
                                                 </div>
 
                                                 <div>
-                                                    <p className="text-gray-500">Pickup Schedule</p>
+                                                    <p className="text-gray-500">Vehicle Pickup Info</p>
                                                     <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
                                                         {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
                                                     </p>
@@ -363,20 +363,21 @@ const OfficeStaffDashboard = () => {
                                                     </div>
                                                 )}
 
-                                                {booking.pickup_details && (
+                                                {activeTab === 'completed' && booking.return_details ? (
+                                                    <div>
+                                                        <p className="text-gray-500">Vehicle Return Info</p>
+                                                        <p className="font-medium text-gray-900">
+                                                            Date: {formatDateDDMMYYYY(booking.return_details.actual_return_date)}
+                                                        </p>
+                                                        <p className="text-gray-600">Time: {booking.return_details.actual_return_time}</p>
+                                                    </div>
+                                                ) : booking.pickup_details && (
                                                     <div>
                                                         <p className="text-gray-500">Pickup Info</p>
                                                         <p className="font-medium text-gray-900">
                                                             Odometer: {booking.pickup_details.odometer_reading_start} km
                                                         </p>
                                                         <p className="text-gray-600">ID: {booking.pickup_details.id_proof_type}</p>
-                                                    </div>
-                                                )}
-
-                                                {booking.final_cost && (
-                                                    <div>
-                                                        <p className="text-gray-500">Final Cost</p>
-                                                        <p className="font-medium text-xl text-green-600">₹{booking.final_cost.toFixed(2)}</p>
                                                     </div>
                                                 )}
 
@@ -400,6 +401,14 @@ const OfficeStaffDashboard = () => {
                                                         <p className="font-medium text-gray-900" data-testid="return-staff-name">{booking.return_details.staff_id.name}</p>
                                                     </div>
                                                 )}
+
+                                                {booking.final_cost && (
+                                                    <div>
+                                                        <p className="text-gray-500">Final Cost</p>
+                                                        <p className="font-medium text-xl text-green-600">₹{booking.final_cost.toFixed(2)}</p>
+                                                    </div>
+                                                )}
+
                                             </div>
                                         </div>
 
