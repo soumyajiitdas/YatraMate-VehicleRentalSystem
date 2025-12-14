@@ -347,14 +347,6 @@ const OfficeStaffDashboard = () => {
                                                     <p className="font-medium text-gray-900">To: {booking.end_location}</p>
                                                 </div>
 
-                                                <div>
-                                                    <p className="text-gray-500">Vehicle Pickup Info</p>
-                                                    <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
-                                                        {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
-                                                    </p>
-                                                    <p className="text-gray-600" data-testid="pickup-schedule-time">{booking.pickup_details?.actual_pickup_time || booking.requested_pickup_time}</p>
-                                                </div>
-
                                                 {booking.package_id && (
                                                     <div>
                                                         <p className="text-gray-500">Package</p>
@@ -362,6 +354,14 @@ const OfficeStaffDashboard = () => {
                                                         <p className="text-gray-600">₹{booking.package_id.price_per_hour}/hr | ₹{booking.package_id.price_per_km}/km</p>
                                                     </div>
                                                 )}
+
+                                                <div>
+                                                    <p className="text-gray-500">Vehicle Pickup Info</p>
+                                                    <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
+                                                        {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
+                                                    </p>
+                                                    <p className="text-gray-600" data-testid="pickup-schedule-time">{booking.pickup_details?.actual_pickup_time || booking.requested_pickup_time}</p>
+                                                </div>
 
                                                 {activeTab === 'completed' && booking.return_details ? (
                                                     <div>

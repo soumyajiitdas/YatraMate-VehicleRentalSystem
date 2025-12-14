@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import BillModal from './BillModal';
 import { useAuth } from '../contexts/AuthContext';
+import CustomDropdown from './common/CustomDropdown';
 
 const PickupModal = ({ booking, onClose, onSuccess }) => {
     const { user } = useAuth();
@@ -207,23 +208,18 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
                     </div>
 
                     {/* ID Proof Type */}
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Government ID Proof Type *
-                        </label>
-                        <select
-                            name="id_proof_type"
-                            value={formData.id_proof_type}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                        >
-                            <option value="aadhar_card">Aadhar Card</option>
-                            <option value="pan_card">PAN Card</option>
-                            <option value="voter_card">Voter Card</option>
-                            <option value="driving_license">Driving License</option>
-                            <option value="passport">Passport</option>
-                        </select>
-                    </div>
+                    <CustomDropdown
+                        label="Government ID Proof Type *"
+                        options={[
+                            { value: 'aadhar_card', label: 'Aadhar Card' },
+                            { value: 'pan_card', label: 'PAN Card' },
+                            { value: 'voter_card', label: 'Voter Card' },
+                            { value: 'driving_license', label: 'Driving License' },
+                            { value: 'passport', label: 'Passport' },
+                        ]}
+                        value={formData.id_proof_type}
+                        onChange={(val) => handleChange({ target: { name: 'id_proof_type', value: val } })}
+                    />
 
                     {/* Notes */}
                     <div>

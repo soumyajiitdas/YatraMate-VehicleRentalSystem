@@ -102,11 +102,7 @@ exports.updatePackage = catchAsync(async (req, res, next) => {
 
 // Delete package (soft delete)
 exports.deletePackage = catchAsync(async (req, res, next) => {
-    const packageData = await Package.findByIdAndUpdate(
-        req.params.id,
-        { is_active: false },
-        { new: true }
-    );
+    const packageData = await Package.findByIdAndDelete(req.params.id);
     
     if (!packageData) {
         return next(new AppError('No package found with that ID', 404));

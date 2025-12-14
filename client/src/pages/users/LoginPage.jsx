@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Phone } from 'lucide-react';
+import { Phone, Mail, Lock, UserCircle } from 'lucide-react';
+import CustomDropdown from '../../components/common/CustomDropdown';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const roleOptions = [
+    { value: 'user', label: 'Customer' },
+    { value: 'vendor', label: 'Vendor' },
+    { value: 'office_staff', label: 'Office Staff' },
+    { value: 'admin', label: 'Admin' }
+  ];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -24,6 +32,13 @@ const LoginPage = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleRoleChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      role: value
+    }));
   };
 
   const validateForm = () => {
@@ -107,9 +122,7 @@ const LoginPage = () => {
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                  </svg>
+                  <Mail className="w-5 h-5" />
                 </span>
                 <input
                   type="email"
@@ -135,9 +148,7 @@ const LoginPage = () => {
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+                  <Lock className="w-5 h-5" />
                 </span>
                 <input
                   type="password"
@@ -157,35 +168,13 @@ const LoginPage = () => {
             </div>
 
             {/* Role Selection */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-semibold text-neutral-700 mb-2">
-                Login As
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </span>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 border-2 border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 appearance-none bg-white"
-                >
-                  <option value="user">Customer</option>
-                  <option value="vendor">Vendor</option>
-                  <option value="office_staff">Office Staff</option>
-                  <option value="admin">Admin</option>
-                </select>
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </span>
-              </div>
-            </div>
+            <CustomDropdown
+              label="Login As"
+              options={roleOptions}
+              value={formData.role}
+              onChange={handleRoleChange}
+              icon={UserCircle}
+            />
 
             {/* Forgot Password */}
             <div className="flex items-center justify-between">

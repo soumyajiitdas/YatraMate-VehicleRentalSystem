@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import CustomDropdown from './common/CustomDropdown';
 
 const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const { user } = useAuth();
@@ -417,21 +418,15 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                     </div>
 
                     {/* Vehicle Condition */}
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Vehicle Condition *
-                        </label>
-                        <select
-                            name="vehicle_condition"
-                            value={formData.vehicle_condition}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            data-testid="vehicle-condition-select"
-                        >
-                            <option value="perfect">Perfect - No Damage</option>
-                            <option value="damaged">Damaged</option>
-                        </select>
-                    </div>
+                    <CustomDropdown
+                        label="Vehicle Condition *"
+                        options={[
+                            { value: 'perfect', label: 'Perfect - No Damage' },
+                            { value: 'damaged', label: 'Damaged' }
+                        ]}
+                        value={formData.vehicle_condition}
+                        onChange={(val) => handleChange({ target: { name: 'vehicle_condition', value: val } })}
+                    />
 
                     {/* Damage Details (conditional) */}
                     {formData.vehicle_condition === 'damaged' && (

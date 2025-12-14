@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_ENDPOINTS } from '../../config/api';
+import CustomDropdown from '../../components/common/CustomDropdown';
 import { MapPinned } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -1113,29 +1114,25 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
-                                        <select
-                                            value={formData.vehicle_type}
-                                            onChange={(e) => setFormData({ ...formData, vehicle_type: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        >
-                                            <option value="bike">Bike</option>
-                                            <option value="car">Car</option>
-                                        </select>
-                                    </div>
+                                    <CustomDropdown
+                                        label={<span>Vehicle <span className='text-red-500'>*</span></span>}
+                                        options={[
+                                            { value: 'bike', label: 'Bike' },
+                                            { value: 'car', label: 'Car' }
+                                        ]}
+                                        value={formData.vehicle_type}
+                                        onChange={(val) => setFormData({ ...formData, vehicle_type: val })}
+                                    />
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                        <select
-                                            value={formData.is_active}
-                                            onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'true' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        >
-                                            <option value="true">Active</option>
-                                            <option value="false">Inactive</option>
-                                        </select>
-                                    </div>
+                                    <CustomDropdown
+                                        label={<span>Status <span className='text-red-500'>*</span></span>}
+                                        options={[
+                                            { value: 'true', label: 'Active' },
+                                            { value: 'false', label: 'Inactive' }
+                                        ]}
+                                        value={String(formData.is_active)}
+                                        onChange={(val) => setFormData({ ...formData, is_active: val === 'true' })}
+                                    />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -1248,7 +1245,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                                                 value={formData.phone.replace('+91', '')}
                                                 onChange={(e) => handlePhoneChange(e, 'phone')}
                                                 className="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                placeholder="9876543210"
+                                                placeholder="0000000000"
                                                 maxLength="10"
                                             />
                                         </div>
@@ -1256,14 +1253,14 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                        <select
-                                            value={formData.is_active}
-                                            onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'true' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        >
-                                            <option value="true">Active</option>
-                                            <option value="false">Inactive</option>
-                                        </select>
+                                        <CustomDropdown
+                                            options={[
+                                                { value: 'true', label: 'Active' },
+                                                { value: 'false', label: 'Inactive' }
+                                            ]}
+                                            value={String(formData.is_active)}
+                                            onChange={(val) => setFormData({ ...formData, is_active: val === 'true' })}
+                                        />
                                     </div>
                                 </div>
 
@@ -1327,14 +1324,14 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Verification Status</label>
-                                                    <select
-                                                        value={formData.is_verified}
-                                                        onChange={(e) => setFormData({ ...formData, is_verified: e.target.value === 'true' })}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                    >
-                                                        <option value="true">Verified</option>
-                                                        <option value="false">Not Verified</option>
-                                                    </select>
+                                                    <CustomDropdown
+                                                        options={[
+                                                            { value: 'true', label: 'Verified' },
+                                                            { value: 'false', label: 'Not Verified' }
+                                                        ]}
+                                                        value={String(formData.is_verified)}
+                                                        onChange={(val) => setFormData({ ...formData, is_verified: val === 'true' })}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -1466,8 +1463,8 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                    'bg-yellow-100 text-yellow-800'
+                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
                                             }`}>
                                             {request.status}
                                         </span>
@@ -1503,10 +1500,10 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                                 onClick={() => onToggleFeature(vehicle._id)}
                                                 disabled={!canToggle}
                                                 className={`${canToggle
-                                                        ? isFeatured
-                                                            ? 'text-orange-600 hover:text-orange-900'
-                                                            : 'text-green-600 hover:text-green-900'
-                                                        : 'text-gray-400 cursor-not-allowed'
+                                                    ? isFeatured
+                                                        ? 'text-orange-600 hover:text-orange-900'
+                                                        : 'text-green-600 hover:text-green-900'
+                                                    : 'text-gray-400 cursor-not-allowed'
                                                     }`}
                                                 title={!canToggle && !isFeatured ? 'Maximum featured vehicles reached' : ''}
                                             >
@@ -1537,8 +1534,8 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                 </div>
                                 <div className="flex flex-col items-end space-y-1">
                                     <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
+                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                            'bg-yellow-100 text-yellow-800'
                                         }`}>
                                         {request.status}
                                     </span>
@@ -1584,10 +1581,10 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                         onClick={() => onToggleFeature(vehicle._id)}
                                         disabled={!canToggle}
                                         className={`flex-1 px-3 py-2 text-sm rounded-lg ${canToggle
-                                                ? isFeatured
-                                                    ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
-                                                    : 'text-green-600 bg-green-50 hover:bg-green-100'
-                                                : 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                                            ? isFeatured
+                                                ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+                                                : 'text-green-600 bg-green-50 hover:bg-green-100'
+                                            : 'text-gray-400 bg-gray-100 cursor-not-allowed'
                                             }`}
                                     >
                                         {isFeatured ? 'Unfeature' : 'Feature'}
@@ -1759,8 +1756,8 @@ const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) =
                                 <label className="text-sm font-medium text-gray-500">Status</label>
                                 <p className="mt-1">
                                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                            request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
+                                        request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                            'bg-yellow-100 text-yellow-800'
                                         }`}>
                                         {request.status}
                                     </span>

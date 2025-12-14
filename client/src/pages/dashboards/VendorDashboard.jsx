@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_ENDPOINTS } from '../../config/api';
 import { MapPinned } from 'lucide-react';
+import CustomDropdown from '../../components/common/CustomDropdown';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
@@ -310,10 +311,10 @@ const VendorDashboard = () => {
             </div>
 
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 {/* Actions */}
                 <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <h2 className="text-xl sm:text-2xl font-bold text-neutral-900"><span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Vehicles</span> <span className='text-red-600'>:</span></h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900"><span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Vehicles</span> <span className='text-red-600'>:</span></h2>
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
                         className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
@@ -324,8 +325,8 @@ const VendorDashboard = () => {
 
                 {/* Add Vehicle Form */}
                 {showAddForm && (
-                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-8 animate-fade-in">
-                        <h3 className="text-xl sm:text-2xl text-center font-bold text-neutral-900 mb-4">Vehicle <span className='text-red-500'>Request</span></h3>
+                    <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8 animate-fade-in">
+                        <h3 className="text-2xl sm:text-3xl text-center font-bold text-neutral-900 p-6">Vehicle <span className='text-red-500'>Request</span></h3>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">Vehicle Name <span className='text-red-500'>*</span></label>
@@ -351,19 +352,15 @@ const VendorDashboard = () => {
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-neutral-700 mb-1">Type <span className='text-red-500'>*</span></label>
-                                <select
-                                    name="type"
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                >
-                                    <option value="bike">Bike</option>
-                                    <option value="car">Car</option>
-                                </select>
-                            </div>
+                            <CustomDropdown
+                                label={<span>Type <span className='text-red-500'>*</span></span>}
+                                options={[
+                                    { value: 'bike', label: 'Bike' },
+                                    { value: 'car', label: 'Car' }
+                                ]}
+                                value={formData.type}
+                                onChange={(val) => handleChange({ target: { name: 'type', value: val } })}
+                            />
 
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-1">Brand <span className='text-red-500'>*</span></label>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
 import { API_ENDPOINTS } from '../config/api';
 import { Search, CarFront, BadgeIndianRupee, CircleCheckBig, ClipboardCheck } from 'lucide-react';
+import CustomDropdown from '../components/common/CustomDropdown';
 
 const VehiclesPage = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -66,6 +67,25 @@ const VehiclesPage = () => {
     return true;
   });
 
+  const typeOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'car', label: 'Cars' },
+    { value: 'bike', label: 'Bikes' },
+  ];
+
+  const priceOptions = [
+    { value: 'all', label: 'All Prices' },
+    { value: 'low', label: 'Under ₹1,500/day' },
+    { value: 'medium', label: '₹1,500 - ₹3,000/day' },
+    { value: 'high', label: 'Above ₹3,000/day' },
+  ];
+
+  const availabilityOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'available', label: 'Available' },
+    { value: 'booked', label: 'Booked' },
+  ];
+
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,56 +118,31 @@ const VehiclesPage = () => {
             </div>
 
             {/* Type Filter */}
-            <div>
-              <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
-                <CarFront className="w-4 h-4 mr-2 text-primary-500" />
-                Vehicle Type
-              </label>
-              <select
-                value={filters.type}
-                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all duration-200 text-sm font-medium"
-              >
-                <option value="all">All Types</option>
-                <option value="car">Cars</option>
-                <option value="bike">Bikes</option>
-              </select>
-            </div>
+            <CustomDropdown
+              label="Vehicle Type"
+              options={typeOptions}
+              value={filters.type}
+              onChange={(val) => setFilters({ ...filters, type: val })}
+              icon={CarFront}
+            />
 
             {/* Price Range */}
-            <div>
-              <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
-                <BadgeIndianRupee className="w-4 h-4 mr-2 text-primary-500" />
-                Price Range
-              </label>
-              <select
-                value={filters.priceRange}
-                onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all duration-200 text-sm font-medium"
-              >
-                <option value="all">All Prices</option>
-                <option value="low">Under ₹1,500/day</option>
-                <option value="medium">₹1,500 - ₹3,000/day</option>
-                <option value="high">Above ₹3,000/day</option>
-              </select>
-            </div>
+            <CustomDropdown
+              label="Price Range"
+              options={priceOptions}
+              value={filters.priceRange}
+              onChange={(val) => setFilters({ ...filters, priceRange: val })}
+              icon={BadgeIndianRupee}
+            />
 
             {/* Availability */}
-            <div>
-              <label className="flex items-center text-sm font-bold text-neutral-700 mb-3">
-                <CircleCheckBig className="w-4 h-4 mr-2 text-primary-500" />
-                Availability
-              </label>
-              <select
-                value={filters.availability}
-                onChange={(e) => setFilters({ ...filters, availability: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all duration-200 text-sm font-medium"
-              >
-                <option value="all">All</option>
-                <option value="available">Available</option>
-                <option value="booked">Booked</option>
-              </select>
-            </div>
+            <CustomDropdown
+              label="Availability"
+              options={availabilityOptions}
+              value={filters.availability}
+              onChange={(val) => setFilters({ ...filters, availability: val })}
+              icon={CircleCheckBig}
+            />
           </div>
 
           {/* Active Filters Display */}

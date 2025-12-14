@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
-import MobileNav from './components/MobileNav';
-import Footer from './components/Footer';
-import PageSkeleton from './components/PageSkeleton';
+import Navbar from './components/common/Navbar';
+import MobileNav from './components/common/MobileNav';
+import Footer from './components/common/Footer';
+import PageSkeleton from './components/common/PageSkeleton';
 import './App.css';
 
 // Lazy load all pages for better initial load performance
