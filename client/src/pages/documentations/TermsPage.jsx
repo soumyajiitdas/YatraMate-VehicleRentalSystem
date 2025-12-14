@@ -88,7 +88,7 @@ const TermsPage = () => {
             Please read these terms carefully before using YatraMate's services
           </p>
           <p className="text-sm text-primary-200 mt-4">
-            Last Updated: January 2024
+            Last Updated: December 2025
           </p>
         </div>
       </section>

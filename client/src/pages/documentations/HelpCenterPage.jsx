@@ -102,13 +102,13 @@ const HelpCenterPage = () => {
     },
     {
       title: '24/7 Phone Support',
-      value: '+91-1800-123-4567',
+      value: '+91-000-000-0000',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
       ),
-      link: 'tel:+911800123456'
+      link: 'tel:+910000000000'
     },
     {
       title: 'Live Chat',
@@ -278,7 +278,7 @@ const HelpCenterPage = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="+91 ***** *****"
+                    placeholder="+91 00000 00000"
                   />
                 </div>
                 <div>

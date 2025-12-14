@@ -84,7 +84,7 @@ Before you begin, ensure you have the following installed:
 *   **npm** (comes with Node.js) or **Yarn**
 *   **MongoDB:** A running instance of MongoDB, either locally or a cloud-hosted service (e.g., MongoDB Atlas).
 
-### Backend Setup
+### Backend Setup:
 
 1.  **Navigate to the `server` directory:**
     ```bash
@@ -93,8 +93,6 @@ Before you begin, ensure you have the following installed:
 2.  **Install dependencies:**
     ```bash
     npm install
-    # or
-    yarn install
     ```
 3.  **Create a `.env` file:**
     In the `server` directory, create a file named `.env` and add the environment variables as specified below:
@@ -118,7 +116,7 @@ Before you begin, ensure you have the following installed:
     ```
     The server will run on `http://localhost:8000`.
 
-### Frontend Setup
+### Frontend Setup:
 
 1.  **Navigate to the `client` directory:**
     ```bash
@@ -127,8 +125,6 @@ Before you begin, ensure you have the following installed:
 2.  **Install dependencies:**
     ```bash
     npm install
-    # or
-    yarn install
     ```
 3.  **Start the frontend development server:**
     ```bash
@@ -136,13 +132,26 @@ Before you begin, ensure you have the following installed:
     ```
     The frontend application will run on `http://localhost:5173`.
 
+### Alternate method:
+#### Run the application using Concurrently-
+1. Simply, create `.env` for backend as instructed above
+2. In root directory, run the command for installing required packages
+    ```
+    npm run download
+    ```
+3. Then run the command to run the application
+    ```
+    npm run app
+    ```
+    Access the application in your browser in this link `http://localhost:5173`
+
 ## 🚀 Usage
 
 Once both the backend and frontend servers are running:
 
 1.  Open your web browser and navigate to the frontend URL (e.g., `http://localhost:5173`).
 2.  Register a new user account or log in with existing credentials.
-3.  Explore the vehicle listings, make bookings, or switch to a vendor/admin role if you have the necessary access.
+3.  Explore the vehicle listings, make bookings, or switch to a vendor/staff/admin role if you have the necessary access.
 
 ## API Endpoints (Overview)
 

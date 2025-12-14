@@ -43,7 +43,7 @@ const BillModal = ({ booking, onClose }) => {
             const imgY = 10;
 
             pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-            pdf.save(`Bill-${booking.bill_id}.pdf`);
+            pdf.save(`YM-${booking.bill_id}.pdf`);
         } catch (error) {
             console.error('Error generating PDF:', error);
             alert('Failed to generate PDF. Please try again.');

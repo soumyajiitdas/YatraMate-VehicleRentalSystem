@@ -112,21 +112,21 @@ const HomePage = () => {
   const testimonials = [
     {
       name: 'Rajesh Kumar',
-      role: 'Business Traveler',
+      role: 'Test Customer 1',
       image: 'https://ui-avatars.com/api/?name=Rajesh+Kumar&background=FF5722&color=fff&size=128',
       rating: 5,
       comment: 'Excellent service! Booked a car for my business trip. The vehicle was in perfect condition and the process was super smooth.',
     },
     {
       name: 'Priya Sharma',
-      role: 'Tourist',
+      role: 'Test Customer 2',
       image: 'https://ui-avatars.com/api/?name=Priya+Sharma&background=EF4444&color=fff&size=128',
       rating: 5,
       comment: 'Had an amazing experience renting a bike for my weekend trip. Affordable prices and great customer support. Highly recommended!',
     },
     {
       name: 'Amit Patel',
-      role: 'Regular Customer',
+      role: 'Test Customer 3',
       image: 'https://ui-avatars.com/api/?name=Amit+Patel&background=F59E0B&color=fff&size=128',
       rating: 5,
       comment: 'I have been using YatraMate for over a year now. Always reliable, professional service and well-maintained vehicles.',
