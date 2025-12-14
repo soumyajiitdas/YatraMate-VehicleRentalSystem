@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
 import CustomDropdown from '../../components/common/CustomDropdown';
 import { MapPinned } from 'lucide-react';
@@ -8,6 +9,7 @@ import { MapPinned } from 'lucide-react';
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
+    const { toast } = useToast();
     const [activeTab, setActiveTab] = useState('customers');
     const [users, setUsers] = useState([]);
     const [vendors, setVendors] = useState([]);
@@ -156,7 +158,7 @@ const AdminDashboard = () => {
             }
         } catch (error) {
             console.error('Error deleting:', error);
-            alert('Failed to delete. Please try again.');
+            toast.error('Failed to delete. Please try again.');
         }
     };
 
@@ -168,12 +170,12 @@ const AdminDashboard = () => {
             });
 
             if (response.ok) {
-                alert('Vendor verified successfully!');
+                toast.success('Vendor verified successfully!');
                 fetchData();
             }
         } catch (error) {
             console.error('Error verifying vendor:', error);
-            alert('Failed to verify vendor. Please try again.');
+            toast.error('Failed to verify vendor. Please try again.');
         }
     };
 
@@ -199,13 +201,13 @@ const AdminDashboard = () => {
             });
 
             if (response.ok) {
-                alert('Vehicle request approved successfully!');
+                toast.success('Vehicle request approved successfully!');
                 setShowRequestDetailsModal(false);
                 fetchData();
             }
         } catch (error) {
             console.error('Error approving request:', error);
-            alert('Failed to approve request. Please try again.');
+            toast.error('Failed to approve request. Please try again.');
         }
     };
 
@@ -224,13 +226,13 @@ const AdminDashboard = () => {
             });
 
             if (response.ok) {
-                alert('Vehicle request rejected.');
+                toast.success('Vehicle request rejected.');
                 setShowRequestDetailsModal(false);
                 fetchData();
             }
         } catch (error) {
             console.error('Error rejecting request:', error);
-            alert('Failed to reject request. Please try again.');
+            toast.error('Failed to reject request. Please try again.');
         }
     };
 
@@ -244,14 +246,14 @@ const AdminDashboard = () => {
             const data = await response.json();
 
             if (response.ok && data.status === 'success') {
-                alert('Vehicle feature status updated successfully!');
+                toast.success('Vehicle feature status updated successfully!');
                 fetchData();
             } else {
-                alert(data.message || 'Failed to toggle feature status. Please try again.');
+                toast.error(data.message || 'Failed to toggle feature status. Please try again.');
             }
         } catch (error) {
             console.error('Error toggling feature:', error);
-            alert('Failed to toggle feature status. Please try again.');
+            toast.error('Failed to toggle feature status. Please try again.');
         }
     };
 
@@ -1083,11 +1085,11 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                 }
                 onSuccess();
             } else {
-                alert('Error: ' + (data.message || 'Failed to save'));
+                toast.error('Error: ' + (data.message || 'Failed to save'));
             }
         } catch (error) {
             console.error('Error saving:', error);
-            alert('Failed to save. Please try again.');
+            toast.error('Failed to save. Please try again.');
         }
     };
 

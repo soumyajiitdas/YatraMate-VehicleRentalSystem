@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { API_ENDPOINTS } from '../config/api';
 import CustomDropdown from '../components/common/CustomDropdown';
 
 const VendorPage = () => {
   const navigate = useNavigate();
   const { registerVendor } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     is_organization: false,
@@ -56,7 +58,7 @@ const VendorPage = () => {
 
     // Validate file size (max 10MB)
     if (file.size > 2 * 1024 * 1024) {
-      alert('File size must be less than 2MB');
+      toast.warning('File size must be less than 2MB');
       return;
     }
 
@@ -75,12 +77,12 @@ const VendorPage = () => {
 
       if (data.status === 'success') {
         setDocumentUrl(data.data.url);
-        alert('Document uploaded successfully!');
+        toast.success('Document uploaded successfully!');
       } else {
-        alert('Error uploading document');
+        toast.error('Error uploading document');
       }
     } catch (error) {
-      alert('Error uploading document: ' + error.message);
+      toast.error('Error uploading document: ' + error.message);
     } finally {
       setUploadingDoc(false);
     }
@@ -132,14 +134,14 @@ const VendorPage = () => {
         setLoading(false);
 
         if (result.success) {
-          alert(result.message || 'Vendor registration successful! Your account is pending verification. Please login after verification.');
+          toast.success(result.message || 'Vendor registration successful! Your account is pending verification. Please login after verification.');
           navigate('/login');
         } else {
-          alert(result.message || 'Error registering vendor. Please try again.');
+          toast.error(result.message || 'Error registering vendor. Please try again.');
         }
       } catch (error) {
         setLoading(false);
-        alert('Error registering vendor: ' + error.message);
+        toast.error('Error registering vendor: ' + error.message);
       }
     }
   };

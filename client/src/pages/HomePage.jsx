@@ -275,98 +275,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 bg-red-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-              How It Works <span className='text-primary-600'>:</span>
-            </h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Rent a vehicle in three simple steps and hit the road in no time
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connection Lines */}
-            <div className="hidden md:block absolute top-13 left-1/4 right-1/4 h-1 bg-linear-to-r from-primary-200 via-secondary-200 to-primary-200" />
-            
-            {howItWorks.map((step, index) => (
-              <div
-                key={index}
-                className="relative text-center group"
-                data-testid={`how-it-works-step-${step.step}`}
-              >
-                <div className="relative inline-block mb-6">
-                  {/* Icon Container */}
-                  <div className="w-24 h-24 bg-linear-to-br from-primary-500 to-secondary-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-glow group-hover:scale-110 transition-all duration-300 relative z-10">
-                    {step.icon}
-                  </div>
-                  {/* Step Number Badge */}
-                  <div className="absolute -top-2 -right-2 w-10 h-10 bg-accent-400 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg z-20">
-                    {step.step}
-                  </div>
-                </div>
-                
-                <h3 className="text-xl font-bold text-neutral-900 mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-neutral-600 leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4">
-              🤔 Why Choose Us
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-              Why Choose YatraMate <span className='text-primary-600'>?</span>
-            </h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              We provide the best vehicle rental experience with unmatched service and quality
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="group relative p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 border border-neutral-100 overflow-hidden"
-                data-testid={`feature-${feature.title.toLowerCase().replace(' ', '-')}`}
-              >
-                {/* Decorative gradient background */}
-                <div className="absolute inset-0 bg-linear-to-br from-primary-50 to-secondary-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                <div className="relative z-10">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-linear-to-br from-primary-500 to-secondary-500 text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-neutral-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-
-                {/* Decorative corner element */}
-                <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-linear-to-br from-primary-200 to-secondary-200 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Featured Vehicles Section */}
-      <section className="py-20 bg-neutral-50" data-testid="featured-vehicles-section">
+      <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50" data-testid="featured-vehicles-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12">
             <div className="mb-6 sm:mb-0">
@@ -427,70 +337,98 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Features Section */}
       <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-secondary-100 text-secondary-600 rounded-full text-sm font-semibold mb-4">
-              <div className='flex items-center space-x-2'>
-              <Users className="w-4 h-4 animate-pulse" />
-                <span>Customer Reviews</span>
-              </div>
-              
+            <div className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4">
+              🤔 Why Choose Us
             </div>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
-              What Our Customers Say <span className='text-primary-600'>:</span>
+              Why Choose YatraMate <span className='text-primary-600'>?</span>
             </h2>
             <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Don't just take our word for it - hear from our satisfied customers
+              We provide the best vehicle rental experience with unmatched service and quality
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
               <div
                 key={index}
-                className="group bg-neutral-50 rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-neutral-100"
-                data-testid={`testimonial-${index}`}
+                className="group relative p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 border border-neutral-100 overflow-hidden"
+                data-testid={`feature-${feature.title.toLowerCase().replace(' ', '-')}`}
               >
-                {/* Rating Stars */}
-                <div className="flex mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="w-5 h-5 text-accent-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-
-                {/* Comment */}
-                <p className="text-neutral-700 mb-6 leading-relaxed italic">
-                  "{testimonial.comment}"
-                </p>
-
-                {/* Customer Info */}
-                <div className="flex items-center space-x-4 pt-4 border-t border-neutral-200">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full ring-2 ring-primary-200"
-                  />
-                  <div>
-                    <h4 className="font-bold text-neutral-900">{testimonial.name}</h4>
-                    <p className="text-sm text-neutral-500">{testimonial.role}</p>
+                {/* Decorative gradient background */}
+                <div className="absolute inset-0 bg-linear-to-br from-primary-50 to-secondary-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                <div className="relative z-10">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-linear-to-br from-primary-500 to-secondary-500 text-white rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                    {feature.icon}
                   </div>
+                  <h3 className="text-xl font-bold text-neutral-900 mb-3 group-hover:text-primary-600 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-neutral-600 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
+
+                {/* Decorative corner element */}
+                <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-linear-to-br from-primary-200 to-secondary-200 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* App Features / Unique Selling Points */}
+      {/* How It Works Section */}
+      <section className="py-20 bg-red-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+              How It Works <span className='text-primary-600'>:</span>
+            </h2>
+            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+              Rent a vehicle in three simple steps and hit the road in no time
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Connection Lines */}
+            <div className="hidden md:block absolute top-13 left-1/4 right-1/4 h-1 bg-linear-to-r from-primary-200 via-secondary-200 to-primary-200" />
+            
+            {howItWorks.map((step, index) => (
+              <div
+                key={index}
+                className="relative text-center group"
+                data-testid={`how-it-works-step-${step.step}`}
+              >
+                <div className="relative inline-block mb-6">
+                  {/* Icon Container */}
+                  <div className="w-24 h-24 bg-linear-to-br from-primary-500 to-secondary-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-glow group-hover:scale-110 transition-all duration-300 relative z-10">
+                    {step.icon}
+                  </div>
+                  {/* Step Number Badge */}
+                  <div className="absolute -top-2 -right-2 w-10 h-10 bg-accent-400 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg z-20">
+                    {step.step}
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-bold text-neutral-900 mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-neutral-600 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* Unique Selling Points */}
       <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -607,6 +545,69 @@ const HomePage = () => {
                 </svg>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-block px-4 py-2 bg-secondary-100 text-secondary-600 rounded-full text-sm font-semibold mb-4">
+              <div className='flex items-center space-x-2'>
+              <Users className="w-4 h-4 animate-pulse" />
+                <span>Customer Reviews</span>
+              </div>
+              
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 mb-4">
+              What Our Customers Say <span className='text-primary-600'>:</span>
+            </h2>
+            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+              Don't just take our word for it - hear from our satisfied customers
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="group bg-neutral-50 rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-neutral-100"
+                data-testid={`testimonial-${index}`}
+              >
+                {/* Rating Stars */}
+                <div className="flex mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="w-5 h-5 text-accent-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+
+                {/* Comment */}
+                <p className="text-neutral-700 mb-6 leading-relaxed italic">
+                  "{testimonial.comment}"
+                </p>
+
+                {/* Customer Info */}
+                <div className="flex items-center space-x-4 pt-4 border-t border-neutral-200">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full ring-2 ring-primary-200"
+                  />
+                  <div>
+                    <h4 className="font-bold text-neutral-900">{testimonial.name}</h4>
+                    <p className="text-sm text-neutral-500">{testimonial.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

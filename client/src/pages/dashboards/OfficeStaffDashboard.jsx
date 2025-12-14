@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
 import PickupModal from '../../components/PickupModal';
 import ReturnModal from '../../components/ReturnModal';
@@ -9,6 +10,7 @@ import { MapPinned } from 'lucide-react';
 const OfficeStaffDashboard = () => {
     const navigate = useNavigate();
     const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
+    const { toast } = useToast();
     const [activeTab, setActiveTab] = useState('pending');
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -131,7 +133,7 @@ const OfficeStaffDashboard = () => {
 
     const handleRejectConfirm = async () => {
         if (!rejectionReason || rejectionReason.trim() === '') {
-            alert('Please provide a rejection reason');
+            toast.warning('Please provide a rejection reason');
             return;
         }
 
@@ -149,17 +151,17 @@ const OfficeStaffDashboard = () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Booking rejected successfully');
+                toast.success('Booking rejected successfully');
                 setShowRejectDialog(false);
                 setSelectedBooking(null);
                 setRejectionReason('');
                 fetchBookings();
             } else {
-                alert(data.message || 'Error rejecting booking');
+                toast.error(data.message || 'Error rejecting booking');
             }
         } catch (error) {
             console.error('Error rejecting booking:', error);
-            alert('Error rejecting booking: ' + error.message);
+            toast.error('Error rejecting booking: ' + error.message);
         } finally {
             setRejecting(false);
         }

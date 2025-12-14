@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { Phone, Mail, Lock, UserCircle } from 'lucide-react';
 import CustomDropdown from '../../components/common/CustomDropdown';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -75,7 +77,7 @@ const LoginPage = () => {
         setLoading(false);
 
         if (result.success) {
-          alert('Login successful!');
+          toast.success('Login successful!');
           
           // Redirect based on role
           const userRole = result.data.user.role;
@@ -89,11 +91,11 @@ const LoginPage = () => {
             navigate('/');
           }
         } else {
-          alert(result.message || 'Login failed. Please check your credentials.');
+          toast.error(result.message || 'Login failed. Please check your credentials.');
         }
       } catch (error) {
         setLoading(false);
-        alert('Error during login: ' + error.message);
+        toast.error('Error during login: ' + error.message);
       }
     }
   };

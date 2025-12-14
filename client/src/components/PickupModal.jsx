@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import BillModal from './BillModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import CustomDropdown from './common/CustomDropdown';
 
 const PickupModal = ({ booking, onClose, onSuccess }) => {
     const { user } = useAuth();
+    const { toast } = useToast();
     const [formData, setFormData] = useState({
         staff_id: user?.id || '',
         actual_pickup_date: new Date(booking.requested_pickup_date).toISOString().split('T')[0],
@@ -55,7 +57,7 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
             const staffId = user?.id;
 
             if (!staffId) {
-                alert('Staff ID not found. Please logout and login again.');
+                toast.error('Staff ID not found. Please logout and login again.');
                 return;
             }
 
@@ -77,11 +79,11 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
                 setConfirmedBooking(data.data.booking);
                 setShowBillModal(true);
             } else {
-                alert(data.message || 'Failed to confirm pickup');
+                toast.error(data.message || 'Failed to confirm pickup');
             }
         } catch (error) {
             console.error('Error confirming pickup:', error);
-            alert('Failed to confirm pickup. Please try again.');
+            toast.error('Failed to confirm pickup. Please try again.');
         } finally {
             setLoading(false);
         }

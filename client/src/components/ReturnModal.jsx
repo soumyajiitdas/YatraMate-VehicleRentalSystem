@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import CustomDropdown from './common/CustomDropdown';
 
 const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const { user } = useAuth();
+    const { toast } = useToast();
     const [formData, setFormData] = useState({
         staff_id: user?.id || '',
         actual_return_date: new Date().toISOString().split('T')[0], // input expects YYYY-MM-DD
@@ -231,7 +233,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         try {
             const staffId = user?.id;
             if (!staffId) {
-                alert('Staff ID not found. Please logout and login again.');
+                toast.error('Staff ID not found. Please logout and login again.');
                 return;
             }
 
@@ -250,14 +252,14 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             const data = await response.json();
 
             if (data.status === 'success') {
-                alert(`Vehicle return confirmed! Final cost: ₹${data.data.booking.final_cost.toFixed(2)}`);
+                toast.success(`Vehicle return confirmed! Final cost: ₹${data.data.booking.final_cost.toFixed(2)}`);
                 onSuccess();
             } else {
-                alert(data.message || 'Failed to confirm return');
+                toast.error(data.message || 'Failed to confirm return');
             }
         } catch (error) {
             console.error('Error confirming return:', error);
-            alert('Failed to confirm return. Please try again.');
+            toast.error('Failed to confirm return. Please try again.');
         } finally {
             setLoading(false);
         }

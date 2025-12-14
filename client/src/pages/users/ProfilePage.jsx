@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { CircleUser, ClipboardList, LockKeyhole, LogOut } from 'lucide-react';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, logout, updateProfile, updatePassword, refreshUser } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -60,29 +62,29 @@ const ProfilePage = () => {
 
       if (result.success) {
         setIsEditing(false);
-        alert('Profile updated successfully!');
+        toast.success('Profile updated successfully!');
         await refreshUser();
       } else {
-        alert(result.message || 'Failed to update profile');
+        toast.error(result.message || 'Failed to update profile');
       }
     } catch (error) {
-      alert('Error updating profile: ' + error.message);
+      toast.error('Error updating profile: ' + error.message);
     }
   };
 
   const handlePasswordUpdate = async () => {
     if (!passwordData.currentPassword || !passwordData.newPassword) {
-      alert('Please fill in all password fields');
+      toast.warning('Please fill in all password fields');
       return;
     }
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+      toast.error('New passwords do not match');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      alert('Password must be at least 6 characters');
+      toast.warning('Password must be at least 6 characters');
       return;
     }
 
@@ -93,17 +95,17 @@ const ProfilePage = () => {
       });
 
       if (result.success) {
-        alert('Password updated successfully!');
+        toast.success('Password updated successfully!');
         setPasswordData({
           currentPassword: '',
           newPassword: '',
           confirmPassword: ''
         });
       } else {
-        alert(result.message || 'Failed to update password');
+        toast.error(result.message || 'Failed to update password');
       }
     } catch (error) {
-      alert('Error updating password: ' + error.message);
+      toast.error('Error updating password: ' + error.message);
     }
   };
 

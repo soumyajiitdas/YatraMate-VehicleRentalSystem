@@ -1,9 +1,11 @@
 import { useRef } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useToast } from '../contexts/ToastContext';
 
 const BillModal = ({ booking, onClose }) => {
     const billRef = useRef(null);
+    const { toast } = useToast();
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -46,7 +48,7 @@ const BillModal = ({ booking, onClose }) => {
             pdf.save(`YM-${booking.bill_id}.pdf`);
         } catch (error) {
             console.error('Error generating PDF:', error);
-            alert('Failed to generate PDF. Please try again.');
+            toast.error('Failed to generate PDF. Please try again.');
         }
     };
 

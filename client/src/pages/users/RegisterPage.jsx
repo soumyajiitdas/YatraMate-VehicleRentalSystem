@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -91,14 +93,14 @@ const RegisterPage = () => {
         setLoading(false);
 
         if (result.success) {
-          alert('Registration successful!');
+          toast.success('Registration successful!');
           navigate('/');
         } else {
-          alert(result.message || 'Registration failed. Please try again.');
+          toast.error(result.message || 'Registration failed. Please try again.');
         }
       } catch (error) {
         setLoading(false);
-        alert('Error during registration: ' + error.message);
+        toast.error('Error during registration: ' + error.message);
       }
     }
   };

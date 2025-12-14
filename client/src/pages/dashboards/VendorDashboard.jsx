@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
 import { MapPinned } from 'lucide-react';
 import CustomDropdown from '../../components/common/CustomDropdown';
@@ -8,6 +9,7 @@ import CustomDropdown from '../../components/common/CustomDropdown';
 const VendorDashboard = () => {
     const navigate = useNavigate();
     const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
+    const { toast } = useToast();
     const [vehicles, setVehicles] = useState([]);
     const [vendorInfo, setVendorInfo] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -106,14 +108,14 @@ const VendorDashboard = () => {
         if (name === 'vehicle_images') {
             // Validate file count (max 5 images)
             if (selectedFiles.length > 5) {
-                alert('Maximum 5 images allowed');
+                toast.warning('Maximum 5 images allowed');
                 return;
             }
 
             // Validate file sizes
             const validFiles = Array.from(selectedFiles).filter(file => {
                 if (file.size > 1024 * 1024) {
-                    alert(`${file.name} is larger than 1MB`);
+                    toast.warning(`${file.name} is larger than 1MB`);
                     return false;
                 }
                 return true;
@@ -124,7 +126,7 @@ const VendorDashboard = () => {
             // Single file validation
             const file = selectedFiles[0];
             if (file && file.size > 1024 * 1024) {
-                alert('File size must be less than 1MB');
+                toast.warning('File size must be less than 1MB');
                 return;
             }
             setFiles(prev => ({ ...prev, [name]: file }));
@@ -138,12 +140,12 @@ const VendorDashboard = () => {
 
         // Validate files
         if (!files.rc_document || !files.insurance_document || files.vehicle_images.length === 0) {
-            alert('Please upload all required documents and at least one vehicle image');
+            toast.warning('Please upload all required documents and at least one vehicle image');
             return;
         }
 
         if (files.vehicle_images.length < 5) {
-            alert('Please upload exactly 5 images (4 sides + interior)');
+            toast.warning('Please upload exactly 5 images (4 sides + interior)');
             return;
         }
 
@@ -205,7 +207,7 @@ const VendorDashboard = () => {
             const data = await response.json();
 
             if (data.status === 'success') {
-                alert('Vehicle request submitted successfully! It will be reviewed by admin.');
+                toast.success('Vehicle request submitted successfully! It will be reviewed by admin.');
                 setShowAddForm(false);
                 setFormData({
                     name: '',
@@ -225,10 +227,10 @@ const VendorDashboard = () => {
                 });
                 setPackageInfo(null);
             } else {
-                alert('Error submitting vehicle request: ' + (data.message || 'Unknown error'));
+                toast.error('Error submitting vehicle request: ' + (data.message || 'Unknown error'));
             }
         } catch (error) {
-            alert('Error submitting vehicle request: ' + error.message);
+            toast.error('Error submitting vehicle request: ' + error.message);
         } finally {
             setUploading(false);
         }
@@ -247,13 +249,13 @@ const VendorDashboard = () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert(data.message || 'Vehicle deleted successfully!');
+                toast.success(data.message || 'Vehicle deleted successfully!');
                 fetchVehicles(user.id);
             } else {
-                alert(data.message || 'Error deleting vehicle');
+                toast.error(data.message || 'Error deleting vehicle');
             }
         } catch (error) {
-            alert('Error deleting vehicle: ' + error.message);
+            toast.error('Error deleting vehicle: ' + error.message);
         }
     };
 

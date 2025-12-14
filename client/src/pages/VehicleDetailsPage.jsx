@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BookingForm from '../components/BookingForm';
 import { Motorbike, Car, Sparkles } from 'lucide-react';
 import { API_ENDPOINTS } from '../config/api';
+import { useToast } from '../contexts/ToastContext';
 
 const VehicleDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -61,14 +63,14 @@ const VehicleDetailsPage = () => {
       const data = await response.json();
 
       if (response.ok && data.status === 'success') {
-        alert('Booking request submitted successfully! You will be redirected to your bookings page.');
+        toast.success('Booking request submitted successfully! You will be redirected to your bookings page.');
         navigate('/bookings');
       } else {
-        alert(data.message || 'Failed to submit booking request. Please make sure you are logged in.');
+        toast.error(data.message || 'Failed to submit booking request. Please make sure you are logged in.');
       }
     } catch (error) {
       console.error('Error submitting booking:', error);
-      alert('Failed to submit booking request. Please try again.');
+      toast.error('Failed to submit booking request. Please try again.');
     }
   };
 
