@@ -56,6 +56,10 @@ const bookingSchema = new mongoose.Schema({
             type: String,
             enum: ['voter_card', 'pan_card', 'aadhar_card', 'driving_license', 'passport']
         },
+        id_number: {
+            type: String,
+            required: false
+        },
         pickup_notes: String
     },
     

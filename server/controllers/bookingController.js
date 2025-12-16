@@ -88,6 +88,7 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         odometer_reading_start,
         vehicle_plate_number,
         id_proof_type,
+        id_number,
         pickup_notes
     } = req.body;
     
@@ -105,8 +106,8 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
     const generateBillId = async () => {
         const today = new Date();
         const dateStr = today.getFullYear() + 
-                       String(today.getMonth() + 1).padStart(2, '0') + 
-                       String(today.getDate()).padStart(2, '0');
+            String(today.getMonth() + 1).padStart(2, '0') + 
+            String(today.getDate()).padStart(2, '0');
         
         // Find the count of bills created today
         const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -132,6 +133,7 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         odometer_reading_start,
         vehicle_plate_number,
         id_proof_type,
+        id_number,
         pickup_notes
     };
     

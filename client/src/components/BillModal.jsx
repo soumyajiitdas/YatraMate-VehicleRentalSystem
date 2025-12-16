@@ -227,9 +227,15 @@ const BillModal = ({ booking, onClose }) => {
                             <div style={billStyles.rowValue}>{booking.user_id?.phone || 'N/A'}</div>
                         </div>
                         <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>ID Proof:</div>
+                            <div style={billStyles.rowLabel}>Govt. ID Proof:</div>
                             <div style={billStyles.rowValue}>
                                 {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'}
+                            </div>
+                        </div>
+                        <div style={billStyles.row}>
+                            <div style={billStyles.rowLabel}>ID Number:</div>
+                            <div style={billStyles.rowValue}>
+                                {booking.pickup_details?.id_number || 'N/A'}
                             </div>
                         </div>
                     </div>

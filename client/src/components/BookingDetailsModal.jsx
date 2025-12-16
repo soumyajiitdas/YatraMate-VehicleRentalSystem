@@ -133,6 +133,18 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                             <span className="text-neutral-900 font-medium">{booking.pickup_details.km_reading_at_pickup} km</span>
                                         </div>
                                     )}
+                                    {booking.pickup_details.id_proof_type && (
+                                        <div className="flex justify-between py-2 border-t border-neutral-100">
+                                            <span className="text-neutral-600">Govt. ID Proof</span>
+                                            <span className="text-neutral-900 font-medium">{booking.pickup_details.id_proof_type.replace('_', ' ').toUpperCase()}</span>
+                                        </div>
+                                    )}
+                                    {booking.pickup_details.id_number && (
+                                        <div className="flex justify-between py-2">
+                                            <span className="text-neutral-600">ID Number</span>
+                                            <span className="text-neutral-900 font-medium">{booking.pickup_details.id_number}</span>
+                                        </div>
+                                    )}
                                 </>
                             )}
                         </div>

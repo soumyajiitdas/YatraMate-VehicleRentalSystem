@@ -299,8 +299,12 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                 <span className="ml-2 font-medium">{booking.pickup_details.odometer_reading_start} km</span>
                             </div>
                             <div>
-                                <span className="text-gray-500">ID Proof:</span>
-                                <span className="ml-2 font-medium">{booking.pickup_details.id_proof_type}</span>
+                                <span className="text-gray-500">Govt. ID Proof:</span>
+                                <span className="ml-2 font-medium">{booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</span>
+                            </div>
+                            <div>
+                                <span className="text-gray-500">ID Number:</span>
+                                <span className="ml-2 font-medium">{booking.pickup_details.id_number || 'N/A'}</span>
                             </div>
                         </div>
                     </div>
@@ -557,7 +561,6 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                             className="w-5 h-5 text-green-600 border-2 border-gray-300 focus:ring-2 focus:ring-green-500"
                                         />
                                         <label htmlFor="payment_cash" className="ml-3 flex items-center cursor-pointer">
-                                            <span className="text-2xl mr-2">💵</span>
                                             <span className="text-base font-semibold text-gray-900">Cash Payment</span>
                                         </label>
                                     </div>
@@ -608,7 +611,6 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                             className="w-5 h-5 text-purple-600 border-2 border-gray-300 focus:ring-2 focus:ring-purple-500"
                                         />
                                         <label htmlFor="payment_upi" className="ml-3 flex items-center cursor-pointer">
-                                            <span className="text-2xl mr-2">📱</span>
                                             <span className="text-base font-semibold text-gray-900">UPI Payment</span>
                                         </label>
                                     </div>

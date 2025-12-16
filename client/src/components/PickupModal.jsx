@@ -15,6 +15,7 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
         odometer_reading_start: '',
         vehicle_plate_number: booking.vehicle_id.registration_number,
         id_proof_type: 'aadhar_card',
+        id_number: '',
         pickup_notes: ''
     });
     const [loading, setLoading] = useState(false);
@@ -22,9 +23,55 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
     const [showBillModal, setShowBillModal] = useState(false);
     const [confirmedBooking, setConfirmedBooking] = useState(null);
 
+    // ID validation patterns and messages
+    const idValidators = {
+        aadhar_card: {
+            pattern: /^[2-9][0-9]{11}$/,
+            message: 'Aadhaar must be 12 digits starting with 2-9',
+            placeholder: 'Enter 12-digit Aadhaar (e.g., 234567891234)',
+            uppercase: false
+        },
+        pan_card: {
+            pattern: /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+            message: 'PAN format: 5 letters, 4 digits, 1 letter (e.g., ABCDE1234F)',
+            placeholder: 'Enter PAN (e.g., ABCDE1234F)',
+            uppercase: true
+        },
+        voter_card: {
+            pattern: /^[A-Z]{3}[0-9]{7}$/,
+            message: 'Voter ID format: 3 letters + 7 digits (e.g., ABC1234567)',
+            placeholder: 'Enter Voter ID (e.g., ABC1234567)',
+            uppercase: true
+        },
+        driving_license: {
+            pattern: /^[A-Z]{2}[0-9]{13}$/,
+            message: 'DL format: 2 letters + 13 digits (e.g., AB1234567890123)',
+            placeholder: 'Enter DL (e.g., AB1234567890123)',
+            uppercase: true
+        },
+        passport: {
+            pattern: /^[A-Z][0-9]{7}$/,
+            message: 'Passport format: 1 letter + 7 digits (e.g., A1234567)',
+            placeholder: 'Enter Passport (e.g., A1234567)',
+            uppercase: true
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        let newValue = value;
+        
+        // Apply uppercase normalization for ID number based on ID type
+        if (name === 'id_number') {
+            const validator = idValidators[formData.id_proof_type];
+            if (validator && validator.uppercase) {
+                newValue = value.toUpperCase();
+            }
+        }
+        
+        setFormData(prev => ({ ...prev, [name]: newValue }));
+        
+        // Clear errors when user types
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -41,6 +88,25 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
 
         if (!formData.vehicle_plate_number) {
             newErrors.vehicle_plate_number = 'Vehicle plate number is required';
+        }
+
+        // Dynamic ID number validation based on selected ID type
+        if (!formData.id_number) {
+            newErrors.id_number = 'ID Number is required';
+        } else {
+            const validator = idValidators[formData.id_proof_type];
+            if (validator) {
+                // Apply uppercase if needed before validation
+                const valueToValidate = validator.uppercase 
+                    ? formData.id_number.toUpperCase() 
+                    : formData.id_number;
+                
+                if (!validator.pattern.test(valueToValidate)) {
+                    newErrors.id_number = validator.message;
+                }
+            } else if (formData.id_number.length < 5) {
+                newErrors.id_number = 'ID Number must be at least 5 characters';
+            }
         }
 
         setErrors(newErrors);
@@ -211,7 +277,7 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
 
                     {/* ID Proof Type */}
                     <CustomDropdown
-                        label="Government ID Proof Type *"
+                        label="Govt. ID Proof *"
                         options={[
                             { value: 'aadhar_card', label: 'Aadhar Card' },
                             { value: 'pan_card', label: 'PAN Card' },
@@ -222,6 +288,27 @@ const PickupModal = ({ booking, onClose, onSuccess }) => {
                         value={formData.id_proof_type}
                         onChange={(val) => handleChange({ target: { name: 'id_proof_type', value: val } })}
                     />
+
+                    {/* ID Number */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            ID Number *
+                        </label>
+                        <input
+                            type="text"
+                            name="id_number"
+                            value={formData.id_number}
+                            onChange={handleChange}
+                            placeholder={idValidators[formData.id_proof_type]?.placeholder || 'Enter ID number'}
+                            className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${errors.id_number ? 'border-red-500' : 'border-gray-200 focus:border-primary-500'
+                                }`}
+                        />
+                        {errors.id_number ? (
+                            <p className="mt-1 text-sm text-red-600">{errors.id_number}</p>
+                        ) : (
+                            <p className="mt-1 text-xs text-gray-500">{idValidators[formData.id_proof_type]?.message}</p>
+                        )}
+                    </div>
 
                     {/* Notes */}
                     <div>

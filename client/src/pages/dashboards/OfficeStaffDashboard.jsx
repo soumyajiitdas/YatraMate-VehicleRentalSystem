@@ -357,7 +357,7 @@ const OfficeStaffDashboard = () => {
                                                 )}
 
                                                 <div>
-                                                    <p className="text-gray-500">Vehicle Pickup Info</p>
+                                                    <p className="text-gray-500">Vehicle Pickup</p>
                                                     <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
                                                         {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
                                                     </p>
@@ -365,27 +365,30 @@ const OfficeStaffDashboard = () => {
                                                 </div>
 
                                                 {activeTab === 'completed' && booking.return_details ? (
-                                                    <div>
-                                                        <p className="text-gray-500">Vehicle Return Info</p>
-                                                        <p className="font-medium text-gray-900">
-                                                            Date: {formatDateDDMMYYYY(booking.return_details.actual_return_date)}
-                                                        </p>
-                                                        <p className="text-gray-600">Time: {booking.return_details.actual_return_time}</p>
-                                                    </div>
+                                                    <>
+                                                        <div>
+                                                            <p className="text-gray-500">Vehicle Returned</p>
+                                                            <p className="font-medium text-gray-900">
+                                                                Date: {formatDateDDMMYYYY(booking.return_details.actual_return_date)}
+                                                            </p>
+                                                            <p className="text-gray-600">Time: {booking.return_details.actual_return_time}</p>
+                                                        </div>
+                                                        {booking.pickup_details && (
+                                                            <div>
+                                                                <p className="text-gray-500">Customer ID Details</p>
+                                                                <p className="text-gray-600">Govt. ID: <span className="text-gray-900">{booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</span></p>
+                                                                <p className="text-gray-600">ID Number: {booking.pickup_details.id_number || 'N/A'}</p>
+                                                            </div>
+                                                        )}
+                                                    </>
                                                 ) : booking.pickup_details && (
                                                     <div>
                                                         <p className="text-gray-500">Pickup Info</p>
                                                         <p className="font-medium text-gray-900">
                                                             Odometer: {booking.pickup_details.odometer_reading_start} km
                                                         </p>
-                                                        <p className="text-gray-600">ID: {booking.pickup_details.id_proof_type}</p>
-                                                    </div>
-                                                )}
-
-                                                {booking.bill_id && (
-                                                    <div>
-                                                        <p className="text-gray-500">Bill ID</p>
-                                                        <p className="font-medium text-blue-600" data-testid="bill-id-display">{booking.bill_id}</p>
+                                                        <p className="text-gray-600">Govt. ID: {booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</p>
+                                                        <p className="text-gray-600">ID Number: {booking.pickup_details.id_number || 'N/A'}</p>
                                                     </div>
                                                 )}
 
@@ -400,6 +403,13 @@ const OfficeStaffDashboard = () => {
                                                     <div>
                                                         <p className="text-gray-500">Return Staff</p>
                                                         <p className="font-medium text-gray-900" data-testid="return-staff-name">{booking.return_details.staff_id.name}</p>
+                                                    </div>
+                                                )}
+
+                                                {booking.bill_id && (
+                                                    <div>
+                                                        <p className="text-gray-500">Bill ID</p>
+                                                        <p className="font-medium text-blue-600" data-testid="bill-id-display">{booking.bill_id}</p>
                                                     </div>
                                                 )}
 
