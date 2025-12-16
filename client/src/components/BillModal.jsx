@@ -271,12 +271,8 @@ const BillModal = ({ booking, onClose }) => {
                             <div style={billStyles.rowValue}>{booking.pickup_details?.actual_pickup_time || 'N/A'}</div>
                         </div>
                         <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>From:</div>
+                            <div style={billStyles.rowLabel}>Pickup Location:</div>
                             <div style={billStyles.rowValue}>{booking.start_location || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>To:</div>
-                            <div style={billStyles.rowValue}>{booking.end_location || 'N/A'}</div>
                         </div>
                         <div style={billStyles.row}>
                             <div style={billStyles.rowLabel}>Odometer Start:</div>

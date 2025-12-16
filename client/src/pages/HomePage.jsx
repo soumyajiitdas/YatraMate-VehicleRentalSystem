@@ -139,24 +139,28 @@ const HomePage = () => {
       image: 'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=400&h=300&fit=crop',
       count: '5+',
       gradient: 'from-purple-500 to-pink-500',
+      type: "car",
     },
     {
       name: 'SUVs',
       image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?w=400&h=300&fit=crop',
       count: '3+',
       gradient: 'from-blue-500 to-cyan-500',
+      type: "car",
     },
     {
       name: 'Street Bikes',
       image: 'https://images.unsplash.com/photo-1622185135505-2d795003994a?w=400&h=300&fit=crop',
       count: '5+',
       gradient: 'from-green-500 to-emerald-500',
+      type: "bike",
     },
     {
       name: 'Sports Bikes',
       image: 'https://images.unsplash.com/photo-1598209279122-8541213a0387?w=400&h=300&fit=crop',
       count: '3+',
       gradient: 'from-orange-500 to-red-500',
+      type: "bike",
     },
   ];
 
@@ -251,7 +255,7 @@ const HomePage = () => {
             {vehicleCategories.map((category, index) => (
               <Link
                 key={index}
-                to="/vehicles"
+                to={`/vehicles?type=${category.type}`}
                 className="group relative h-64 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-2"
                 data-testid={`category-${category.name.toLowerCase().replace(' ', '-')}`}
               >

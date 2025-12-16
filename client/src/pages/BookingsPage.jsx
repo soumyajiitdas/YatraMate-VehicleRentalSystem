@@ -48,16 +48,16 @@ const BookingsPage = () => {
         const transformedBookings = data.data.bookings.map(booking => ({
           _id: booking._id,
           vehicle: {
+            _id: booking.vehicle_id._id,
             name: booking.vehicle_id.name,
             type: booking.vehicle_id.type,
             images: booking.vehicle_id.images,
             registration_number: booking.vehicle_id.registration_number
           },
           pickup_location: booking.start_location,
-          dropoff_location: booking.end_location,
           pickup_datetime: booking.requested_pickup_date,
           pickup_time: booking.requested_pickup_time,
-          dropoff_datetime: booking.return_details?.actual_return_date || null,
+          return_datetime: booking.return_details?.actual_return_date || null,
           total_cost: booking.final_cost || 0,
           status: mapBackendStatus(booking.status),
           payment_status: booking.payment_status,
@@ -199,7 +199,7 @@ const BookingsPage = () => {
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <div className="text-sm font-semibold text-neutral-700 mb-1">Pickup</div>
+                          <div className="text-sm font-semibold text-neutral-700 mb-1">Pickup Location</div>
                           <div className="flex items-start space-x-2">
                             <svg className="w-5 h-5 text-primary-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -214,15 +214,16 @@ const BookingsPage = () => {
                         </div>
 
                         <div>
-                          <div className="text-sm font-semibold text-neutral-700 mb-1">Dropoff</div>
+                          <div className="text-sm font-semibold text-neutral-700 mb-1">Return Date</div>
                           <div className="flex items-start space-x-2">
                             <svg className="w-5 h-5 text-secondary-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <div>
-                              <div className="text-neutral-900 font-medium">{booking.dropoff_location}</div>
-                              {booking.dropoff_datetime && (
-                                <div className="text-sm text-neutral-600">{formatDate(booking.dropoff_datetime)}</div>
+                              {booking.return_datetime ? (
+                                <div className="text-sm text-neutral-600">{formatDate(booking.return_datetime)}</div>
+                              ) : (
+                                <div className="text-sm text-neutral-600">Pending</div>
                               )}
                             </div>
                           </div>
@@ -261,7 +262,7 @@ const BookingsPage = () => {
                           </button>
                         )}
                         {booking.status === 'completed' && (
-                          <Link to="/vehicles/ ">
+                          <Link to={`/vehicles/${booking.vehicle._id}`}>
                             <button className="px-5 py-2 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-all duration-200">
                               Book Again
                             </button>

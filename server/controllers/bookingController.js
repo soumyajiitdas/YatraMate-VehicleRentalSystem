@@ -6,7 +6,7 @@ const AppError = require('../utils/appError');
 
 // Customer creates a booking request (no payment yet)
 exports.createBookingRequest = catchAsync(async (req, res, next) => {
-    const { vehicle_id, start_location, end_location, requested_pickup_date, requested_pickup_time } = req.body;
+    const { vehicle_id, start_location, requested_pickup_date, requested_pickup_time } = req.body;
     
     // Get vehicle to find package
     const vehicle = await Vehicle.findById(vehicle_id);
@@ -33,7 +33,6 @@ exports.createBookingRequest = catchAsync(async (req, res, next) => {
         vendor_id: vehicle.vendor_id,
         package_id: packageData._id,
         start_location,
-        end_location,
         requested_pickup_date,
         requested_pickup_time,
         status: 'booking_requested'

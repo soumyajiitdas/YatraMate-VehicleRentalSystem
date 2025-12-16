@@ -46,7 +46,6 @@ const VehicleDetailsPage = () => {
       const payload = {
         vehicle_id: bookingData.vehicle_id,
         start_location: bookingData.pickup_location,
-        end_location: bookingData.dropoff_location,
         requested_pickup_date: pickupDate.toISOString(),
         requested_pickup_time: pickupTime
       };

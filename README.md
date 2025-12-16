@@ -135,11 +135,15 @@ Before you begin, ensure you have the following installed:
 ### Alternate method:
 #### Run the application using Concurrently-
 1. Simply, create `.env` for backend as instructed above
-2. In root directory, run the command for installing required packages
+2. In root directory, install concurrently by running the command 
+    ```
+    npm install
+    ```
+3. After that, run the command for installing required packages for the application
     ```
     npm run download
     ```
-3. Then run the command to run the application
+4. Then run the command to run the application
     ```
     npm run app
     ```

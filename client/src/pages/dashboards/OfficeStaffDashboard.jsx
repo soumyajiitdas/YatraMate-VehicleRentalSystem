@@ -344,9 +344,8 @@ const OfficeStaffDashboard = () => {
                                                 </div>
 
                                                 <div>
-                                                    <p className="text-gray-500">Route</p>
-                                                    <p className="font-medium text-gray-900">From: {booking.start_location}</p>
-                                                    <p className="font-medium text-gray-900">To: {booking.end_location}</p>
+                                                    <p className="text-gray-500">Pickup Location</p>
+                                                    <p className="font-medium text-gray-900">{booking.start_location}</p>
                                                 </div>
 
                                                 {booking.package_id && (

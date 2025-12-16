@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
 import { API_ENDPOINTS } from '../config/api';
+import { useSearchParams } from "react-router-dom";
 import { Search, CarFront, BadgeIndianRupee, CircleCheckBig, ClipboardCheck } from 'lucide-react';
 import CustomDropdown from '../components/common/CustomDropdown';
 
 const VehiclesPage = () => {
   const [vehicles, setVehicles] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     type: 'all',
@@ -18,6 +20,17 @@ const VehiclesPage = () => {
   useEffect(() => {
     fetchVehicles();
   }, []);
+
+  useEffect(() => {
+  const typeFromUrl = searchParams.get("type");
+
+  if (typeFromUrl === "car" || typeFromUrl === "bike") {
+    setFilters((prev) => ({
+      ...prev,
+      type: typeFromUrl,
+    }));
+  }
+}, [searchParams]);
 
   const fetchVehicles = async () => {
     setLoading(true);
@@ -34,6 +47,17 @@ const VehiclesPage = () => {
       setLoading(false);
     }
   };
+
+  const handleTypeChange = (val) => {
+  setFilters((prev) => ({ ...prev, type: val }));
+
+  if (val === "all") {
+    searchParams.delete("type");
+    setSearchParams(searchParams);
+  } else {
+    setSearchParams({ type: val });
+  }
+};
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     // Type filter
@@ -131,7 +155,7 @@ const VehiclesPage = () => {
               label="Price Range"
               options={priceOptions}
               value={filters.priceRange}
-              onChange={(val) => setFilters({ ...filters, priceRange: val })}
+              onChange={handleTypeChange}
               icon={BadgeIndianRupee}
             />
 

@@ -26,10 +26,6 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    end_location: {
-        type: String,
-        required: true
-    },
     requested_pickup_date: {
         type: Date,
         required: true

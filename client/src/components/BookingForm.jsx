@@ -3,7 +3,6 @@ import { useState } from 'react';
 const BookingForm = ({ vehicle, onSubmit }) => {
   const [formData, setFormData] = useState({
     pickup_location: vehicle?.location || '',
-    dropoff_location: '',
     pickup_datetime: '',
     dropoff_datetime: '',
   });
@@ -41,9 +40,8 @@ const BookingForm = ({ vehicle, onSubmit }) => {
     const newErrors = {};
     
     if (!formData.pickup_location) newErrors.pickup_location = 'Pickup location is required';
-    if (!formData.dropoff_location) newErrors.dropoff_location = 'Dropoff location is required';
     if (!formData.pickup_datetime) newErrors.pickup_datetime = 'Pickup date & time is required';
-    if (!formData.dropoff_datetime) newErrors.dropoff_datetime = 'Dropoff date & time is required';
+    if (!formData.dropoff_datetime) newErrors.dropoff_datetime = 'Return date & time is required';
     
     if (formData.pickup_datetime && formData.dropoff_datetime) {
       const pickup = new Date(formData.pickup_datetime);
@@ -54,7 +52,7 @@ const BookingForm = ({ vehicle, onSubmit }) => {
         newErrors.pickup_datetime = 'Pickup date must be in the future';
       }
       if (dropoff <= pickup) {
-        newErrors.dropoff_datetime = 'Dropoff date must be after pickup date';
+        newErrors.dropoff_datetime = 'Return date must be after pickup date';
       }
     }
 
@@ -81,17 +79,17 @@ const BookingForm = ({ vehicle, onSubmit }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-neutral-900">Book Your Ride</h2>
+        <h2 className="text-2xl font-bold text-neutral-900">Book <span className="text-primary-500">Your Ride</span></h2>
       </div>
 
       {/* Pickup Location */}
       <div>
         <label htmlFor="pickup_location" className="block text-sm font-semibold text-neutral-700 mb-2">
-          Pickup Location
+          Pickup & Drop-off Location
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
           </span>
@@ -101,42 +99,15 @@ const BookingForm = ({ vehicle, onSubmit }) => {
             name="pickup_location"
             value={formData.pickup_location}
             onChange={handleChange}
-            className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
-              errors.pickup_location ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
+            readOnly
+            className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 bg-neutral-50 cursor-not-allowed transition-all duration-200 ${
+              errors.pickup_location ? 'border-secondary-500' : 'border-neutral-200'
             }`}
-            placeholder="Enter pickup location"
+            placeholder="Pickup location is fixed"
           />
         </div>
         {errors.pickup_location && (
           <p className="mt-1 text-sm text-secondary-600">{errors.pickup_location}</p>
-        )}
-      </div>
-
-      {/* Dropoff Location */}
-      <div>
-        <label htmlFor="dropoff_location" className="block text-sm font-semibold text-neutral-700 mb-2">
-          Dropoff Location
-        </label>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            </svg>
-          </span>
-          <input
-            type="text"
-            id="dropoff_location"
-            name="dropoff_location"
-            value={formData.dropoff_location}
-            onChange={handleChange}
-            className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200 ${
-              errors.dropoff_location ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
-            }`}
-            placeholder="Enter dropoff location"
-          />
-        </div>
-        {errors.dropoff_location && (
-          <p className="mt-1 text-sm text-secondary-600">{errors.dropoff_location}</p>
         )}
       </div>
 
@@ -147,7 +118,7 @@ const BookingForm = ({ vehicle, onSubmit }) => {
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </span>
@@ -167,14 +138,14 @@ const BookingForm = ({ vehicle, onSubmit }) => {
         )}
       </div>
 
-      {/* Dropoff Date & Time */}
+      {/* Return Date & Time */}
       <div>
         <label htmlFor="dropoff_datetime" className="block text-sm font-semibold text-neutral-700 mb-2">
-          Dropoff Date & Time
+          Return Date & Time
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </span>
