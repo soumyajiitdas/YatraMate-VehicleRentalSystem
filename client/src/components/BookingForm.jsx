@@ -8,7 +8,7 @@ const BookingForm = ({ vehicle, onSubmit }) => {
   });
 
   const [errors, setErrors] = useState({});
-  const [totalCost, setTotalCost] = useState(0);
+  const [totalCost, setTotalCost] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,12 +27,23 @@ const BookingForm = ({ vehicle, onSubmit }) => {
     if (data.pickup_datetime && data.dropoff_datetime && vehicle) {
       const pickup = new Date(data.pickup_datetime);
       const dropoff = new Date(data.dropoff_datetime);
-      const hours = Math.abs(dropoff - pickup) / 36e5;
-      const days = Math.floor(hours / 24);
-      const remainingHours = hours % 24;
+      const totalHours = Math.abs(dropoff - pickup) / 36e5;
+      const days = Math.floor(totalHours / 24);
+      const remainingHours = Math.floor(totalHours % 24);
 
       const cost = (days * vehicle.price_per_day) + (remainingHours * vehicle.price_per_hour);
-      setTotalCost(Math.round(cost));
+      setTotalCost({
+        total: Math.round(cost),
+        breakdown: {
+          totalHours: Math.round(totalHours * 10) / 10,
+          days,
+          remainingHours,
+          pricePerDay: vehicle.price_per_day,
+          pricePerHour: vehicle.price_per_hour,
+          dayCost: days * vehicle.price_per_day,
+          hourCost: remainingHours * vehicle.price_per_hour
+        }
+      });
     }
   };
 
@@ -65,7 +76,7 @@ const BookingForm = ({ vehicle, onSubmit }) => {
     if (validateForm()) {
       onSubmit({
         ...formData,
-        total_cost: totalCost,
+        total_cost: totalCost?.total || 0,
         vehicle_id: vehicle._id,
       });
     }
@@ -165,13 +176,55 @@ const BookingForm = ({ vehicle, onSubmit }) => {
         )}
       </div>
 
-      {/* Total Cost Display */}
-      {totalCost > 0 && (
-        <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-xl p-4 border-2 border-primary-200">
-          <div className="flex items-center justify-between">
-            <span className="text-neutral-700 font-medium">Estimated Total:</span>
+      {/* Cost Breakdown Display */}
+      {totalCost && totalCost.total > 0 && (
+        <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-xl p-5 border-2 border-primary-200">
+          <h3 className="text-lg font-bold text-neutral-800 mb-3 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Cost Breakdown
+          </h3>
+          
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-neutral-600">Total Duration:</span>
+              <span className="font-semibold text-neutral-800">
+                {totalCost.breakdown.totalHours} hours
+                {totalCost.breakdown.days > 0 && ` (${totalCost.breakdown.days} day${totalCost.breakdown.days > 1 ? 's' : ''} + ${totalCost.breakdown.remainingHours} hr)`}
+              </span>
+            </div>
+            
+            {totalCost.breakdown.days > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-neutral-600">
+                  {totalCost.breakdown.days} day{totalCost.breakdown.days > 1 ? 's' : ''} × ₹{totalCost.breakdown.pricePerDay}/day:
+                </span>
+                <span className="font-semibold text-neutral-800">₹{totalCost.breakdown.dayCost}</span>
+              </div>
+            )}
+            
+            {totalCost.breakdown.remainingHours > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-neutral-600">
+                  {totalCost.breakdown.remainingHours} hr × ₹{totalCost.breakdown.pricePerHour}/hr:
+                </span>
+                <span className="font-semibold text-neutral-800">₹{totalCost.breakdown.hourCost}</span>
+              </div>
+            )}
+            
+            {totalCost.breakdown.days === 0 && totalCost.breakdown.remainingHours === 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-neutral-600">Hourly Rate:</span>
+                <span className="font-semibold text-neutral-800">₹{totalCost.breakdown.pricePerHour}/hr</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="pt-3 border-t-2 border-primary-300 flex items-center justify-between">
+            <span className="text-neutral-700 font-bold text-lg">Estimated Total:</span>
             <span className="text-3xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              ₹{totalCost}
+              ₹{totalCost.total}
             </span>
           </div>
         </div>

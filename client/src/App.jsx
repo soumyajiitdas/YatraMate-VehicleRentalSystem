@@ -16,6 +16,7 @@ const BookingsPage = lazy(() => import('./pages/BookingsPage'));
 const ProfilePage = lazy(() => import('./pages/users/ProfilePage'));
 const LoginPage = lazy(() => import('./pages/users/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/users/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/users/ForgotPasswordPage'));
 const VendorPage = lazy(() => import('./pages/VendorPage'));
 const VendorDashboard = lazy(() => import('./pages/dashboards/VendorDashboard'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
@@ -67,6 +68,7 @@ function AppContent() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/vendor" element={<VendorPage />} />
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/office-staff" element={<OfficeStaffDashboard />} />

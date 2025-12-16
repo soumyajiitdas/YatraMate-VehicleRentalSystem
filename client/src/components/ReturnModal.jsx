@@ -25,6 +25,8 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [costBreakdown, setCostBreakdown] = useState(null);
+    const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' or 'upi'
+    const [cashPaymentConfirmed, setCashPaymentConfirmed] = useState(false);
 
     // ---- Local Date/Time Parsing Utilities (supports DD/MM/YYYY and YYYY-MM-DD and MM/DD/YYYY) ----
     const parseTimeString = (t) => {
@@ -209,15 +211,11 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             newErrors.damage_description = 'Damage description is required';
         }
 
-        if (!formData.payment_done) {
-            newErrors.payment_done = 'Payment confirmation is required';
-        }
-
-        if (!formData.amount_paid || formData.amount_paid <= 0) {
-            newErrors.amount_paid = 'Amount paid is required and must be greater than 0';
-        } else if (costBreakdown && Math.abs(parseFloat(formData.amount_paid) - costBreakdown.totalCost) > 1) {
-            // Allow 1 Rupee difference for rounding
-            newErrors.amount_paid = `Amount paid must match total calculated amount (₹${costBreakdown.totalCost.toFixed(2)})`;
+        // Payment validation for cash method only
+        if (paymentMethod === 'cash') {
+            if (!cashPaymentConfirmed) {
+                newErrors.payment_confirmation = 'Please confirm that payment has been collected';
+            }
         }
 
         setErrors(newErrors);
@@ -239,7 +237,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
             const payload = {
                 ...formData,
-                staff_id: staffId
+                staff_id: staffId,
+                payment_done: paymentMethod === 'cash' && cashPaymentConfirmed,
+                amount_paid: costBreakdown ? costBreakdown.totalCost : 0
             };
 
             const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
@@ -524,58 +524,123 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                         </div>
                     )}
 
-                    {/* Payment Collection Section */}
-                    <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
-                        <h3 className="font-semibold text-blue-900 mb-4">Payment Collection *</h3>
+                    {/* Payment Method Section */}
+                    <div className="bg-blue-50 rounded-lg p-5 border-2 border-blue-300">
+                        <h3 className="font-semibold text-blue-900 mb-4 flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Payment Method *
+                        </h3>
                         
                         <div className="space-y-4">
-                            {/* Payment Done Checkbox */}
-                            <div className="flex items-start">
-                                <input
-                                    type="checkbox"
-                                    id="payment_done"
-                                    name="payment_done"
-                                    checked={formData.payment_done}
-                                    onChange={handleChange}
-                                    className="mt-1 w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                                    data-testid="payment-done-checkbox"
-                                />
-                                <label htmlFor="payment_done" className="ml-3 text-sm font-medium text-gray-900 cursor-pointer">
-                                    I confirm that payment has been collected from the customer
-                                </label>
-                            </div>
-                            {errors.payment_done && (
-                                <p className="text-sm text-red-600" data-testid="payment-done-error">{errors.payment_done}</p>
-                            )}
-
-                            {/* Amount Paid Input */}
-                            <div>
-                                <label htmlFor="amount_paid" className="block text-sm font-semibold text-gray-900 mb-2">
-                                    Amount Paid (₹) *
-                                </label>
-                                <input
-                                    type="number"
-                                    id="amount_paid"
-                                    name="amount_paid"
-                                    value={formData.amount_paid}
-                                    onChange={handleChange}
-                                    placeholder="Enter the amount paid by customer"
-                                    min="0"
-                                    step="0.01"
-                                    className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                        errors.amount_paid ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'
+                            {/* Payment Method Selection */}
+                            <div className="space-y-3">
+                                {/* Cash Payment Option */}
+                                <div 
+                                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                                        paymentMethod === 'cash' 
+                                            ? 'border-green-500 bg-green-50' 
+                                            : 'border-gray-300 bg-white hover:border-green-300'
                                     }`}
-                                    data-testid="amount-paid-input"
-                                />
-                                {errors.amount_paid && (
-                                    <p className="mt-1 text-sm text-red-600" data-testid="amount-paid-error">{errors.amount_paid}</p>
-                                )}
-                                {costBreakdown && (
-                                    <p className="mt-2 text-xs text-gray-600">
-                                        Suggested amount based on calculation: ₹{costBreakdown.totalCost.toFixed(2)}
-                                    </p>
-                                )}
+                                    onClick={() => setPaymentMethod('cash')}
+                                    data-testid="cash-payment-option"
+                                >
+                                    <div className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            id="payment_cash"
+                                            name="payment_method"
+                                            value="cash"
+                                            checked={paymentMethod === 'cash'}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className="w-5 h-5 text-green-600 border-2 border-gray-300 focus:ring-2 focus:ring-green-500"
+                                        />
+                                        <label htmlFor="payment_cash" className="ml-3 flex items-center cursor-pointer">
+                                            <span className="text-2xl mr-2">💵</span>
+                                            <span className="text-base font-semibold text-gray-900">Cash Payment</span>
+                                        </label>
+                                    </div>
+                                    
+                                    {/* Cash Payment Confirmation */}
+                                    {paymentMethod === 'cash' && (
+                                        <div className="mt-4 ml-8 pl-4 border-l-2 border-green-400">
+                                            <div className="flex items-start">
+                                                <input
+                                                    type="checkbox"
+                                                    id="cash_payment_confirmed"
+                                                    checked={cashPaymentConfirmed}
+                                                    onChange={(e) => setCashPaymentConfirmed(e.target.checked)}
+                                                    className="mt-1 w-5 h-5 text-green-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-green-500"
+                                                    data-testid="cash-payment-confirmation-checkbox"
+                                                />
+                                                <label htmlFor="cash_payment_confirmed" className="ml-3 text-sm font-medium text-gray-900 cursor-pointer">
+                                                    I confirm that payment has been collected from the customer
+                                                </label>
+                                            </div>
+                                            {errors.payment_confirmation && (
+                                                <p className="mt-2 text-sm text-red-600" data-testid="payment-confirmation-error">
+                                                    {errors.payment_confirmation}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* UPI Payment Option */}
+                                <div 
+                                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                                        paymentMethod === 'upi' 
+                                            ? 'border-purple-500 bg-purple-50' 
+                                            : 'border-gray-300 bg-white hover:border-purple-300'
+                                    }`}
+                                    onClick={() => setPaymentMethod('upi')}
+                                    data-testid="upi-payment-option"
+                                >
+                                    <div className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            id="payment_upi"
+                                            name="payment_method"
+                                            value="upi"
+                                            checked={paymentMethod === 'upi'}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className="w-5 h-5 text-purple-600 border-2 border-gray-300 focus:ring-2 focus:ring-purple-500"
+                                        />
+                                        <label htmlFor="payment_upi" className="ml-3 flex items-center cursor-pointer">
+                                            <span className="text-2xl mr-2">📱</span>
+                                            <span className="text-base font-semibold text-gray-900">UPI Payment</span>
+                                        </label>
+                                    </div>
+                                    
+                                    {/* UPI Not Available Message */}
+                                    {paymentMethod === 'upi' && (
+                                        <div className="mt-4 ml-8 pl-4 border-l-2 border-amber-400 bg-amber-50 p-3 rounded">
+                                            <div className="flex items-start">
+                                                <svg className="w-5 h-5 text-amber-600 mt-0.5 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-amber-800">Payment Gateway Not Implemented</p>
+                                                    <p className="text-sm text-amber-700 mt-1">
+                                                        UPI payment gateway is not yet implemented. Please collect the payment in cash.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Amount Display */}
+                            {costBreakdown && (
+                                <div className="bg-white rounded-lg p-3 border-2 border-blue-200">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm font-medium text-gray-700">Amount to be Collected:</span>
+                                        <span className="text-xl font-bold text-blue-900">₹{costBreakdown.totalCost.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -591,7 +656,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                         </button>
                         <button
                             type="submit"
-                            disabled={loading || !costBreakdown || !formData.payment_done || !formData.amount_paid}
+                            disabled={loading || !costBreakdown || paymentMethod === 'upi' || (paymentMethod === 'cash' && !cashPaymentConfirmed)}
                             className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             data-testid="confirm-return-submit-button"
                         >
