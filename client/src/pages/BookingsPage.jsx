@@ -2,13 +2,21 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
+import BookingDetailsModal from '../components/BookingDetailsModal';
+import CancelConfirmationModal from '../components/CancelConfirmationModal';
+import { useToast } from '../contexts/ToastContext';
 
 const BookingsPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -119,6 +127,58 @@ const BookingsPage = () => {
   const filteredBookings = filter === 'all'
     ? bookings
     : bookings.filter(booking => booking.status === filter);
+
+  const handleViewDetails = (booking) => {
+    setSelectedBooking(booking);
+    setShowDetailsModal(true);
+  };
+
+  const handleCancelClick = (booking) => {
+    setSelectedBooking(booking);
+    setShowCancelModal(true);
+  };
+
+  const handleCancelBooking = async () => {
+    if (!selectedBooking) return;
+
+    setCancelLoading(true);
+    try {
+      const response = await fetch(`${API_ENDPOINTS.bookings}/${selectedBooking._id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status === 'success') {
+        showToast('Booking cancelled successfully', 'success');
+        setShowCancelModal(false);
+        setSelectedBooking(null);
+        // Refresh bookings list
+        fetchBookings();
+      } else {
+        showToast(data.message || 'Failed to cancel booking', 'error');
+      }
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      showToast('An error occurred while cancelling the booking', 'error');
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false);
+    setSelectedBooking(null);
+  };
+
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setSelectedBooking(null);
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50 py-8">
@@ -251,13 +311,19 @@ const BookingsPage = () => {
                       )}
 
                       <div className="flex flex-wrap gap-3 pt-2">
-                        <Link to="/vehicles/" >
-                          <button className="px-5 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all duration-200">
-                            View Details
-                          </button>
-                        </Link>
+                        <button
+                          onClick={() => handleViewDetails(booking)}
+                          className="px-5 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transition-all duration-200"
+                          data-testid="view-details-button"
+                        >
+                          View Details
+                        </button>
                         {booking.status === 'pending' && (
-                          <button className="px-5 py-2 border-2 border-secondary-500 text-secondary-600 rounded-lg font-semibold hover:bg-secondary-50 transition-all duration-200">
+                          <button
+                            onClick={() => handleCancelClick(booking)}
+                            className="px-5 py-2 border-2 border-secondary-500 text-secondary-600 rounded-lg font-semibold hover:bg-secondary-50 transition-all duration-200"
+                            data-testid="cancel-booking-button"
+                          >
                             Cancel Booking
                           </button>
                         )}
@@ -301,6 +367,23 @@ const BookingsPage = () => {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {showDetailsModal && (
+        <BookingDetailsModal
+          booking={selectedBooking}
+          onClose={closeDetailsModal}
+        />
+      )}
+
+      {showCancelModal && (
+        <CancelConfirmationModal
+          booking={selectedBooking}
+          onConfirm={handleCancelBooking}
+          onClose={closeCancelModal}
+          loading={cancelLoading}
+        />
+      )}
     </div>
   );
 };

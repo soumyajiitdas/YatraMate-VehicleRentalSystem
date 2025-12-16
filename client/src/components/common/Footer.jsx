@@ -12,8 +12,8 @@ const Footer = () => {
       { label: 'Blog', path: '/about' },
     ],
     services: [
-      { label: 'Car Rentals', path: '/vehicles' },
-      { label: 'Bike Rentals', path: '/vehicles' },
+      { label: 'Car Rentals', path: '/vehicles?type=car' },
+      { label: 'Bike Rentals', path: '/vehicles?type=bike' },
       { label: 'Become a Vendor', path: '/vendor' },
       { label: 'Pricing', path: '/pricing' },
     ],

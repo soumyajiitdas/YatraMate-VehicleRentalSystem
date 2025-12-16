@@ -223,7 +223,7 @@ const PricingPage = () => {
                                 </div>
 
                                 {/* CTA */}
-                                <Link to="/vehicles">
+                                <Link to={`/vehicles?package=${pkg._id}`}>
                                     <button className="w-full py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold hover:shadow-glow-lg transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
                                         View Vehicles
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

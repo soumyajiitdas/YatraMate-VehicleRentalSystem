@@ -2,35 +2,45 @@ import { useState, useEffect } from 'react';
 import VehicleCard from '../components/VehicleCard';
 import { API_ENDPOINTS } from '../config/api';
 import { useSearchParams } from "react-router-dom";
-import { Search, CarFront, BadgeIndianRupee, CircleCheckBig, ClipboardCheck } from 'lucide-react';
+import { Search, CarFront, Package, CircleCheckBig, ClipboardCheck } from 'lucide-react';
 import CustomDropdown from '../components/common/CustomDropdown';
 
 const VehiclesPage = () => {
   const [vehicles, setVehicles] = useState([]);
+  const [packages, setPackages] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     type: 'all',
     search: '',
-    priceRange: 'all',
+    package: 'all',
     availability: 'all',
   });
 
-  // Fetch vehicles data from API
+  // Fetch vehicles and packages data from API
   useEffect(() => {
     fetchVehicles();
+    fetchPackages();
   }, []);
 
   useEffect(() => {
-  const typeFromUrl = searchParams.get("type");
+    const typeFromUrl = searchParams.get("type");
+    const packageFromUrl = searchParams.get("package");
 
-  if (typeFromUrl === "car" || typeFromUrl === "bike") {
-    setFilters((prev) => ({
-      ...prev,
-      type: typeFromUrl,
-    }));
-  }
-}, [searchParams]);
+    if (typeFromUrl === "car" || typeFromUrl === "bike") {
+      setFilters((prev) => ({
+        ...prev,
+        type: typeFromUrl,
+      }));
+    }
+
+    if (packageFromUrl && packageFromUrl !== 'all') {
+      setFilters((prev) => ({
+        ...prev,
+        package: packageFromUrl,
+      }));
+    }
+  }, [searchParams]);
 
   const fetchVehicles = async () => {
     setLoading(true);
@@ -48,16 +58,40 @@ const VehiclesPage = () => {
     }
   };
 
-  const handleTypeChange = (val) => {
-  setFilters((prev) => ({ ...prev, type: val }));
+  const fetchPackages = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.packages);
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setPackages(data.data.packages);
+      }
+    } catch (error) {
+      console.error('Error fetching packages:', error);
+    }
+  };
 
-  if (val === "all") {
-    searchParams.delete("type");
-    setSearchParams(searchParams);
-  } else {
-    setSearchParams({ type: val });
-  }
-};
+  const handleTypeChange = (val) => {
+    setFilters((prev) => ({ ...prev, type: val }));
+
+    if (val === "all") {
+      searchParams.delete("type");
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ type: val });
+    }
+  };
+
+  const handlePackageChange = (val) => {
+    setFilters((prev) => ({ ...prev, package: val }));
+
+    if (val === "all") {
+      searchParams.delete("package");
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ package: val });
+    }
+  };
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     // Type filter
@@ -75,11 +109,19 @@ const VehiclesPage = () => {
       }
     }
     
-    // Price range filter
-    if (filters.priceRange !== 'all') {
-      if (filters.priceRange === 'low' && vehicle.price_per_day > 1500) return false;
-      if (filters.priceRange === 'medium' && (vehicle.price_per_day <= 1500 || vehicle.price_per_day > 3000)) return false;
-      if (filters.priceRange === 'high' && vehicle.price_per_day <= 3000) return false;
+    // Package filter - filter based on vehicle cc_engine falling within package cc range
+    if (filters.package !== 'all') {
+      const selectedPackage = packages.find(pkg => pkg._id === filters.package);
+      if (selectedPackage) {
+        // Check if vehicle's cc_engine is within the package's cc range
+        if (vehicle.cc_engine < selectedPackage.cc_range_min || vehicle.cc_engine > selectedPackage.cc_range_max) {
+          return false;
+        }
+        // Also check vehicle type matches package type
+        if (vehicle.type !== selectedPackage.vehicle_type) {
+          return false;
+        }
+      }
     }
     
     // Availability filter
@@ -97,11 +139,12 @@ const VehiclesPage = () => {
     { value: 'bike', label: 'Bikes' },
   ];
 
-  const priceOptions = [
-    { value: 'all', label: 'All Prices' },
-    { value: 'low', label: 'Under ₹1,500/day' },
-    { value: 'medium', label: '₹1,500 - ₹3,000/day' },
-    { value: 'high', label: 'Above ₹3,000/day' },
+  const packageOptions = [
+    { value: 'all', label: 'All Packages' },
+    ...packages.map(pkg => ({
+      value: pkg._id,
+      label: `${pkg.name}`
+    }))
   ];
 
   const availabilityOptions = [
@@ -146,17 +189,17 @@ const VehiclesPage = () => {
               label="Vehicle Type"
               options={typeOptions}
               value={filters.type}
-              onChange={(val) => setFilters({ ...filters, type: val })}
+              onChange={handleTypeChange}
               icon={CarFront}
             />
 
-            {/* Price Range */}
+            {/* Package Filter */}
             <CustomDropdown
-              label="Price Range"
-              options={priceOptions}
-              value={filters.priceRange}
-              onChange={handleTypeChange}
-              icon={BadgeIndianRupee}
+              label="Package"
+              options={packageOptions}
+              value={filters.package}
+              onChange={handlePackageChange}
+              icon={Package}
             />
 
             {/* Availability */}
@@ -170,7 +213,7 @@ const VehiclesPage = () => {
           </div>
 
           {/* Active Filters Display */}
-          {(filters.type !== 'all' || filters.search || filters.priceRange !== 'all' || filters.availability !== 'all') && (
+          {(filters.type !== 'all' || filters.search || filters.package !== 'all' || filters.availability !== 'all') && (
             <div className="mt-6 pt-6 border-t border-neutral-200">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-semibold text-neutral-600">Active filters:</span>
@@ -184,9 +227,9 @@ const VehiclesPage = () => {
                     "{filters.search}"
                   </span>
                 )}
-                {filters.priceRange !== 'all' && (
+                {filters.package !== 'all' && (
                   <span className="px-4 py-2 bg-linear-to-r from-primary-500 to-secondary-500 text-white text-xs rounded-full font-bold capitalize shadow-md">
-                    {filters.priceRange} price
+                    {packages.find(pkg => pkg._id === filters.package)?.name || 'Package'}
                   </span>
                 )}
                 {filters.availability !== 'all' && (
@@ -195,7 +238,7 @@ const VehiclesPage = () => {
                   </span>
                 )}
                 <button
-                  onClick={() => setFilters({ type: 'all', search: '', priceRange: 'all', availability: 'all' })}
+                  onClick={() => setFilters({ type: 'all', search: '', package: 'all', availability: 'all' })}
                   className="ml-auto px-4 py-2 text-sm text-secondary-600 hover:text-secondary-700 font-bold underline hover:no-underline transition-all duration-200"
                 >
                   Clear all filters
@@ -240,7 +283,7 @@ const VehiclesPage = () => {
             <h3 className="text-3xl font-bold text-neutral-900 mb-3">No vehicles found</h3>
             <p className="text-neutral-600 mb-8 text-lg">Try adjusting your filters to discover more vehicles</p>
             <button
-              onClick={() => setFilters({ type: 'all', search: '', priceRange: 'all', availability: 'all' })}
+              onClick={() => setFilters({ type: 'all', search: '', package: 'all', availability: 'all' })}
               className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold hover:shadow-glow-lg transform hover:scale-105 transition-all duration-300"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
