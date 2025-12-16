@@ -40,6 +40,7 @@ export const API_ENDPOINTS = {
     vendors: `${API_BASE_URL}/vendors`,
     vendorById: (id) => `${API_BASE_URL}/vendors/${id}`,
     vendorByEmail: (email) => `${API_BASE_URL}/vendors/email/${email}`,
+    vendorEarnings: `${API_BASE_URL}/vendors/earnings`,
 
     // Payment endpoints
     payments: `${API_BASE_URL}/payments`,

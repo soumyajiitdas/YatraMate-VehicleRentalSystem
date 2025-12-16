@@ -106,3 +106,63 @@ exports.verifyVendor = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+// Get vendor earnings with filters
+exports.getVendorEarnings = catchAsync(async (req, res, next) => {
+    const Booking = require('../models/Booking');
+    const vendorId = req.user.id; // Get vendor ID from authenticated user
+    const { filter } = req.query; // day, week, month, year
+    
+    // Build date filter
+    let dateFilter = {};
+    if (filter) {
+        const now = new Date();
+        let startDate;
+        
+        switch (filter) {
+            case 'day':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                break;
+            case 'week':
+                const dayOfWeek = now.getDay();
+                startDate = new Date(now);
+                startDate.setDate(now.getDate() - dayOfWeek);
+                startDate.setHours(0, 0, 0, 0);
+                break;
+            case 'month':
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                break;
+            case 'year':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                break;
+            default:
+                startDate = null;
+        }
+        
+        if (startDate) {
+            dateFilter = { 'return_details.actual_return_date': { $gte: startDate } };
+        }
+    }
+    
+    // Query bookings
+    const earnings = await Booking.find({
+        vendor_id: vendorId,
+        status: 'returned',
+        payment_status: 'paid',
+        ...dateFilter
+    })
+        .populate('vehicle_id', 'name model_name brand registration_number')
+        .sort({ 'return_details.actual_return_date': -1 });
+    
+    // Calculate total earnings
+    const totalEarnings = earnings.reduce((sum, booking) => sum + (booking.final_cost || 0), 0);
+    
+    res.status(200).json({
+        status: 'success',
+        results: earnings.length,
+        data: {
+            earnings,
+            totalEarnings
+        }
+    });
+});

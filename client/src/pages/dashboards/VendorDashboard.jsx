@@ -14,6 +14,11 @@ const VendorDashboard = () => {
     const [vendorInfo, setVendorInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' or 'earnings'
+    const [earnings, setEarnings] = useState([]);
+    const [earningsFilter, setEarningsFilter] = useState('all');
+    const [totalEarnings, setTotalEarnings] = useState(0);
+    const [earningsLoading, setEarningsLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -50,6 +55,16 @@ const VendorDashboard = () => {
         fetchVehicles(user.id);
     }, [navigate, isAuthenticated, user, authLoading]);
 
+    useEffect(() => {
+        if (activeTab === 'earnings' && user) {
+            fetchEarnings(earningsFilter);
+            // Fetch vehicles data if not already loaded
+            if (vehicles.length === 0) {
+                fetchVehicles(user.id);
+            }
+        }
+    }, [activeTab, earningsFilter, user]);
+
     const fetchVendorInfo = async (vendorId) => {
         try {
             const response = await fetch(API_ENDPOINTS.vendorById(vendorId));
@@ -75,6 +90,30 @@ const VendorDashboard = () => {
             console.error('Error fetching vehicles:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchEarnings = async (filter) => {
+        try {
+            setEarningsLoading(true);
+            const url = filter === 'all' 
+                ? API_ENDPOINTS.vendorEarnings 
+                : `${API_ENDPOINTS.vendorEarnings}?filter=${filter}`;
+            
+            const response = await fetch(url, {
+                credentials: 'include'
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                setEarnings(data.data.earnings);
+                setTotalEarnings(data.data.totalEarnings);
+            }
+        } catch (error) {
+            console.error('Error fetching earnings:', error);
+            toast.error('Error fetching earnings');
+        } finally {
+            setEarningsLoading(false);
         }
     };
 
@@ -314,19 +353,49 @@ const VendorDashboard = () => {
 
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                {/* Actions */}
-                <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900"><span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Vehicles</span> <span className='text-red-600'>:</span></h2>
+                {/* Tab Navigation */}
+                <div className="mb-6 flex justify-center gap-4">
                     <button
-                        onClick={() => setShowAddForm(!showAddForm)}
-                        className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
+                        onClick={() => setActiveTab('vehicles')}
+                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                            activeTab === 'vehicles'
+                                ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
+                                : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                        }`}
+                        data-testid="vehicles-tab"
                     >
-                        {showAddForm ? 'Cancel' : '+ Add Vehicle'}
+                        My Vehicles
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('earnings')}
+                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                            activeTab === 'earnings'
+                                ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
+                                : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                        }`}
+                        data-testid="earnings-tab"
+                    >
+                        My Earnings
                     </button>
                 </div>
 
-                {/* Add Vehicle Form */}
-                {showAddForm && (
+                {/* Vehicles Tab */}
+                {activeTab === 'vehicles' && (
+                    <>
+                        {/* Actions */}
+                        <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900"><span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Vehicles</span> <span className='text-red-600'>:</span></h2>
+                            <button
+                                onClick={() => setShowAddForm(!showAddForm)}
+                                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
+                                data-testid="add-vehicle-btn"
+                            >
+                                {showAddForm ? 'Cancel' : '+ Add Vehicle'}
+                            </button>
+                        </div>
+
+                        {/* Add Vehicle Form */}
+                        {showAddForm && (
                     <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8 animate-fade-in">
                         <h3 className="text-2xl sm:text-3xl text-center font-bold text-neutral-900 p-6">Vehicle <span className='text-red-500'>Request</span></h3>
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -508,75 +577,284 @@ const VendorDashboard = () => {
                                 </button>
                             </div>
                         </form>
-                    </div>
-                )}
+                        </div>
+                        )}
 
-                {/* Vehicles List */}
-                {loading ? (
-                    <div className="text-center py-8 sm:py-12">
-                        <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary-600 mx-auto"></div>
-                        <p className="mt-4 text-neutral-600 text-sm sm:text-base">Loading vehicles...</p>
-                    </div>
-                ) : vehicles.length === 0 ? (
-                    <div className="text-center py-8 sm:py-12 bg-white rounded-2xl shadow-lg px-4">
-                        <p className="text-neutral-600 text-base sm:text-lg">No vehicles added yet. Start by adding your first vehicle!</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        {vehicles.map((vehicle) => (
-                            <div key={vehicle._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
-                                <div className="bg-linear-to-r from-primary-500 to-secondary-500 text-white p-3 sm:p-4">
-                                    <h3 className="text-lg sm:text-xl font-bold truncate">{vehicle.name}</h3>
-                                    <p className="text-white/90 text-sm sm:text-base truncate">{vehicle.brand} - {vehicle.model_name}</p>
-                                </div>
+                        {/* Vehicles List */}
+                        {loading ? (
+                            <div className="text-center py-8 sm:py-12">
+                                <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary-600 mx-auto"></div>
+                                <p className="mt-4 text-neutral-600 text-sm sm:text-base">Loading vehicles...</p>
+                            </div>
+                        ) : vehicles.length === 0 ? (
+                            <div className="text-center py-8 sm:py-12 bg-white rounded-2xl shadow-lg px-4">
+                                <p className="text-neutral-600 text-base sm:text-lg">No vehicles added yet. Start by adding your first vehicle!</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                                {vehicles.map((vehicle) => (
+                                    <div key={vehicle._id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                                        <div className="bg-linear-to-r from-primary-500 to-secondary-500 text-white p-3 sm:p-4">
+                                            <h3 className="text-lg sm:text-xl font-bold truncate">{vehicle.name}</h3>
+                                            <p className="text-white/90 text-sm sm:text-base truncate">{vehicle.brand} - {vehicle.model_name}</p>
+                                        </div>
 
-                                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs sm:text-sm text-neutral-600">Registration:</span>
-                                        <span className="font-semibold text-neutral-900 text-xs sm:text-sm">{vehicle.registration_number}</span>
-                                    </div>
+                                        <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs sm:text-sm text-neutral-600">Registration:</span>
+                                                <span className="font-semibold text-neutral-900 text-xs sm:text-sm">{vehicle.registration_number}</span>
+                                            </div>
 
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs sm:text-sm text-neutral-600">Status:</span>
-                                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${vehicle.availability_status === 'available' ? 'bg-green-100 text-green-700' :
-                                            vehicle.availability_status === 'booked' ? 'bg-red-100 text-red-700' :
-                                                'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                            {vehicle.availability_status}
-                                        </span>
-                                    </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs sm:text-sm text-neutral-600">Status:</span>
+                                                <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${vehicle.availability_status === 'available' ? 'bg-green-100 text-green-700' :
+                                                    vehicle.availability_status === 'booked' ? 'bg-red-100 text-red-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                    }`}>
+                                                    {vehicle.availability_status}
+                                                </span>
+                                            </div>
 
-                                    <div className="border-t pt-2 sm:pt-3 mt-2 sm:mt-3">
-                                        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-                                            <div>
-                                                <p className="text-neutral-600">Total Distance</p>
-                                                <p className="font-bold text-neutral-900">{vehicle.total_distance_travelled || 0} km</p>
+                                            <div className="border-t pt-2 sm:pt-3 mt-2 sm:mt-3">
+                                                <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                                    <div>
+                                                        <p className="text-neutral-600">Total Distance</p>
+                                                        <p className="font-bold text-neutral-900">{vehicle.total_distance_travelled || 0} km</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-neutral-600">Total Hours</p>
+                                                        <p className="font-bold text-neutral-900">{vehicle.total_hours_booked || 0} hrs</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-neutral-600">Total Bookings</p>
+                                                        <p className="font-bold text-neutral-900">{vehicle.total_bookings || 0}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-neutral-600">Total Earnings</p>
+                                                        <p className="font-bold text-green-600">₹{vehicle.total_earnings?.toLocaleString('en-IN') || 0}</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-neutral-600">Total Hours</p>
-                                                <p className="font-bold text-neutral-900">{vehicle.total_hours_booked || 0} hrs</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-neutral-600">Total Bookings</p>
-                                                <p className="font-bold text-neutral-900">{vehicle.total_bookings || 0}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-neutral-600">Total Earnings</p>
-                                                <p className="font-bold text-green-600">₹{vehicle.total_earnings?.toLocaleString('en-IN') || 0}</p>
-                                            </div>
+
+                                            <button
+                                                onClick={() => handleDelete(vehicle._id)}
+                                                className="w-full mt-3 sm:mt-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200 text-sm sm:text-base"
+                                                data-testid={`delete-vehicle-${vehicle._id}`}
+                                            >
+                                                Delete Vehicle
+                                            </button>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
 
-                                    <button
-                                        onClick={() => handleDelete(vehicle._id)}
-                                        className="w-full mt-3 sm:mt-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors duration-200 text-sm sm:text-base"
-                                    >
-                                        Delete Vehicle
-                                    </button>
+                {/* Earnings Tab */}
+                {activeTab === 'earnings' && (
+                    <>
+                        {/* Filter buttons */}
+                        <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900">
+                                <span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Earnings</span> 
+                                <span className='text-red-600'>:</span>
+                            </h2>
+                            <div className="flex gap-2 flex-wrap justify-center">
+                                <button
+                                    onClick={() => setEarningsFilter('all')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                        earningsFilter === 'all'
+                                            ? 'bg-primary-500 text-white'
+                                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                                    }`}
+                                    data-testid="filter-all"
+                                >
+                                    All Time
+                                </button>
+                                <button
+                                    onClick={() => setEarningsFilter('day')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                        earningsFilter === 'day'
+                                            ? 'bg-primary-500 text-white'
+                                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                                    }`}
+                                    data-testid="filter-day"
+                                >
+                                    Today
+                                </button>
+                                <button
+                                    onClick={() => setEarningsFilter('week')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                        earningsFilter === 'week'
+                                            ? 'bg-primary-500 text-white'
+                                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                                    }`}
+                                    data-testid="filter-week"
+                                >
+                                    This Week
+                                </button>
+                                <button
+                                    onClick={() => setEarningsFilter('month')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                        earningsFilter === 'month'
+                                            ? 'bg-primary-500 text-white'
+                                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                                    }`}
+                                    data-testid="filter-month"
+                                >
+                                    This Month
+                                </button>
+                                <button
+                                    onClick={() => setEarningsFilter('year')}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                        earningsFilter === 'year'
+                                            ? 'bg-primary-500 text-white'
+                                            : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                                    }`}
+                                    data-testid="filter-year"
+                                >
+                                    This Year
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Summary Cards */}
+                        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Total Earnings Card */}
+                            <div className="bg-linear-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg p-6 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-white/80 text-sm font-medium">Total Earnings</p>
+                                        <p className="text-3xl font-bold mt-1" data-testid="total-earnings">₹{totalEarnings.toLocaleString('en-IN')}</p>
+                                    </div>
+                                    <div className="bg-white/20 p-4 rounded-xl">
+                                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p className="text-white/80 text-sm mt-2">{earnings.length} completed booking{earnings.length !== 1 ? 's' : ''}</p>
+                            </div>
+
+                            {/* Currently Booked Vehicles Card */}
+                            <div className="bg-linear-to-r from-orange-500 to-red-600 rounded-2xl shadow-lg p-6 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-white/80 text-sm font-medium">Currently Booked</p>
+                                        <p className="text-3xl font-bold mt-1" data-testid="booked-vehicles">
+                                            {vehicles.filter(v => v.availability_status === 'booked').length}
+                                        </p>
+                                    </div>
+                                    <div className="bg-white/20 p-4 rounded-xl">
+                                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p className="text-white/80 text-sm mt-2">Vehicle{vehicles.filter(v => v.availability_status === 'booked').length !== 1 ? 's' : ''} on rent</p>
+                            </div>
+
+                            {/* Total Listed Vehicles Card */}
+                            <div className="bg-linear-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-lg p-6 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-white/80 text-sm font-medium">Total Listed Vehicles</p>
+                                        <p className="text-3xl font-bold mt-1" data-testid="total-vehicles">
+                                            {vehicles.length}
+                                        </p>
+                                    </div>
+                                    <div className="bg-white/20 p-4 rounded-xl">
+                                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p className="text-white/80 text-sm mt-2">Active vehicle{vehicles.length !== 1 ? 's' : ''} in fleet</p>
+                            </div>
+                        </div>
+
+                        {/* Earnings Table */}
+                        {earningsLoading ? (
+                            <div className="text-center py-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+                                <p className="mt-4 text-neutral-600">Loading earnings...</p>
+                            </div>
+                        ) : earnings.length === 0 ? (
+                            <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
+                                <p className="text-neutral-600 text-lg">No earnings found for the selected period.</p>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full" data-testid="earnings-table">
+                                        <thead className="bg-linear-to-r from-primary-500 to-secondary-500 text-white">
+                                            <tr>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Vehicle Info</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Pickup Date & Time</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Return Date & Time</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Distance (km)</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Damage Cost</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Total Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-neutral-200">
+                                            {earnings.map((earning, index) => (
+                                                <tr key={earning._id} className="hover:bg-neutral-50 transition-colors" data-testid={`earning-row-${index}`}>
+                                                    <td className="px-4 py-4">
+                                                        <div>
+                                                            <p className="font-semibold text-neutral-900">{earning.vehicle_id?.name || 'N/A'}</p>
+                                                            <p className="text-sm text-neutral-600">{earning.vehicle_id?.brand} {earning.vehicle_id?.model_name}</p>
+                                                            <p className="text-xs text-neutral-500">{earning.vehicle_id?.registration_number}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <div>
+                                                            <p className="text-sm text-neutral-900">
+                                                                {earning.pickup_details?.actual_pickup_date 
+                                                                    ? new Date(earning.pickup_details.actual_pickup_date).toLocaleDateString('en-IN')
+                                                                    : 'N/A'}
+                                                            </p>
+                                                            <p className="text-xs text-neutral-600">
+                                                                {earning.pickup_details?.actual_pickup_time || 'N/A'}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <div>
+                                                            <p className="text-sm text-neutral-900">
+                                                                {earning.return_details?.actual_return_date 
+                                                                    ? new Date(earning.return_details.actual_return_date).toLocaleDateString('en-IN')
+                                                                    : 'N/A'}
+                                                            </p>
+                                                            <p className="text-xs text-neutral-600">
+                                                                {earning.return_details?.actual_return_time || 'N/A'}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <p className="text-sm font-medium text-neutral-900">
+                                                            {earning.distance_traveled_km || 0}
+                                                        </p>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <p className={`text-sm font-medium ${earning.damage_cost > 0 ? 'text-red-600' : 'text-neutral-900'}`}>
+                                                            ₹{(earning.damage_cost || 0).toLocaleString('en-IN')}
+                                                        </p>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <p className="text-sm font-bold text-green-600">
+                                                            ₹{(earning.final_cost || 0).toLocaleString('en-IN')}
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

@@ -12,6 +12,8 @@ router
 // Protect all routes after this middleware
 router.use(protect);
 
+router.get('/earnings', restrictTo('vendor'), vendorController.getVendorEarnings);
+
 router.patch('/:id/verify', restrictTo('admin', 'office_staff'), vendorController.verifyVendor);
 
 router
