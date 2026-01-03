@@ -3,10 +3,13 @@ import { API_ENDPOINTS } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import CustomDropdown from './common/CustomDropdown';
+import FinalBillModal from './FinalBillModal';
 
 const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const { user } = useAuth();
     const { toast } = useToast();
+    const [showFinalBill, setShowFinalBill] = useState(false);
+    const [completedBooking, setCompletedBooking] = useState(null);
     const [formData, setFormData] = useState({
         staff_id: user?.id || '',
         actual_return_date: new Date().toISOString().split('T')[0], // input expects YYYY-MM-DD
@@ -253,7 +256,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
             if (data.status === 'success') {
                 toast.success(`Vehicle return confirmed! Final cost: ₹${data.data.booking.final_cost.toFixed(2)}`);
-                onSuccess();
+                // Show the final bill modal with the completed booking data
+                setCompletedBooking(data.data.booking);
+                setShowFinalBill(true);
             } else {
                 toast.error(data.message || 'Failed to confirm return');
             }
@@ -667,6 +672,18 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                     </div>
                 </form>
             </div>
+
+            {/* Final Bill Modal - shown after successful return */}
+            {showFinalBill && completedBooking && (
+                <FinalBillModal
+                    booking={completedBooking}
+                    onClose={() => {
+                        setShowFinalBill(false);
+                        setCompletedBooking(null);
+                        onSuccess();
+                    }}
+                />
+            )}
         </div>
     );
 };

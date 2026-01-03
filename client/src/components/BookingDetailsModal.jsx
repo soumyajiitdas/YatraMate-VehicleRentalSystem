@@ -1,6 +1,10 @@
-import { X, MapPin, Calendar, Clock, CreditCard, Car } from 'lucide-react';
+import { useState } from 'react';
+import { X, MapPin, Calendar, Clock, CreditCard, Car, FileText } from 'lucide-react';
+import FinalBillModal from './FinalBillModal';
 
 const BookingDetailsModal = ({ booking, onClose }) => {
+    const [showBillModal, setShowBillModal] = useState(false);
+
     if (!booking) return null;
 
     const formatDate = (dateString) => {
@@ -99,6 +103,29 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                             </span>
                         </div>
                     </div>
+
+                    {/* View Bill Button - Only for completed bookings */}
+                    {booking.status === 'completed' && (
+                        <div className="border border-green-200 bg-green-50 rounded-xl p-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-green-600" />
+                                    <div>
+                                        <p className="font-semibold text-green-800">Final Bill Available</p>
+                                        <p className="text-sm text-green-600">View and download your trip invoice</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowBillModal(true)}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all flex items-center gap-2"
+                                    data-testid="view-bill-button"
+                                >
+                                    <FileText className="w-4 h-4" />
+                                    View Bill
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Pickup Details */}
                     <div className="border border-neutral-200 rounded-xl p-4">
@@ -248,6 +275,14 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     </button>
                 </div>
             </div>
+
+            {/* Final Bill Modal */}
+            {showBillModal && (
+                <FinalBillModal
+                    booking={booking}
+                    onClose={() => setShowBillModal(false)}
+                />
+            )}
         </div>
     );
 };

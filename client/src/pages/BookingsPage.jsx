@@ -55,23 +55,36 @@ const BookingsPage = () => {
         // Transform backend data to match frontend structure
         const transformedBookings = data.data.bookings.map(booking => ({
           _id: booking._id,
+          bill_id: booking.bill_id,
           vehicle: {
             _id: booking.vehicle_id._id,
             name: booking.vehicle_id.name,
             type: booking.vehicle_id.type,
             images: booking.vehicle_id.images,
-            registration_number: booking.vehicle_id.registration_number
+            registration_number: booking.vehicle_id.registration_number,
+            model_name: booking.vehicle_id.model_name,
+            cc_engine: booking.vehicle_id.cc_engine
           },
+          vehicle_id: booking.vehicle_id, // Keep original for bill modal
+          user_id: booking.user_id, // Include user details for bill
           pickup_location: booking.start_location,
+          start_location: booking.start_location, // Keep original field name
           pickup_datetime: booking.requested_pickup_date,
           pickup_time: booking.requested_pickup_time,
           return_datetime: booking.return_details?.actual_return_date || null,
           total_cost: booking.final_cost || 0,
+          final_cost: booking.final_cost,
           status: mapBackendStatus(booking.status),
           payment_status: booking.payment_status,
           pickup_details: booking.pickup_details,
           return_details: booking.return_details,
-          rejection_reason: booking.rejection_reason || null
+          rejection_reason: booking.rejection_reason || null,
+          // Additional fields for bill display
+          distance_traveled_km: booking.distance_traveled_km,
+          duration_hours: booking.duration_hours,
+          cost_per_distance: booking.cost_per_distance,
+          cost_per_time: booking.cost_per_time,
+          damage_cost: booking.damage_cost
         }));
 
         setBookings(transformedBookings);

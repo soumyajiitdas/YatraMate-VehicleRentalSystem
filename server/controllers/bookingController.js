@@ -373,6 +373,7 @@ exports.getUserBookings = catchAsync(async (req, res, next) => {
     const bookings = await Booking.find({ user_id: userId })
         .populate('vehicle_id')
         .populate('package_id')
+        .populate('user_id', 'name email phone')
         .populate('pickup_details.staff_id', 'name')
         .populate('return_details.staff_id', 'name')
         .sort({ createdAt: -1 });
