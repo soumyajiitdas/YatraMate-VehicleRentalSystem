@@ -54,137 +54,20 @@ const BillModal = ({ booking, onClose }) => {
 
     if (!booking) return null;
 
-    const billStyles = {
-        container: {
-            maxWidth: '800px',
-            margin: '0 auto',
-            padding: '30px',
-            backgroundColor: '#ffffff',
-            fontFamily: 'Arial, sans-serif',
-        },
-        header: {
-            textAlign: 'center',
-            borderBottom: '3px solid #000',
-            paddingBottom: '20px',
-            marginBottom: '30px',
-        },
-        companyName: {
-            fontSize: '32px',
-            fontWeight: 'bold',
-            margin: '0 0 5px 0',
-            color: '#000',
-        },
-        companyTagline: {
-            fontSize: '14px',
-            margin: '5px 0',
-            color: '#333',
-        },
-        billInfo: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: '30px',
-        },
-        infoBlock: {
-            flex: 1,
-        },
-        label: {
-            fontSize: '12px',
-            color: '#666',
-            marginBottom: '5px',
-        },
-        value: {
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#000',
-        },
-        section: {
-            marginBottom: '25px',
-            border: '1px solid #000',
-            padding: '15px',
-        },
-        sectionTitle: {
-            fontSize: '16px',
-            fontWeight: 'bold',
-            marginBottom: '15px',
-            color: '#000',
-            textTransform: 'uppercase',
-            borderBottom: '2px solid #000',
-            paddingBottom: '8px',
-        },
-        row: {
-            display: 'flex',
-            marginBottom: '10px',
-        },
-        rowLabel: {
-            flex: '0 0 150px',
-            fontSize: '13px',
-            color: '#333',
-            fontWeight: '500',
-        },
-        rowValue: {
-            flex: 1,
-            fontSize: '13px',
-            color: '#000',
-            fontWeight: '400',
-        },
-        footer: {
-            marginTop: '40px',
-            paddingTop: '20px',
-            borderTop: '3px solid #000',
-            textAlign: 'center',
-        },
-        footerText: {
-            fontSize: '11px',
-            marginBottom: '50px',
-            color: '#666',
-            margin: '5px 0',
-        },
-    };
-
     return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-            zIndex: 1000,
-        }} data-testid="bill-modal-overlay">
-            <div style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                maxWidth: '900px',
-                width: '100%',
-                maxHeight: '90vh',
-                overflow: 'auto',
-            }}>
+        <div 
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 md:p-5 z-1000"
+            data-testid="bill-modal-overlay"
+        >
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-[900px] max-h-[90vh] overflow-auto">
                 {/* Modal Header */}
-                <div style={{
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: '#ffffff',
-                    borderBottom: '1px solid #ddd',
-                    padding: '20px 30px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    zIndex: 10,
-                }}>
-                    <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#000', margin: 0 }}>
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5 flex items-center justify-between z-10">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-black">
                         Vehicle <span className='text-red-500'>Pickup Bill</span> 
                     </h2>
                     <button
                         onClick={onClose}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            fontSize: '24px',
-                            cursor: 'pointer',
-                            color: '#666',
-                        }}
+                        className="text-gray-500 hover:text-gray-700 text-2xl sm:text-3xl leading-none p-1"
                         data-testid="bill-modal-close-btn"
                     >
                         ×
@@ -192,158 +75,136 @@ const BillModal = ({ booking, onClose }) => {
                 </div>
 
                 {/* Bill Content */}
-                <div ref={billRef} style={billStyles.container}>
+                <div ref={billRef} className="max-w-[800px] mx-auto p-4 sm:p-6 md:p-8 bg-white font-sans">
                     {/* Company Header */}
-                    <div style={billStyles.header}>
-                        <h1 style={billStyles.companyName}>YatraMate Rental Services</h1>
-                        <p style={{ fontSize: '16px', margin: '5px 0', color: '#666' }}>Travel made effortless ~</p>
+                    <div className="text-center border-b-[3px] border-black pb-4 sm:pb-5 mb-4 sm:mb-6 md:mb-8">
+                        <h1 className="text-xl sm:text-2xl md:text-[32px] font-bold m-0 mb-1 text-black">YatraMate Rental Services</h1>
+                        <p className="text-sm sm:text-base text-gray-500 my-1">Travel made effortless ~</p>
                     </div>
 
                     {/* Bill ID and Date */}
-                    <div style={billStyles.billInfo}>
-                        <div style={billStyles.infoBlock}>
-                            <div style={billStyles.label}>Bill ID</div>
-                            <div style={billStyles.value} data-testid="bill-id">{booking.bill_id}</div>
+                    <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 mb-4 sm:mb-6 md:mb-8">
+                        <div className="flex-1">
+                            <div className="text-xs text-gray-500 mb-1">Bill ID</div>
+                            <div className="text-sm sm:text-base font-bold text-black" data-testid="bill-id">{booking.bill_id}</div>
                         </div>
-                        <div style={{ ...billStyles.infoBlock, textAlign: 'right' }}>
-                            <div style={billStyles.label}>Date</div>
-                            <div style={billStyles.value}>{formatDate(booking.pickup_details?.actual_pickup_date)}</div>
+                        <div className="flex-1 sm:text-right">
+                            <div className="text-xs text-gray-500 mb-1">Date</div>
+                            <div className="text-sm sm:text-base font-bold text-black">{formatDate(booking.pickup_details?.actual_pickup_date)}</div>
                         </div>
                     </div>
 
                     {/* Customer Details */}
-                    <div style={billStyles.section}>
-                        <div style={billStyles.sectionTitle}>Customer Details</div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Name:</div>
-                            <div style={billStyles.rowValue}>{booking.user_id?.name || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Email:</div>
-                            <div style={billStyles.rowValue}>{booking.user_id?.email || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Phone:</div>
-                            <div style={billStyles.rowValue}>{booking.user_id?.phone || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Govt. ID Proof:</div>
-                            <div style={billStyles.rowValue}>
-                                {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Customer Details</div>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Name:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.user_id?.name || 'N/A'}</div>
                             </div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>ID Number:</div>
-                            <div style={billStyles.rowValue}>
-                                {booking.pickup_details?.id_number || 'N/A'}
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Email:</div>
+                                <div className="text-xs sm:text-sm text-black break-all">{booking.user_id?.email || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Phone:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.user_id?.phone || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Govt. ID Proof:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'}
+                                </div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">ID Number:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {booking.pickup_details?.id_number || 'N/A'}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Vehicle Details */}
-                    <div style={billStyles.section}>
-                        <div style={billStyles.sectionTitle}>Vehicle Details</div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Vehicle:</div>
-                            <div style={billStyles.rowValue}>
-                                {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Vehicle Details</div>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Vehicle:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
+                                </div>
                             </div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Type:</div>
-                            <div style={billStyles.rowValue}>{booking.vehicle_id?.type || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Registration No:</div>
-                            <div style={billStyles.rowValue}>{booking.vehicle_id?.registration_number || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Engine CC:</div>
-                            <div style={billStyles.rowValue}>{booking.vehicle_id?.cc_engine || 'N/A'}cc</div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Type:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.vehicle_id?.type || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Registration No:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.vehicle_id?.registration_number || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Engine CC:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.vehicle_id?.cc_engine || 'N/A'}cc</div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Pickup Details */}
-                    <div style={billStyles.section}>
-                        <div style={billStyles.sectionTitle}>Pickup Details</div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Pickup Date:</div>
-                            <div style={billStyles.rowValue}>
-                                {formatDate(booking.pickup_details?.actual_pickup_date)}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Pickup Details</div>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Pickup Date:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {formatDate(booking.pickup_details?.actual_pickup_date)}
+                                </div>
                             </div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Pickup Time:</div>
-                            <div style={billStyles.rowValue}>{booking.pickup_details?.actual_pickup_time || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Pickup Location:</div>
-                            <div style={billStyles.rowValue}>{booking.start_location || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Odometer Start:</div>
-                            <div style={billStyles.rowValue}>{booking.pickup_details?.odometer_reading_start || 'N/A'} km</div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Pickup Time:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.pickup_details?.actual_pickup_time || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Pickup Location:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.start_location || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Odometer Start:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.pickup_details?.odometer_reading_start || 'N/A'} km</div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Notes */}
                     {booking.pickup_details?.pickup_notes && (
-                        <div style={billStyles.section}>
-                            <div style={billStyles.sectionTitle}>Notes</div>
-                            <p style={{ fontSize: '13px', color: '#333', margin: 0 }}>
+                        <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                            <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Notes</div>
+                            <p className="text-xs sm:text-sm text-gray-600 m-0">
                                 {booking.pickup_details.pickup_notes}
                             </p>
                         </div>
                     )}
 
                     {/* Footer */}
-                    <div style={billStyles.footer}>
-                        <p style={billStyles.footerText}>
+                    <div className="mt-6 sm:mt-8 md:mt-10 pt-4 sm:pt-5 border-t-[3px] border-black text-center">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mb-8 sm:mb-12">
                             Final charges will be calculated upon vehicle return. Thank you for choosing YatraMate!
                         </p>
                     </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div style={{
-                    position: 'sticky',
-                    bottom: 0,
-                    backgroundColor: '#ffffff',
-                    borderTop: '1px solid #ddd',
-                    padding: '20px 30px',
-                    display: 'flex',
-                    gap: '15px',
-                }}>
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-3 sm:p-4 md:p-5 flex flex-col sm:flex-row gap-2 sm:gap-4">
                     <button
                         onClick={downloadPDF}
-                        style={{
-                            flex: 1,
-                            padding: '12px 24px',
-                            backgroundColor: '#f00',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            fontSize: '15px',
-                        }}
+                        className="flex-1 py-3 sm:py-3 px-4 sm:px-6 bg-red-500 text-white border-none rounded-md font-semibold cursor-pointer text-sm sm:text-base hover:bg-red-600 transition-colors"
                         data-testid="download-pdf-btn"
                     >
                         Download PDF
                     </button>
                     <button
                         onClick={onClose}
-                        style={{
-                            flex: 1,
-                            padding: '12px 24px',
-                            backgroundColor: '#fff',
-                            color: '#f00',
-                            border: '2px solid #f00',
-                            borderRadius: '6px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            fontSize: '15px',
-                        }}
+                        className="flex-1 py-3 sm:py-3 px-4 sm:px-6 bg-white text-red-500 border-2 border-red-500 rounded-md font-semibold cursor-pointer text-sm sm:text-base hover:bg-red-50 transition-colors"
                         data-testid="close-bill-btn"
                     >
                         Close

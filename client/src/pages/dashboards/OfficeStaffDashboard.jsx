@@ -5,7 +5,7 @@ import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
 import PickupModal from '../../components/PickupModal';
 import ReturnModal from '../../components/ReturnModal';
-import { MapPinned } from 'lucide-react';
+import { MapPinned, ChevronDown, ChevronUp } from 'lucide-react';
 
 const OfficeStaffDashboard = () => {
     const navigate = useNavigate();
@@ -20,6 +20,14 @@ const OfficeStaffDashboard = () => {
     const [showRejectDialog, setShowRejectDialog] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [rejecting, setRejecting] = useState(false);
+    const [expandedCards, setExpandedCards] = useState({});
+
+    const toggleCardExpansion = (bookingId) => {
+        setExpandedCards(prev => ({
+            ...prev,
+            [bookingId]: !prev[bookingId]
+        }));
+    };
 
     // Utility: parse various date string formats and return a local Date at 00:00
     const parseDateLocal = (s) => {
@@ -320,140 +328,261 @@ const OfficeStaffDashboard = () => {
                         {bookings.map((booking) => (
                             <div key={booking._id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
                                 <div className="p-4 md:p-6">
-                                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
-                                        <div className="flex-1">
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-3">
-                                                <h3 className="text-base md:text-lg font-semibold text-gray-900">
-                                                    {booking.vehicle_id.name} - {booking.vehicle_id.model_name}
-                                                </h3>
-                                                {getStatusBadge(booking.status)}
+                                    {/* Collapsible Header for Completed Tab */}
+                                    {activeTab === 'completed' ? (
+                                        <>
+                                            <div 
+                                                className="flex items-center justify-between cursor-pointer"
+                                                onClick={() => toggleCardExpansion(booking._id)}
+                                                data-testid={`toggle-card-${booking._id}`}
+                                            >
+                                                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
+                                                    <h3 className="text-base md:text-lg font-semibold text-gray-900">
+                                                        {booking.vehicle_id.name} - {booking.vehicle_id.model_name}
+                                                    </h3>
+                                                    
+                                                </div>
+                                                <button 
+                                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                                    aria-label={expandedCards[booking._id] ? "Collapse details" : "Expand details"}
+                                                >
+                                                    {expandedCards[booking._id] ? (
+                                                        <ChevronUp className="w-5 h-5 text-gray-500" />
+                                                    ) : (
+                                                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                                                    )}
+                                                </button>
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                                                <div>
-                                                    <p className="text-gray-500">Customer</p>
-                                                    <p className="font-medium text-gray-900">{booking.user_id.name}</p>
-                                                    <p className="text-gray-600 warp-break-words">{booking.user_id.email}</p>
-                                                    <p className="text-gray-600">{booking.user_id.phone}</p>
+                                            {/* Collapsed Summary - Always visible */}
+                                            {!expandedCards[booking._id] && (
+                                                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                                                    <span>Customer: <span className="font-medium text-gray-900">{booking.user_id.name}</span></span>
+                                                    <span>•</span>
+                                                    <span>Returned: <span className="font-medium text-gray-900">{formatDateDDMMYYYY(booking.return_details?.actual_return_date)}</span></span>
+                                                    {booking.bill_id && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>Bill: <span className="font-medium text-blue-600">{booking.bill_id}</span></span>
+                                                        </>
+                                                    )}
+                                                    {booking.final_cost && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>Cost: <span className="font-medium text-green-600">₹{booking.final_cost.toFixed(2)}</span></span>
+                                                        </>
+                                                        
+                                                    )}
                                                 </div>
+                                            )}
 
-                                                <div>
-                                                    <p className="text-gray-500">Vehicle Details</p>
-                                                    <p className="font-medium text-gray-900">{booking.vehicle_id.registration_number}</p>
-                                                    <p className="text-gray-600">{booking.vehicle_id.type} - {booking.vehicle_id.cc_engine}cc</p>
-                                                </div>
-
-                                                <div>
-                                                    <p className="text-gray-500">Pickup Location</p>
-                                                    <p className="font-medium text-gray-900">{booking.start_location}</p>
-                                                </div>
-
-                                                {booking.package_id && (
-                                                    <div>
-                                                        <p className="text-gray-500">Package</p>
-                                                        <p className="font-medium text-gray-900">{booking.package_id.name}</p>
-                                                        <p className="text-gray-600">₹{booking.package_id.price_per_hour}/hr | ₹{booking.package_id.price_per_km}/km</p>
-                                                    </div>
-                                                )}
-
-                                                <div>
-                                                    <p className="text-gray-500">Vehicle Pickup</p>
-                                                    <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
-                                                        {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
-                                                    </p>
-                                                    <p className="text-gray-600" data-testid="pickup-schedule-time">{booking.pickup_details?.actual_pickup_time || booking.requested_pickup_time}</p>
-                                                </div>
-
-                                                {activeTab === 'completed' && booking.return_details ? (
-                                                    <>
+                                            {/* Expandable Content */}
+                                            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedCards[booking._id] ? 'max-h-[1000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                                                <div className="border-t border-gray-100 pt-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                                         <div>
-                                                            <p className="text-gray-500">Vehicle Returned</p>
-                                                            <p className="font-medium text-gray-900">
-                                                                Date: {formatDateDDMMYYYY(booking.return_details.actual_return_date)}
-                                                            </p>
-                                                            <p className="text-gray-600">Time: {booking.return_details.actual_return_time}</p>
+                                                            <p className="text-gray-500">Customer</p>
+                                                            <p className="font-medium text-gray-900">{booking.user_id.name}</p>
+                                                            <p className="text-gray-600 wrap-break-words">{booking.user_id.email}</p>
+                                                            <p className="text-gray-600">{booking.user_id.phone}</p>
                                                         </div>
-                                                        {booking.pickup_details && (
+
+                                                        <div>
+                                                            <p className="text-gray-500">Vehicle Details</p>
+                                                            <p className="font-medium text-gray-900">{booking.vehicle_id.registration_number}</p>
+                                                            <p className="text-gray-600">{booking.vehicle_id.type} - {booking.vehicle_id.cc_engine}cc</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="text-gray-500">Pickup Location</p>
+                                                            <p className="font-medium text-gray-900">{booking.start_location}</p>
+                                                        </div>
+
+                                                        {booking.package_id && (
                                                             <div>
-                                                                <p className="text-gray-500">Customer ID Details</p>
-                                                                <p className="text-gray-600">Govt. ID: <span className="text-gray-900">{booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</span></p>
-                                                                <p className="text-gray-600">ID Number: {booking.pickup_details.id_number || 'N/A'}</p>
+                                                                <p className="text-gray-500">Package</p>
+                                                                <p className="font-medium text-gray-900">{booking.package_id.name}</p>
+                                                                <p className="text-gray-600">₹{booking.package_id.price_per_hour}/hr | ₹{booking.package_id.price_per_km}/km</p>
                                                             </div>
                                                         )}
-                                                    </>
-                                                ) : booking.pickup_details && (
+
+                                                        <div>
+                                                            <p className="text-gray-500">Vehicle Pickup</p>
+                                                            <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
+                                                                {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
+                                                            </p>
+                                                            <p className="text-gray-600" data-testid="pickup-schedule-time">{booking.pickup_details?.actual_pickup_time || booking.requested_pickup_time}</p>
+                                                        </div>
+
+                                                        {booking.return_details && (
+                                                            <>
+                                                                <div>
+                                                                    <p className="text-gray-500">Vehicle Returned</p>
+                                                                    <p className="font-medium text-gray-900">
+                                                                        Date: {formatDateDDMMYYYY(booking.return_details.actual_return_date)}
+                                                                    </p>
+                                                                    <p className="text-gray-600">Time: {booking.return_details.actual_return_time}</p>
+                                                                </div>
+                                                                {booking.pickup_details && (
+                                                                    <div>
+                                                                        <p className="text-gray-500">Customer ID Details</p>
+                                                                        <p className="text-gray-600">Govt. ID: <span className="text-gray-900">{booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</span></p>
+                                                                        <p className="text-gray-600">ID Number: {booking.pickup_details.id_number || 'N/A'}</p>
+                                                                    </div>
+                                                                )}
+                                                            </>
+                                                        )}
+
+                                                        {booking.pickup_details?.staff_id && (
+                                                            <div>
+                                                                <p className="text-gray-500">Pickup Staff</p>
+                                                                <p className="font-medium text-gray-900" data-testid="pickup-staff-name">{booking.pickup_details.staff_id.name}</p>
+                                                            </div>
+                                                        )}
+
+                                                        {booking.return_details?.staff_id && (
+                                                            <div>
+                                                                <p className="text-gray-500">Return Staff</p>
+                                                                <p className="font-medium text-gray-900" data-testid="return-staff-name">{booking.return_details.staff_id.name}</p>
+                                                            </div>
+                                                        )}
+
+                                                        {booking.bill_id && (
+                                                            <div>
+                                                                <p className="text-gray-500">Bill ID</p>
+                                                                <p className="font-medium text-blue-600" data-testid="bill-id-display">{booking.bill_id}</p>
+                                                            </div>
+                                                        )}
+
+                                                        {booking.final_cost && (
+                                                            <div>
+                                                                <p className="text-gray-500">Final Cost</p>
+                                                                <p className="font-medium text-xl text-green-600">₹{booking.final_cost.toFixed(2)}</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        /* Non-collapsible layout for Pending and Active tabs */
+                                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
+                                            <div className="flex-1">
+                                                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-3">
+                                                    <h3 className="text-base md:text-lg font-semibold text-gray-900">
+                                                        {booking.vehicle_id.name} - {booking.vehicle_id.model_name}
+                                                    </h3>
+                                                    {getStatusBadge(booking.status)}
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                                     <div>
-                                                        <p className="text-gray-500">Pickup Info</p>
-                                                        <p className="font-medium text-gray-900">
-                                                            Odometer: {booking.pickup_details.odometer_reading_start} km
+                                                        <p className="text-gray-500">Customer</p>
+                                                        <p className="font-medium text-gray-900">{booking.user_id.name}</p>
+                                                        <p className="text-gray-600 wrap-break-words">{booking.user_id.email}</p>
+                                                        <p className="text-gray-600">{booking.user_id.phone}</p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-gray-500">Vehicle Details</p>
+                                                        <p className="font-medium text-gray-900">{booking.vehicle_id.registration_number}</p>
+                                                        <p className="text-gray-600">{booking.vehicle_id.type} - {booking.vehicle_id.cc_engine}cc</p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-gray-500">Pickup Location</p>
+                                                        <p className="font-medium text-gray-900">{booking.start_location}</p>
+                                                    </div>
+
+                                                    {booking.package_id && (
+                                                        <div>
+                                                            <p className="text-gray-500">Package</p>
+                                                            <p className="font-medium text-gray-900">{booking.package_id.name}</p>
+                                                            <p className="text-gray-600">₹{booking.package_id.price_per_hour}/hr | ₹{booking.package_id.price_per_km}/km</p>
+                                                        </div>
+                                                    )}
+
+                                                    <div>
+                                                        <p className="text-gray-500">Vehicle Pickup</p>
+                                                        <p className="font-medium text-gray-900" data-testid="pickup-schedule-date">
+                                                            {formatDateDDMMYYYY(booking.pickup_details?.actual_pickup_date || booking.requested_pickup_date)}
                                                         </p>
-                                                        <p className="text-gray-600">Govt. ID: {booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</p>
-                                                        <p className="text-gray-600">ID Number: {booking.pickup_details.id_number || 'N/A'}</p>
+                                                        <p className="text-gray-600" data-testid="pickup-schedule-time">{booking.pickup_details?.actual_pickup_time || booking.requested_pickup_time}</p>
                                                     </div>
+
+                                                    {booking.pickup_details && (
+                                                        <div>
+                                                            <p className="text-gray-500">Pickup Info</p>
+                                                            <p className="font-medium text-gray-900">
+                                                                Odometer: {booking.pickup_details.odometer_reading_start} km
+                                                            </p>
+                                                            <p className="text-gray-600">Govt. ID: {booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</p>
+                                                            <p className="text-gray-600">ID Number: {booking.pickup_details.id_number || 'N/A'}</p>
+                                                        </div>
+                                                    )}
+
+                                                    {booking.pickup_details?.staff_id && (
+                                                        <div>
+                                                            <p className="text-gray-500">Pickup Staff</p>
+                                                            <p className="font-medium text-gray-900" data-testid="pickup-staff-name">{booking.pickup_details.staff_id.name}</p>
+                                                        </div>
+                                                    )}
+
+                                                    {booking.return_details?.staff_id && (
+                                                        <div>
+                                                            <p className="text-gray-500">Return Staff</p>
+                                                            <p className="font-medium text-gray-900" data-testid="return-staff-name">{booking.return_details.staff_id.name}</p>
+                                                        </div>
+                                                    )}
+
+                                                    {booking.bill_id && (
+                                                        <div>
+                                                            <p className="text-gray-500">Bill ID</p>
+                                                            <p className="font-medium text-blue-600" data-testid="bill-id-display">{booking.bill_id}</p>
+                                                        </div>
+                                                    )}
+
+                                                    {booking.final_cost && (
+                                                        <div>
+                                                            <p className="text-gray-500">Final Cost</p>
+                                                            <p className="font-medium text-xl text-green-600">₹{booking.final_cost.toFixed(2)}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="lg:ml-6 flex flex-row lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2">
+                                                {booking.status === 'booking_requested' && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handlePickup(booking)}
+                                                            className="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                                            data-testid="complete-pickup-btn"
+                                                        >
+                                                            Complete Pickup
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleReject(booking)}
+                                                            className="flex-1 lg:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                                            data-testid="reject-booking-btn"
+                                                        >
+                                                            Reject Booking
+                                                        </button>
+                                                    </>
                                                 )}
 
-                                                {booking.pickup_details?.staff_id && (
-                                                    <div>
-                                                        <p className="text-gray-500">Pickup Staff</p>
-                                                        <p className="font-medium text-gray-900" data-testid="pickup-staff-name">{booking.pickup_details.staff_id.name}</p>
-                                                    </div>
+                                                {booking.status === 'picked_up' && (
+                                                    <button
+                                                        onClick={() => handleReturn(booking)}
+                                                        className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap"
+                                                        data-testid="verify-return-btn"
+                                                    >
+                                                        Verify Return
+                                                    </button>
                                                 )}
-
-                                                {booking.return_details?.staff_id && (
-                                                    <div>
-                                                        <p className="text-gray-500">Return Staff</p>
-                                                        <p className="font-medium text-gray-900" data-testid="return-staff-name">{booking.return_details.staff_id.name}</p>
-                                                    </div>
-                                                )}
-
-                                                {booking.bill_id && (
-                                                    <div>
-                                                        <p className="text-gray-500">Bill ID</p>
-                                                        <p className="font-medium text-blue-600" data-testid="bill-id-display">{booking.bill_id}</p>
-                                                    </div>
-                                                )}
-
-                                                {booking.final_cost && (
-                                                    <div>
-                                                        <p className="text-gray-500">Final Cost</p>
-                                                        <p className="font-medium text-xl text-green-600">₹{booking.final_cost.toFixed(2)}</p>
-                                                    </div>
-                                                )}
-
                                             </div>
                                         </div>
-
-                                        <div className="lg:ml-6 flex flex-row lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2">
-                                            {booking.status === 'booking_requested' && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handlePickup(booking)}
-                                                        className="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
-                                                        data-testid="complete-pickup-btn"
-                                                    >
-                                                        Complete Pickup
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleReject(booking)}
-                                                        className="flex-1 lg:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium whitespace-nowrap"
-                                                        data-testid="reject-booking-btn"
-                                                    >
-                                                        Reject Booking
-                                                    </button>
-                                                </>
-                                            )}
-
-                                            {booking.status === 'picked_up' && (
-                                                <button
-                                                    onClick={() => handleReturn(booking)}
-                                                    className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap"
-                                                    data-testid="verify-return-btn"
-                                                >
-                                                    Verify Return
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

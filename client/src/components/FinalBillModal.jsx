@@ -61,147 +61,20 @@ const FinalBillModal = ({ booking, onClose }) => {
     const pickupDetails = booking.pickup_details || {};
     const returnDetails = booking.return_details || {};
 
-    const billStyles = {
-        container: {
-            maxWidth: '800px',
-            margin: '0 auto',
-            padding: '30px',
-            backgroundColor: '#ffffff',
-            fontFamily: 'Arial, sans-serif',
-        },
-        header: {
-            textAlign: 'center',
-            borderBottom: '3px solid #000',
-            paddingBottom: '20px',
-            marginBottom: '20px',
-        },
-        companyName: {
-            fontSize: '32px',
-            fontWeight: 'bold',
-            margin: '0 0 5px 0',
-            color: '#000',
-        },
-        billInfo: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: '30px',
-        },
-        infoBlock: {
-            flex: 1,
-        },
-        label: {
-            fontSize: '12px',
-            color: '#666',
-            marginBottom: '5px',
-        },
-        value: {
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#000',
-        },
-        section: {
-            marginBottom: '25px',
-            border: '1px solid #000',
-            padding: '15px',
-        },
-        sectionTitle: {
-            fontSize: '16px',
-            fontWeight: 'bold',
-            marginBottom: '15px',
-            color: '#000',
-            textTransform: 'uppercase',
-            borderBottom: '2px solid #000',
-            paddingBottom: '8px',
-        },
-        row: {
-            display: 'flex',
-            marginBottom: '10px',
-        },
-        rowLabel: {
-            flex: '0 0 180px',
-            fontSize: '13px',
-            color: '#333',
-            fontWeight: '500',
-        },
-        rowValue: {
-            flex: 1,
-            fontSize: '13px',
-            color: '#000',
-            fontWeight: '400',
-        },
-        costRow: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '8px 0',
-            borderBottom: '1px solid #eee',
-        },
-        totalRow: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '12px 0',
-            borderTop: '2px solid #000',
-            marginTop: '10px',
-            fontSize: '18px',
-            fontWeight: 'bold',
-        },
-        footer: {
-            marginTop: '30px',
-            paddingTop: '20px',
-            borderTop: '3px solid #000',
-            textAlign: 'center',
-        },
-        footerText: {
-            fontSize: '11px',
-            marginBottom: '50px',
-            color: '#666',
-            margin: '5px 0',
-        },
-    };
-
     return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-            zIndex: 1000,
-        }} data-testid="final-bill-modal-overlay">
-            <div style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                maxWidth: '900px',
-                width: '100%',
-                maxHeight: '90vh',
-                overflow: 'auto',
-            }}>
+        <div 
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 md:p-5 z-1000"
+            data-testid="final-bill-modal-overlay"
+        >
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-[900px] max-h-[90vh] overflow-auto">
                 {/* Modal Header */}
-                <div style={{
-                    position: 'sticky',
-                    top: 0,
-                    backgroundColor: '#ffffff',
-                    borderBottom: '1px solid #ddd',
-                    padding: '20px 30px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    zIndex: 10,
-                }}>
-                    <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#000', margin: 0 }}>
-                        Final <span style={{ color: '#16a34a' }}>Bill</span>
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5 flex items-center justify-between z-10">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-black">
+                        Final <span className="text-green-600">Bill</span>
                     </h2>
                     <button
                         onClick={onClose}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            fontSize: '24px',
-                            cursor: 'pointer',
-                            color: '#666',
-                        }}
+                        className="text-gray-500 hover:text-gray-700 text-2xl sm:text-3xl leading-none p-1"
                         data-testid="final-bill-modal-close-btn"
                     >
                         ×
@@ -209,147 +82,151 @@ const FinalBillModal = ({ booking, onClose }) => {
                 </div>
 
                 {/* Bill Content */}
-                <div ref={billRef} style={billStyles.container}>
+                <div ref={billRef} className="max-w-[800px] mx-auto p-4 sm:p-6 md:p-8 bg-white font-sans">
                     {/* Company Header */}
-                    <div style={billStyles.header}>
-                        <h1 style={billStyles.companyName}>YatraMate Rental Services</h1>
-                        <p style={{ fontSize: '16px', margin: '5px 0', color: '#666' }}>Travel made effortless ~</p>
-                        <p style={{ fontSize: '14px', margin: '5px 0 0', color: '#16a34a', fontWeight: 'bold' }}>RETURN INVOICE</p>
+                    <div className="text-center border-b-[3px] border-black pb-4 sm:pb-5 mb-4 sm:mb-5">
+                        <h1 className="text-xl sm:text-2xl md:text-[32px] font-bold m-0 mb-1 text-black">YatraMate Rental Services</h1>
+                        <p className="text-sm sm:text-base text-gray-500 my-1">Travel made effortless ~</p>
+                        <p className="text-xs sm:text-sm text-green-600 font-bold mt-1">RETURN INVOICE</p>
                     </div>
 
-                    {/* Bill ID and Date */}
-                    <div style={billStyles.billInfo}>
-                        <div style={billStyles.infoBlock}>
-                            <div style={billStyles.label}>Bill ID</div>
-                            <div style={billStyles.value} data-testid="final-bill-id">{booking.bill_id || 'N/A'}</div>
+                    {/* Bill ID, Booking ID, and Date */}
+                    <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
+                        <div className="flex-1">
+                            <div className="text-xs text-gray-500 mb-1">Bill ID</div>
+                            <div className="text-sm sm:text-base font-bold text-black" data-testid="final-bill-id">{booking.bill_id || 'N/A'}</div>
                         </div>
-                        <div style={{ ...billStyles.infoBlock, textAlign: 'center' }}>
-                            <div style={billStyles.label}>Booking ID</div>
-                            <div style={{ ...billStyles.value, fontSize: '12px' }}>{booking._id}</div>
+                        <div className="flex-1 sm:text-center">
+                            <div className="text-xs text-gray-500 mb-1">Booking ID</div>
+                            <div className="text-[10px] sm:text-xs font-bold text-black break-all">{booking._id}</div>
                         </div>
-                        <div style={{ ...billStyles.infoBlock, textAlign: 'right' }}>
-                            <div style={billStyles.label}>Return Date</div>
-                            <div style={billStyles.value}>{formatDate(returnDetails.actual_return_date)}</div>
+                        <div className="flex-1 sm:text-right">
+                            <div className="text-xs text-gray-500 mb-1">Return Date</div>
+                            <div className="text-sm sm:text-base font-bold text-black">{formatDate(returnDetails.actual_return_date)}</div>
                         </div>
                     </div>
 
                     {/* Customer Details */}
-                    <div style={billStyles.section}>
-                        <div style={billStyles.sectionTitle}>Customer Details</div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Name:</div>
-                            <div style={billStyles.rowValue}>{userData.name || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Email:</div>
-                            <div style={billStyles.rowValue}>{userData.email || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Phone:</div>
-                            <div style={billStyles.rowValue}>{userData.phone || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Govt. ID Proof:</div>
-                            <div style={billStyles.rowValue}>
-                                {pickupDetails.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'} - {pickupDetails.id_number || 'N/A'}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Customer Details</div>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Name:</div>
+                                <div className="text-xs sm:text-sm text-black">{userData.name || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Email:</div>
+                                <div className="text-xs sm:text-sm text-black break-all">{userData.email || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Phone:</div>
+                                <div className="text-xs sm:text-sm text-black">{userData.phone || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Govt. ID Proof:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {pickupDetails.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'} - {pickupDetails.id_number || 'N/A'}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Vehicle Details */}
-                    <div style={billStyles.section}>
-                        <div style={billStyles.sectionTitle}>Vehicle Details</div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Vehicle:</div>
-                            <div style={billStyles.rowValue}>
-                                {vehicleData.name || 'N/A'} - {vehicleData.model_name || 'N/A'}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Vehicle Details</div>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Vehicle:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {vehicleData.name || 'N/A'} - {vehicleData.model_name || 'N/A'}
+                                </div>
                             </div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Type:</div>
-                            <div style={billStyles.rowValue}>{vehicleData.type || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Registration No:</div>
-                            <div style={billStyles.rowValue}>{vehicleData.registration_number || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Engine CC:</div>
-                            <div style={billStyles.rowValue}>{vehicleData.cc_engine || 'N/A'}cc</div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Type:</div>
+                                <div className="text-xs sm:text-sm text-black">{vehicleData.type || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Registration No:</div>
+                                <div className="text-xs sm:text-sm text-black">{vehicleData.registration_number || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Engine CC:</div>
+                                <div className="text-xs sm:text-sm text-black">{vehicleData.cc_engine || 'N/A'}cc</div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Trip Summary */}
-                    <div style={billStyles.section}>
-                        <div style={billStyles.sectionTitle}>Trip Summary</div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Pickup Date & Time:</div>
-                            <div style={billStyles.rowValue}>
-                                {formatDate(pickupDetails.actual_pickup_date)} at {pickupDetails.actual_pickup_time || 'N/A'}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Trip Summary</div>
+                        <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Pickup Date & Time:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {formatDate(pickupDetails.actual_pickup_date)} at {pickupDetails.actual_pickup_time || 'N/A'}
+                                </div>
                             </div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Return Date & Time:</div>
-                            <div style={billStyles.rowValue}>
-                                {formatDate(returnDetails.actual_return_date)} at {returnDetails.actual_return_time || 'N/A'}
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Return Date & Time:</div>
+                                <div className="text-xs sm:text-sm text-black">
+                                    {formatDate(returnDetails.actual_return_date)} at {returnDetails.actual_return_time || 'N/A'}
+                                </div>
                             </div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Pickup Location:</div>
-                            <div style={billStyles.rowValue}>{booking.start_location || 'N/A'}</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Total Distance:</div>
-                            <div style={{ ...billStyles.rowValue, fontWeight: 'bold' }}>{booking.distance_traveled_km || 'N/A'} km</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Total Duration:</div>
-                            <div style={{ ...billStyles.rowValue, fontWeight: 'bold' }}>{booking.duration_hours || 'N/A'} hours</div>
-                        </div>
-                        <div style={billStyles.row}>
-                            <div style={billStyles.rowLabel}>Vehicle Condition:</div>
-                            <div style={{ 
-                                ...billStyles.rowValue, 
-                                color: returnDetails.vehicle_condition === 'damaged' ? '#dc2626' : '#16a34a',
-                                fontWeight: 'bold'
-                            }}>
-                                {returnDetails.vehicle_condition?.toUpperCase() || 'N/A'}
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Pickup Location:</div>
+                                <div className="text-xs sm:text-sm text-black">{booking.start_location || 'N/A'}</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Total Distance:</div>
+                                <div className="text-xs sm:text-sm text-black font-bold">{booking.distance_traveled_km || 'N/A'} km</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Total Duration:</div>
+                                <div className="text-xs sm:text-sm text-black font-bold">{booking.duration_hours || 'N/A'} hours</div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-start">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[140px] md:w-[180px] sm:shrink-0">Vehicle Condition:</div>
+                                <div className={`text-xs sm:text-sm font-bold ${returnDetails.vehicle_condition === 'damaged' ? 'text-red-600' : 'text-green-600'}`}>
+                                    {returnDetails.vehicle_condition?.toUpperCase() || 'N/A'}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Cost Breakdown */}
-                    <div style={{ ...billStyles.section, backgroundColor: '#f9fafb' }}>
-                        <div style={billStyles.sectionTitle}>Cost Breakdown</div>
-                        <div style={billStyles.costRow}>
-                            <span>Distance Cost ({booking.distance_traveled_km || 0} km)</span>
-                            <span>₹{booking.cost_per_distance?.toFixed(2) || '0.00'}</span>
-                        </div>
-                        <div style={billStyles.costRow}>
-                            <span>Time Cost ({booking.duration_hours || 0} hours)</span>
-                            <span>₹{booking.cost_per_time?.toFixed(2) || '0.00'}</span>
-                        </div>
-                        <div style={{ ...billStyles.costRow, color: '#666', fontStyle: 'italic' }}>
-                            <span>Applicable Cost (Higher of Distance/Time)</span>
-                            <span>₹{Math.max(booking.cost_per_distance || 0, booking.cost_per_time || 0).toFixed(2)}</span>
-                        </div>
-                        {(booking.damage_cost > 0 || returnDetails.damage_cost > 0) && (
-                            <div style={{ ...billStyles.costRow, color: '#dc2626' }}>
-                                <span>Damage Cost</span>
-                                <span>₹{(booking.damage_cost || returnDetails.damage_cost || 0).toFixed(2)}</span>
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4 bg-gray-50">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Cost Breakdown</div>
+                        <div className="space-y-2">
+                            <div className="flex justify-between py-2 border-b border-gray-200 text-xs sm:text-sm">
+                                <span>Distance Cost ({booking.distance_traveled_km || 0} km)</span>
+                                <span>₹{booking.cost_per_distance?.toFixed(2) || '0.00'}</span>
                             </div>
-                        )}
-                        <div style={billStyles.totalRow}>
-                            <span>TOTAL AMOUNT</span>
-                            <span style={{ color: '#16a34a' }}>₹{booking.final_cost?.toFixed(2) || '0.00'}</span>
+                            <div className="flex justify-between py-2 border-b border-gray-200 text-xs sm:text-sm">
+                                <span>Time Cost ({booking.duration_hours || 0} hours)</span>
+                                <span>₹{booking.cost_per_time?.toFixed(2) || '0.00'}</span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b border-gray-200 text-xs sm:text-sm text-gray-500 italic">
+                                <span>Applicable Cost (Higher of Distance/Time)</span>
+                                <span>₹{Math.max(booking.cost_per_distance || 0, booking.cost_per_time || 0).toFixed(2)}</span>
+                            </div>
+                            {(booking.damage_cost > 0 || returnDetails.damage_cost > 0) && (
+                                <div className="flex justify-between py-2 border-b border-gray-200 text-xs sm:text-sm text-red-600">
+                                    <span>Damage Cost</span>
+                                    <span>₹{(booking.damage_cost || returnDetails.damage_cost || 0).toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between py-3 border-t-2 border-black mt-3 text-base sm:text-lg font-bold">
+                                <span>TOTAL AMOUNT</span>
+                                <span className="text-green-600">₹{booking.final_cost?.toFixed(2) || '0.00'}</span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Damage Notes (if any) */}
                     {returnDetails.damage_description && (
-                        <div style={{ ...billStyles.section, borderColor: '#dc2626' }}>
-                            <div style={{ ...billStyles.sectionTitle, color: '#dc2626' }}>Damage Notes</div>
-                            <p style={{ fontSize: '13px', color: '#dc2626', margin: 0 }}>
+                        <div className="mb-4 sm:mb-6 border border-red-600 p-3 sm:p-4">
+                            <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-red-600 uppercase border-b-2 border-red-600 pb-2">Damage Notes</div>
+                            <p className="text-xs sm:text-sm text-red-600 m-0">
                                 {returnDetails.damage_description}
                             </p>
                         </div>
@@ -357,62 +234,34 @@ const FinalBillModal = ({ booking, onClose }) => {
 
                     {/* Return Notes (if any) */}
                     {returnDetails.return_notes && (
-                        <div style={billStyles.section}>
-                            <div style={billStyles.sectionTitle}>Return Notes</div>
-                            <p style={{ fontSize: '13px', color: '#333', margin: 0 }}>
+                        <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
+                            <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Return Notes</div>
+                            <p className="text-xs sm:text-sm text-gray-600 m-0">
                                 {returnDetails.return_notes}
                             </p>
                         </div>
                     )}
 
                     {/* Footer */}
-                    <div style={billStyles.footer}>
-                        <p style={billStyles.footerText}>
+                    <div className="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t-[3px] border-black text-center">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mb-8 sm:mb-12">
                             Thank you for choosing YatraMate! We hope you had a great journey.
                         </p>
                     </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div style={{
-                    position: 'sticky',
-                    bottom: 0,
-                    backgroundColor: '#ffffff',
-                    borderTop: '1px solid #ddd',
-                    padding: '20px 30px',
-                    display: 'flex',
-                    gap: '15px',
-                }}>
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-3 sm:p-4 md:p-5 flex flex-col sm:flex-row gap-2 sm:gap-4">
                     <button
                         onClick={downloadPDF}
-                        style={{
-                            flex: 1,
-                            padding: '12px 24px',
-                            backgroundColor: '#16a34a',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            fontSize: '15px',
-                        }}
+                        className="flex-1 py-3 sm:py-3 px-4 sm:px-6 bg-green-600 text-white border-none rounded-md font-semibold cursor-pointer text-sm sm:text-base hover:bg-green-700 transition-colors"
                         data-testid="download-final-bill-pdf-btn"
                     >
                         Download Bill PDF
                     </button>
                     <button
                         onClick={onClose}
-                        style={{
-                            flex: 1,
-                            padding: '12px 24px',
-                            backgroundColor: '#fff',
-                            color: '#16a34a',
-                            border: '2px solid #16a34a',
-                            borderRadius: '6px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            fontSize: '15px',
-                        }}
+                        className="flex-1 py-3 sm:py-3 px-4 sm:px-6 bg-white text-green-600 border-2 border-green-600 rounded-md font-semibold cursor-pointer text-sm sm:text-base hover:bg-green-50 transition-colors"
                         data-testid="close-final-bill-btn"
                     >
                         Close
