@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { sendEmail, generateOTP } = require('../utils/email');
 
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
@@ -83,6 +84,10 @@ exports.register = catchAsync(async (req, res, next) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+
     // Create new user
     const newUser = await User.create({
         name,
@@ -90,10 +95,102 @@ exports.register = catchAsync(async (req, res, next) => {
         password_hash: hashedPassword,
         phone,
         address,
-        role: 'user'
+        role: 'user',
+        otp,
+        otp_expires,
+        is_verified: false,
     });
 
-    createSendToken(req, res, newUser, 201);
+    try {
+        await sendEmail({
+            email: newUser.email,
+            subject: 'Your YatraMate OTP for Registration',
+            message: `Your OTP for YatraMate registration is: <b>${otp}</b>. It is valid for 10 minutes.`,
+        });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'OTP sent to your email! Please verify your account.',
+            data: {
+                userId: newUser._id,
+            },
+        });
+    } catch (err) {
+        newUser.otp = undefined;
+        newUser.otp_expires = undefined;
+        await newUser.save({ validateBeforeSave: false });
+        return next(
+            new AppError(
+                'There was an error sending the email. Please try again later!',
+                500
+            )
+        );
+    }
+});
+
+exports.verifyOtp = catchAsync(async (req, res, next) => {
+    const { email, otp } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    if (user.otp !== otp || user.otp_expires < Date.now()) {
+        return next(new AppError('Invalid or expired OTP', 400));
+    }
+
+    user.is_verified = true;
+    user.otp = undefined;
+    user.otp_expires = undefined;
+    await user.save();
+
+    createSendToken(req, res, user, 200);
+});
+
+exports.resendOtp = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    if (user.is_verified) {
+        return next(new AppError('User is already verified', 400));
+    }
+
+    const otp = generateOTP();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+
+    user.otp = otp;
+    user.otp_expires = otpExpires;
+    await user.save({ validateBeforeSave: false });
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Your YatraMate OTP for Registration (Resend)',
+            message: `Your new OTP for YatraMate registration is: <b>${otp}</b>. It is valid for 10 minutes.`,
+        });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'New OTP sent to your email!',
+        });
+    } catch (err) {
+        user.otp = undefined;
+        user.otp_expires = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(
+            new AppError(
+                'There was an error sending the email. Please try again later!',
+                500
+            )
+        );
+    }
 });
 
 // Login user (all roles)
@@ -119,6 +216,11 @@ exports.login = catchAsync(async (req, res, next) => {
         user = await User.findOne({ email });
         if (!user) {
             return next(new AppError('Incorrect email or password', 401));
+        }
+
+        // Check if user is verified
+        if (!user.is_verified) {
+            return next(new AppError('Please verify your email to log in', 401));
         }
 
         // If role is specified, verify it matches

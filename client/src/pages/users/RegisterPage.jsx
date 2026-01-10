@@ -93,8 +93,8 @@ const RegisterPage = () => {
         setLoading(false);
 
         if (result.success) {
-          toast.success('Registration successful!');
-          navigate('/');
+          toast.success('Registration successful! Please check your email for OTP verification.');
+          navigate('/verify-otp', { state: { email: formData.email } });
         } else {
           toast.error(result.message || 'Registration failed. Please try again.');
         }

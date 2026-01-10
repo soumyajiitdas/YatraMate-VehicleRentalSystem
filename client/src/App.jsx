@@ -17,6 +17,7 @@ const ProfilePage = lazy(() => import('./pages/users/ProfilePage'));
 const LoginPage = lazy(() => import('./pages/users/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/users/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/users/ForgotPasswordPage'));
+const OtpVerificationPage = lazy(() => import('./pages/users/OtpVerificationPage'));
 const VendorPage = lazy(() => import('./pages/VendorPage'));
 const VendorDashboard = lazy(() => import('./pages/dashboards/VendorDashboard'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
@@ -34,7 +35,7 @@ function AppContent() {
   const { user, loading, isAuthenticated } = useAuth();
   const hideNavbarRoutes = ['/admin', '/office-staff', '/vendor-dashboard'];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
-  const redirectableRoutes = ['/', '/login', '/register', '/vendor'];
+  const redirectableRoutes = ['/', '/login', '/register', '/verify-otp', '/vendor'];
 
   useEffect(() => {
     if (loading || !isAuthenticated || !user) {
@@ -69,6 +70,7 @@ function AppContent() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/verify-otp" element={<OtpVerificationPage />} />
             <Route path="/vendor" element={<VendorPage />} />
             <Route path="/vendor-dashboard" element={<VendorDashboard />} />
             <Route path="/office-staff" element={<OfficeStaffDashboard />} />

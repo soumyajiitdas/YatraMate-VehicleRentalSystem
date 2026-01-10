@@ -91,7 +91,12 @@ const LoginPage = () => {
             navigate('/');
           }
         } else {
-          toast.error(result.message || 'Login failed. Please check your credentials.');
+          if (result.message === 'Please verify your email to log in') {
+            toast.error(result.message);
+            navigate('/verify-otp', { state: { email: formData.email } });
+          } else {
+            toast.error(result.message || 'Login failed. Please check your credentials.');
+          }
         }
       } catch (error) {
         setLoading(false);
