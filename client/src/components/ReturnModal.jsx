@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { API_ENDPOINTS } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import CustomDropdown from './common/CustomDropdown';
 import FinalBillModal from './FinalBillModal';
+import PaymentSuccessModal from './PaymentSuccessModal';
 
 const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const { user } = useAuth();
@@ -32,6 +33,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const [cashPaymentConfirmed, setCashPaymentConfirmed] = useState(false);
     const [onlinePaymentCompleted, setOnlinePaymentCompleted] = useState(false);
     const [onlinePaymentDetails, setOnlinePaymentDetails] = useState(null);
+    const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
 
     // Get advance payment amount from booking
     const advancePaid = booking?.advance_payment?.amount || 0;
@@ -333,7 +335,8 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                 paymentId: response.razorpay_payment_id,
                                 amount: orderData.data.amount
                             });
-                            toast.success('Payment successful!');
+                            // Show the payment success modal
+                            setShowPaymentSuccessModal(true);
                         } else {
                             toast.error(verifyData.message || 'Payment verification failed');
                         }
@@ -372,6 +375,55 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             setLoading(false);
         }
     };
+
+    // Handle payment success modal close - auto submit the return form
+    const handlePaymentSuccessClose = useCallback(async () => {
+        setShowPaymentSuccessModal(false);
+        toast.success('Payment collected successfully!');
+        
+        // Auto-submit the return form after a brief delay
+        setTimeout(async () => {
+            setLoading(true);
+            try {
+                const staffId = user?.id;
+                if (!staffId) {
+                    toast.error('Staff ID not found. Please logout and login again.');
+                    setLoading(false);
+                    return;
+                }
+
+                const payload = {
+                    ...formData,
+                    staff_id: staffId,
+                    payment_done: true,
+                    amount_paid: costBreakdown ? costBreakdown.totalCost : 0
+                };
+
+                const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    toast.success(`Vehicle return confirmed! Final cost: ₹${data.data.booking.final_cost.toFixed(2)}`);
+                    // Show the final bill modal with the completed booking data
+                    setCompletedBooking(data.data.booking);
+                    setShowFinalBill(true);
+                } else {
+                    toast.error(data.message || 'Failed to confirm return');
+                }
+            } catch (error) {
+                console.error('Error confirming return:', error);
+                toast.error('Failed to confirm return. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        }, 500);
+    }, [user, formData, costBreakdown, booking._id, toast]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -902,6 +954,15 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                     </div>
                 </form>
             </div>
+
+            {/* Payment Success Modal - shown after successful Razorpay payment */}
+            {showPaymentSuccessModal && onlinePaymentDetails && (
+                <PaymentSuccessModal
+                    paymentDetails={onlinePaymentDetails}
+                    onClose={handlePaymentSuccessClose}
+                    autoCloseDelay={3000}
+                />
+            )}
 
             {/* Final Bill Modal - shown after successful return */}
             {showFinalBill && completedBooking && (
