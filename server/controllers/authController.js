@@ -5,7 +5,7 @@ const User = require('../models/User');
 const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const { sendOTPEmail } = require('../utils/email');
+const { sendOTPEmail, sendPasswordResetEmail } = require('../utils/email');
 
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
@@ -468,5 +468,96 @@ exports.registerVendor = catchAsync(async (req, res, next) => {
                 is_verified: newVendor.is_verified
             }
         }
+    });
+});
+
+// Forgot Password - Send reset token via email
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return next(new AppError('Please provide your email address', 400));
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return next(new AppError('No user found with this email address', 404));
+    }
+
+    // Generate reset token (using crypto for secure random token)
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    // Hash the token before saving to database
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // Set token and expiry (10 minutes)
+    user.password_reset_token = hashedToken;
+    user.password_reset_expires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset URL - use frontend URL
+    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetURL = `${frontendURL}/reset-password/${resetToken}`;
+
+    try {
+        await sendPasswordResetEmail(email, resetURL, user.name);
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Password reset link has been sent to your email.'
+        });
+    } catch (emailError) {
+        // If email fails, clear the reset token
+        user.password_reset_token = undefined;
+        user.password_reset_expires = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        console.error('Email sending failed:', emailError);
+        return next(new AppError('Failed to send password reset email. Please try again.', 500));
+    }
+});
+
+// Reset Password - Verify token and update password
+exports.resetPassword = catchAsync(async (req, res, next) => {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+        return next(new AppError('Please provide reset token and new password', 400));
+    }
+
+    if (password.length < 8) {
+        return next(new AppError('Password must be at least 8 characters long', 400));
+    }
+
+    // Hash the provided token to compare with stored hash
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    // Find user with valid token and non-expired
+    const user = await User.findOne({
+        password_reset_token: hashedToken,
+        password_reset_expires: { $gt: Date.now() }
+    }).select('+password_reset_token +password_reset_expires');
+
+    if (!user) {
+        return next(new AppError('Invalid or expired password reset token', 400));
+    }
+
+    // Update password
+    user.password_hash = await bcrypt.hash(password, 12);
+    user.password_reset_token = undefined;
+    user.password_reset_expires = undefined;
+    await user.save();
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Password has been reset successfully. You can now login with your new password.'
     });
 });

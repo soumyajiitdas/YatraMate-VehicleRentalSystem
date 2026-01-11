@@ -11,6 +11,8 @@ router.post('/resend-otp', authController.resendOTP);
 router.post('/register-vendor', authController.registerVendor);
 router.post('/login', authController.login);
 router.get('/logout', authController.logout);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
 // Protected routes
 router.use(protect);

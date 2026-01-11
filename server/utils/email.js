@@ -91,7 +91,78 @@ const sendOTPEmail = async (email, otp, name) => {
     });
 };
 
+const sendPasswordResetEmail = async (email, resetURL, name) => {
+    const subject = 'Reset Your Password - YatraMate';
+    
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 40px;">
+                                <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 22px; font-weight: 600;">Reset Your Password</h2>
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi ${name},</p>
+                                <p style="margin: 0 0 30px; color: #4b5563; font-size: 16px; line-height: 1.6;">We received a request to reset your password. Click the button below to create a new password:</p>
+                                
+                                <!-- Reset Button -->
+                                <div style="text-align: center; margin-bottom: 30px;">
+                                    <a href="${resetURL}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 12px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);">Reset Password</a>
+                                </div>
+                                
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px; line-height: 1.6;">This link is valid for <strong>10 minutes</strong>.</p>
+                                <p style="margin: 0 0 20px; color: #6b7280; font-size: 14px; line-height: 1.6;">If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
+                                
+                                <!-- Alternative Link -->
+                                <div style="background: #f3f4f6; border-radius: 8px; padding: 15px; margin-top: 20px;">
+                                    <p style="margin: 0 0 10px; color: #6b7280; font-size: 12px;">If the button doesn't work, copy and paste this link into your browser:</p>
+                                    <p style="margin: 0; color: #6366f1; font-size: 12px; word-break: break-all;">${resetURL}</p>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 20px 40px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${name},\n\nWe received a request to reset your password.\n\nPlease click the following link to reset your password:\n${resetURL}\n\nThis link is valid for 10 minutes.\n\nIf you didn't request a password reset, please ignore this email.\n\nBest regards,\nYatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
 module.exports = {
     sendEmail,
-    sendOTPEmail
+    sendOTPEmail,
+    sendPasswordResetEmail
 };

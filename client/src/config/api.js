@@ -11,6 +11,8 @@ export const API_ENDPOINTS = {
     currentUser: `${API_BASE_URL}/auth/me`,
     updatePassword: `${API_BASE_URL}/auth/update-password`,
     updateProfile: `${API_BASE_URL}/auth/update-profile`,
+    forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
+    resetPassword: `${API_BASE_URL}/auth/reset-password`,
 
     // User endpoints
     users: `${API_BASE_URL}/users`,
