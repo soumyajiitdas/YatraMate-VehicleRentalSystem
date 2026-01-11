@@ -93,8 +93,16 @@ const RegisterPage = () => {
         setLoading(false);
 
         if (result.success) {
-          toast.success('Registration successful!');
-          navigate('/');
+          // Check if email verification is required
+          if (result.requiresVerification || result.data?.requiresVerification) {
+            toast.success(result.message || 'Registration successful! Please verify your email.');
+            // Navigate to OTP verification page with email
+            navigate('/verify-otp', { state: { email: formData.email } });
+          } else {
+            // Direct login (for existing verified users or if OTP is disabled)
+            toast.success('Registration successful!');
+            navigate('/');
+          }
         } else {
           toast.error(result.message || 'Registration failed. Please try again.');
         }
@@ -134,6 +142,7 @@ const RegisterPage = () => {
                   errors.name ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                 }`}
                 placeholder="Enter your full name"
+                data-testid="register-name-input"
               />
               {errors.name && <p className="mt-1 text-sm text-secondary-600">{errors.name}</p>}
             </div>
@@ -153,6 +162,7 @@ const RegisterPage = () => {
                   errors.email ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                 }`}
                 placeholder="Enter your email"
+                data-testid="register-email-input"
               />
               {errors.email && <p className="mt-1 text-sm text-secondary-600">{errors.email}</p>}
             </div>
@@ -177,6 +187,7 @@ const RegisterPage = () => {
                   }`}
                   placeholder="0000000000"
                   maxLength="10"
+                  data-testid="register-phone-input"
                 />
               </div>
               {errors.phone && <p className="mt-1 text-sm text-secondary-600">{errors.phone}</p>}
@@ -197,6 +208,7 @@ const RegisterPage = () => {
                   errors.password ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                 }`}
                 placeholder="Create a password"
+                data-testid="register-password-input"
               />
               {errors.password && <p className="mt-1 text-sm text-secondary-600">{errors.password}</p>}
             </div>
@@ -216,6 +228,7 @@ const RegisterPage = () => {
                   errors.confirmPassword ? 'border-secondary-500' : 'border-neutral-200 focus:border-primary-500'
                 }`}
                 placeholder="Confirm your password"
+                data-testid="register-confirm-password-input"
               />
               {errors.confirmPassword && <p className="mt-1 text-sm text-secondary-600">{errors.confirmPassword}</p>}
             </div>
@@ -229,6 +242,7 @@ const RegisterPage = () => {
                   checked={formData.agreeToTerms}
                   onChange={handleChange}
                   className="w-4 h-4 mt-1 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                  data-testid="register-terms-checkbox"
                 />
                 <span className="text-sm text-neutral-700">
                   I agree to the{' '}
@@ -249,6 +263,7 @@ const RegisterPage = () => {
               type="submit"
               disabled={loading}
               className="w-full py-3.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-bold text-lg hover:shadow-glow transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+              data-testid="register-submit-btn"
             >
               {loading ? (
                 <>

@@ -16,9 +16,62 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
-                return { success: true, data: data.data };
+                return { 
+                    success: true, 
+                    data: data.data, 
+                    message: data.message,
+                    requiresVerification: data.data?.requiresVerification 
+                };
             } else {
                 return { success: false, message: data.message || 'Registration failed' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Verify OTP
+    async verifyOtp(email, otp) {
+        try {
+            const response = await fetch(API_ENDPOINTS.verifyOtp, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email, otp })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, data: data.data };
+            } else {
+                return { success: false, message: data.message || 'OTP verification failed' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Resend OTP
+    async resendOtp(email) {
+        try {
+            const response = await fetch(API_ENDPOINTS.resendOtp, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, message: data.message };
+            } else {
+                return { success: false, message: data.message || 'Failed to resend OTP' };
             }
         } catch (error) {
             return { success: false, message: error.message };
@@ -66,7 +119,12 @@ class AuthService {
             if (data.status === 'success') {
                 return { success: true, data: data.data };
             } else {
-                return { success: false, message: data.message || 'Login failed' };
+                return { 
+                    success: false, 
+                    message: data.message || 'Login failed',
+                    requiresVerification: data.requiresVerification,
+                    email: data.email
+                };
             }
         } catch (error) {
             return { success: false, message: error.message };

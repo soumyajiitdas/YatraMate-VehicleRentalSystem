@@ -91,7 +91,13 @@ const LoginPage = () => {
             navigate('/');
           }
         } else {
-          toast.error(result.message || 'Login failed. Please check your credentials.');
+          // Check if email verification is required
+          if (result.requiresVerification && result.email) {
+            toast.error(result.message || 'Please verify your email first.');
+            navigate('/verify-otp', { state: { email: result.email } });
+          } else {
+            toast.error(result.message || 'Login failed. Please check your credentials.');
+          }
         }
       } catch (error) {
         setLoading(false);

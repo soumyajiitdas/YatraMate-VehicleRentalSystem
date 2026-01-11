@@ -1,9 +1,11 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const User = require('../models/User');
 const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { sendOTPEmail } = require('../utils/email');
 
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
@@ -50,6 +52,8 @@ const createSendToken = (req, res, user, statusCode, role = null) => {
     // Remove password from output
     const userObj = user.toObject();
     delete userObj.password_hash;
+    delete userObj.email_otp;
+    delete userObj.email_otp_expires;
 
     res.status(statusCode).json({
         status: 'success',
@@ -70,30 +74,170 @@ const createSendToken = (req, res, user, statusCode, role = null) => {
     });
 };
 
-// Register new user (customer)
+// Generate 6-digit OTP
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Register new user (customer) - Now requires email verification
 exports.register = catchAsync(async (req, res, next) => {
     const { name, email, password, phone, address } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+        // If user exists but is not verified, allow re-registration
+        if (!existingUser.is_verified) {
+            // Generate new OTP
+            const otp = generateOTP();
+            const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+            // Update existing user with new data and OTP
+            existingUser.name = name;
+            existingUser.password_hash = await bcrypt.hash(password, 12);
+            existingUser.phone = phone;
+            existingUser.address = address;
+            existingUser.email_otp = otp;
+            existingUser.email_otp_expires = otpExpires;
+            await existingUser.save();
+
+            // Send OTP email
+            try {
+                await sendOTPEmail(email, otp, name);
+            } catch (emailError) {
+                console.error('Email sending failed:', emailError);
+                return next(new AppError('Failed to send verification email. Please try again.', 500));
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                message: 'Verification OTP has been sent to your email.',
+                data: {
+                    email: email,
+                    requiresVerification: true
+                }
+            });
+        }
         return next(new AppError('User with this email already exists', 400));
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create new user
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Create new user (unverified)
     const newUser = await User.create({
         name,
         email,
         password_hash: hashedPassword,
         phone,
         address,
-        role: 'user'
+        role: 'user',
+        is_verified: false,
+        email_otp: otp,
+        email_otp_expires: otpExpires
     });
 
-    createSendToken(req, res, newUser, 201);
+    // Send OTP email
+    try {
+        await sendOTPEmail(email, otp, name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Delete the user if email fails
+        await User.findByIdAndDelete(newUser._id);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(201).json({
+        status: 'success',
+        message: 'Registration successful! Please verify your email with the OTP sent.',
+        data: {
+            email: email,
+            requiresVerification: true
+        }
+    });
+});
+
+// Verify email OTP
+exports.verifyOTP = catchAsync(async (req, res, next) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return next(new AppError('Please provide email and OTP', 400));
+    }
+
+    // Find user with OTP fields
+    const user = await User.findOne({ email }).select('+email_otp +email_otp_expires');
+
+    if (!user) {
+        return next(new AppError('No user found with this email', 404));
+    }
+
+    if (user.is_verified) {
+        return next(new AppError('Email is already verified', 400));
+    }
+
+    // Check if OTP matches
+    if (user.email_otp !== otp) {
+        return next(new AppError('Invalid OTP', 400));
+    }
+
+    // Check if OTP has expired
+    if (user.email_otp_expires < Date.now()) {
+        return next(new AppError('OTP has expired. Please request a new one.', 400));
+    }
+
+    // Mark user as verified and clear OTP
+    user.is_verified = true;
+    user.email_otp = undefined;
+    user.email_otp_expires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    // Log in the user
+    createSendToken(req, res, user, 200);
+});
+
+// Resend OTP
+exports.resendOTP = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return next(new AppError('Please provide email', 400));
+    }
+
+    const user = await User.findOne({ email }).select('+email_otp +email_otp_expires');
+
+    if (!user) {
+        return next(new AppError('No user found with this email', 404));
+    }
+
+    if (user.is_verified) {
+        return next(new AppError('Email is already verified', 400));
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.email_otp = otp;
+    user.email_otp_expires = otpExpires;
+    await user.save({ validateBeforeSave: false });
+
+    // Send OTP email
+    try {
+        await sendOTPEmail(email, otp, user.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'New OTP has been sent to your email.'
+    });
 });
 
 // Login user (all roles)
@@ -119,6 +263,16 @@ exports.login = catchAsync(async (req, res, next) => {
         user = await User.findOne({ email });
         if (!user) {
             return next(new AppError('Incorrect email or password', 401));
+        }
+
+        // Check if email is verified (only for regular users, not admin/office_staff)
+        if (user.role === 'user' && !user.is_verified) {
+            return res.status(401).json({
+                status: 'fail',
+                message: 'Please verify your email before logging in.',
+                requiresVerification: true,
+                email: email
+            });
         }
 
         // If role is specified, verify it matches

@@ -56,6 +56,21 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
+
+        is_verified: {
+            type: Boolean,
+            default: false,
+        },
+
+        email_otp: {
+            type: String,
+            select: false,
+        },
+
+        email_otp_expires: {
+            type: Date,
+            select: false,
+        },
     },
     {
         timestamps: true,

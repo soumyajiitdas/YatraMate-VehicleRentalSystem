@@ -4,6 +4,8 @@ export const API_ENDPOINTS = {
     // Auth endpoints
     login: `${API_BASE_URL}/auth/login`,
     register: `${API_BASE_URL}/auth/register`,
+    verifyOtp: `${API_BASE_URL}/auth/verify-otp`,
+    resendOtp: `${API_BASE_URL}/auth/resend-otp`,
     registerVendor: `${API_BASE_URL}/auth/register-vendor`,
     logout: `${API_BASE_URL}/auth/logout`,
     currentUser: `${API_BASE_URL}/auth/me`,
