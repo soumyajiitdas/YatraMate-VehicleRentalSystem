@@ -34,43 +34,13 @@ const VehicleDetailsPage = () => {
   };
 
   const handleBooking = async (bookingData) => {
-    try {
-      // Parse datetime fields to separate date and time
-      const pickupDate = new Date(bookingData.pickup_datetime);
-      const pickupTime = pickupDate.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+    // This is called after successful payment, navigate to bookings
+    navigate('/bookings');
+  };
 
-      const payload = {
-        vehicle_id: bookingData.vehicle_id,
-        start_location: bookingData.pickup_location,
-        requested_pickup_date: pickupDate.toISOString(),
-        requested_pickup_time: pickupTime
-      };
-
-      const response = await fetch(API_ENDPOINTS.bookingRequest, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.status === 'success') {
-        toast.success('Booking request submitted successfully! You will be redirected to your bookings page.');
-        navigate('/bookings');
-      } else {
-        toast.error(data.message || 'Failed to submit booking request. Please make sure you are logged in.');
-      }
-    } catch (error) {
-      console.error('Error submitting booking:', error);
-      toast.error('Failed to submit booking request. Please try again.');
-    }
+  const handlePaymentSuccess = (booking) => {
+    // Called after successful Razorpay payment
+    console.log('Booking created:', booking);
   };
 
   if (loading) {
@@ -275,7 +245,7 @@ const VehicleDetailsPage = () => {
           {/* Right Column - Booking Form */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              <BookingForm vehicle={vehicle} onSubmit={handleBooking} />
+              <BookingForm vehicle={vehicle} onSubmit={handleBooking} onPaymentSuccess={handlePaymentSuccess} />
             </div>
           </div>
         </div>

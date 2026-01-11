@@ -50,6 +50,13 @@ export const API_ENDPOINTS = {
     payments: `${API_BASE_URL}/payments`,
     paymentById: (id) => `${API_BASE_URL}/payments/${id}`,
 
+    // Razorpay endpoints
+    razorpayKey: `${API_BASE_URL}/razorpay/key`,
+    createAdvanceOrder: `${API_BASE_URL}/razorpay/create-advance-order`,
+    verifyAdvancePayment: `${API_BASE_URL}/razorpay/verify-advance-payment`,
+    createFinalOrder: `${API_BASE_URL}/razorpay/create-final-order`,
+    verifyFinalPayment: `${API_BASE_URL}/razorpay/verify-final-payment`,
+
     // Upload endpoints
     uploadAuth: `${API_BASE_URL}/upload/auth`,
     uploadFile: `${API_BASE_URL}/upload/file`,
