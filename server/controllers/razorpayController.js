@@ -7,11 +7,18 @@ const Package = require('../models/Package');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-    key_id: process.env.RZP_API_KEY,
-    key_secret: process.env.RZP_KEY_SECRET
-});
+// Lazy initialization of Razorpay instance
+let razorpay = null;
+
+const getRazorpayInstance = () => {
+    if (!razorpay) {
+        razorpay = new Razorpay({
+            key_id: process.env.RZP_API_KEY,
+            key_secret: process.env.RZP_KEY_SECRET
+        });
+    }
+    return razorpay;
+};
 
 // Create order for advance payment (40% of estimated cost)
 exports.createAdvancePaymentOrder = catchAsync(async (req, res, next) => {
@@ -40,7 +47,7 @@ exports.createAdvancePaymentOrder = catchAsync(async (req, res, next) => {
     };
     
     try {
-        const order = await razorpay.orders.create(options);
+        const order = await getRazorpayInstance().orders.create(options);
         
         res.status(200).json({
             status: 'success',
@@ -200,7 +207,7 @@ exports.createFinalPaymentOrder = catchAsync(async (req, res, next) => {
     };
     
     try {
-        const order = await razorpay.orders.create(options);
+        const order = await getRazorpayInstance().orders.create(options);
         
         res.status(200).json({
             status: 'success',

@@ -28,8 +28,13 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [costBreakdown, setCostBreakdown] = useState(null);
-    const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' or 'upi'
+    const [paymentMethod, setPaymentMethod] = useState('cash'); // 'cash' or 'online'
     const [cashPaymentConfirmed, setCashPaymentConfirmed] = useState(false);
+    const [onlinePaymentCompleted, setOnlinePaymentCompleted] = useState(false);
+    const [onlinePaymentDetails, setOnlinePaymentDetails] = useState(null);
+
+    // Get advance payment amount from booking
+    const advancePaid = booking?.advance_payment?.amount || 0;
 
     // ---- Local Date/Time Parsing Utilities (supports DD/MM/YYYY and YYYY-MM-DD and MM/DD/YYYY) ----
     const parseTimeString = (t) => {
@@ -170,6 +175,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         const maxCost = Math.max(costPerDistance, costPerTime);
         const damageCost = parseFloat(currentFormData.damage_cost || 0) || 0;
         const totalCost = maxCost + damageCost;
+        
+        // Calculate remaining amount after advance payment
+        const remainingAmount = Math.max(0, totalCost - advancePaid);
 
         setCostBreakdown({
             distanceTraveled,
@@ -180,7 +188,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             costPerTime,
             maxCost,
             damageCost,
-            totalCost
+            totalCost,
+            advancePaid,
+            remainingAmount
         });
     };
 
@@ -214,15 +224,153 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             newErrors.damage_description = 'Damage description is required';
         }
 
-        // Payment validation for cash method only
+        // Payment validation
         if (paymentMethod === 'cash') {
             if (!cashPaymentConfirmed) {
                 newErrors.payment_confirmation = 'Please confirm that payment has been collected';
+            }
+        } else if (paymentMethod === 'online') {
+            if (!onlinePaymentCompleted && costBreakdown && costBreakdown.remainingAmount > 0) {
+                newErrors.payment_confirmation = 'Please complete the online payment first';
             }
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    // Load Razorpay SDK
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    // Handle online payment via Razorpay
+    const handleOnlinePayment = async () => {
+        if (!costBreakdown || costBreakdown.remainingAmount <= 0) {
+            toast.info('No remaining amount to pay');
+            setOnlinePaymentCompleted(true);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Load Razorpay SDK
+            const razorpayLoaded = await loadRazorpay();
+            if (!razorpayLoaded) {
+                toast.error('Failed to load payment gateway. Please refresh and try again.');
+                setLoading(false);
+                return;
+            }
+
+            // Create order for final payment
+            const orderResponse = await fetch(API_ENDPOINTS.createFinalOrder, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    booking_id: booking._id,
+                    final_amount: costBreakdown.totalCost,
+                    advance_paid: advancePaid
+                })
+            });
+
+            const orderData = await orderResponse.json();
+
+            if (orderData.status !== 'success') {
+                toast.error(orderData.message || 'Failed to create payment order');
+                setLoading(false);
+                return;
+            }
+
+            // Check if no remaining amount
+            if (orderData.data.remaining_amount === 0) {
+                toast.success('No remaining amount to pay. Advance covers the full cost.');
+                setOnlinePaymentCompleted(true);
+                setOnlinePaymentDetails({ amount: 0, message: 'Fully covered by advance' });
+                setLoading(false);
+                return;
+            }
+
+            // Razorpay options
+            const options = {
+                key: orderData.data.key_id,
+                amount: orderData.data.amount_in_paise,
+                currency: orderData.data.currency,
+                name: 'YatraMate',
+                description: `Final Payment for Booking`,
+                order_id: orderData.data.order_id,
+                handler: async function (response) {
+                    try {
+                        // Verify payment
+                        const verifyResponse = await fetch(API_ENDPOINTS.verifyFinalPayment, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                booking_id: booking._id,
+                                amount: orderData.data.amount
+                            })
+                        });
+
+                        const verifyData = await verifyResponse.json();
+
+                        if (verifyData.status === 'success') {
+                            setOnlinePaymentCompleted(true);
+                            setOnlinePaymentDetails({
+                                paymentId: response.razorpay_payment_id,
+                                amount: orderData.data.amount
+                            });
+                            toast.success('Payment successful!');
+                        } else {
+                            toast.error(verifyData.message || 'Payment verification failed');
+                        }
+                    } catch (error) {
+                        console.error('Payment verification error:', error);
+                        toast.error('Payment verification failed. Please contact support.');
+                    }
+                    setLoading(false);
+                },
+                prefill: {
+                    name: booking.user_id?.name || '',
+                    email: booking.user_id?.email || '',
+                    contact: booking.user_id?.phone || ''
+                },
+                theme: {
+                    color: '#10b981'
+                },
+                modal: {
+                    ondismiss: function() {
+                        setLoading(false);
+                        toast.info('Payment cancelled');
+                    }
+                }
+            };
+
+            const razorpay = new window.Razorpay(options);
+            razorpay.on('payment.failed', function (response) {
+                toast.error(`Payment failed: ${response.error.description}`);
+                setLoading(false);
+            });
+            razorpay.open();
+
+        } catch (error) {
+            console.error('Payment error:', error);
+            toast.error('Something went wrong. Please try again.');
+            setLoading(false);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -241,7 +389,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
             const payload = {
                 ...formData,
                 staff_id: staffId,
-                payment_done: paymentMethod === 'cash' && cashPaymentConfirmed,
+                payment_done: paymentMethod === 'cash' ? cashPaymentConfirmed : onlinePaymentCompleted,
                 amount_paid: costBreakdown ? costBreakdown.totalCost : 0
             };
 
@@ -311,6 +459,12 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                 <span className="text-gray-500">ID Number:</span>
                                 <span className="ml-2 font-medium">{booking.pickup_details.id_number || 'N/A'}</span>
                             </div>
+                            {advancePaid > 0 && (
+                                <div>
+                                    <span className="text-gray-500">Advance Paid:</span>
+                                    <span className="ml-2 font-medium text-green-600">₹{advancePaid}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -529,6 +683,20 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     <span>Total Amount:</span>
                                     <span data-testid="total-amount">₹{costBreakdown.totalCost.toFixed(2)}</span>
                                 </div>
+                                
+                                {/* Advance Payment Info */}
+                                {costBreakdown.advancePaid > 0 && (
+                                    <>
+                                        <div className="flex justify-between pt-2 border-t border-green-200">
+                                            <span className="text-green-700">Advance Paid:</span>
+                                            <span className="font-medium text-green-600" data-testid="advance-paid">- ₹{costBreakdown.advancePaid.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-lg font-bold text-blue-900 pt-2 border-t-2 border-blue-300 bg-blue-50 -mx-4 px-4 py-2">
+                                            <span>Remaining to Collect:</span>
+                                            <span data-testid="remaining-amount">₹{costBreakdown.remainingAmount.toFixed(2)}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
@@ -552,7 +720,11 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                             ? 'border-green-500 bg-green-50' 
                                             : 'border-gray-300 bg-white hover:border-green-300'
                                     }`}
-                                    onClick={() => setPaymentMethod('cash')}
+                                    onClick={() => {
+                                        setPaymentMethod('cash');
+                                        setOnlinePaymentCompleted(false);
+                                        setOnlinePaymentDetails(null);
+                                    }}
                                     data-testid="cash-payment-option"
                                 >
                                     <div className="flex items-center">
@@ -562,10 +734,17 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                             name="payment_method"
                                             value="cash"
                                             checked={paymentMethod === 'cash'}
-                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            onChange={(e) => {
+                                                setPaymentMethod(e.target.value);
+                                                setOnlinePaymentCompleted(false);
+                                                setOnlinePaymentDetails(null);
+                                            }}
                                             className="w-5 h-5 text-green-600 border-2 border-gray-300 focus:ring-2 focus:ring-green-500"
                                         />
                                         <label htmlFor="payment_cash" className="ml-3 flex items-center cursor-pointer">
+                                            <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
                                             <span className="text-base font-semibold text-gray-900">Cash Payment</span>
                                         </label>
                                     </div>
@@ -583,10 +762,10 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                                     data-testid="cash-payment-confirmation-checkbox"
                                                 />
                                                 <label htmlFor="cash_payment_confirmed" className="ml-3 text-sm font-medium text-gray-900 cursor-pointer">
-                                                    I confirm that payment has been collected from the customer
+                                                    I confirm that payment of <span className="font-bold text-green-600">₹{costBreakdown ? costBreakdown.remainingAmount.toFixed(2) : '0.00'}</span> has been collected from the customer
                                                 </label>
                                             </div>
-                                            {errors.payment_confirmation && (
+                                            {errors.payment_confirmation && paymentMethod === 'cash' && (
                                                 <p className="mt-2 text-sm text-red-600" data-testid="payment-confirmation-error">
                                                     {errors.payment_confirmation}
                                                 </p>
@@ -595,45 +774,96 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                     )}
                                 </div>
 
-                                {/* UPI Payment Option */}
+                                {/* Online Payment Option */}
                                 <div 
                                     className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                                        paymentMethod === 'upi' 
+                                        paymentMethod === 'online' 
                                             ? 'border-purple-500 bg-purple-50' 
                                             : 'border-gray-300 bg-white hover:border-purple-300'
                                     }`}
-                                    onClick={() => setPaymentMethod('upi')}
-                                    data-testid="upi-payment-option"
+                                    onClick={() => {
+                                        setPaymentMethod('online');
+                                        setCashPaymentConfirmed(false);
+                                    }}
+                                    data-testid="online-payment-option"
                                 >
                                     <div className="flex items-center">
                                         <input
                                             type="radio"
-                                            id="payment_upi"
+                                            id="payment_online"
                                             name="payment_method"
-                                            value="upi"
-                                            checked={paymentMethod === 'upi'}
-                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            value="online"
+                                            checked={paymentMethod === 'online'}
+                                            onChange={(e) => {
+                                                setPaymentMethod(e.target.value);
+                                                setCashPaymentConfirmed(false);
+                                            }}
                                             className="w-5 h-5 text-purple-600 border-2 border-gray-300 focus:ring-2 focus:ring-purple-500"
                                         />
-                                        <label htmlFor="payment_upi" className="ml-3 flex items-center cursor-pointer">
-                                            <span className="text-base font-semibold text-gray-900">UPI Payment</span>
+                                        <label htmlFor="payment_online" className="ml-3 flex items-center cursor-pointer">
+                                            <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                            </svg>
+                                            <span className="text-base font-semibold text-gray-900">Online Payment (Razorpay)</span>
                                         </label>
                                     </div>
                                     
-                                    {/* UPI Not Available Message */}
-                                    {paymentMethod === 'upi' && (
-                                        <div className="mt-4 ml-8 pl-4 border-l-2 border-amber-400 bg-amber-50 p-3 rounded">
-                                            <div className="flex items-start">
-                                                <svg className="w-5 h-5 text-amber-600 mt-0.5 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                                <div>
-                                                    <p className="text-sm font-semibold text-amber-800">Payment Gateway Not Implemented</p>
-                                                    <p className="text-sm text-amber-700 mt-1">
-                                                        UPI payment gateway is not yet implemented. Please collect the payment in cash.
-                                                    </p>
+                                    {/* Online Payment Section */}
+                                    {paymentMethod === 'online' && (
+                                        <div className="mt-4 ml-8 pl-4 border-l-2 border-purple-400">
+                                            {onlinePaymentCompleted ? (
+                                                <div className="bg-green-100 p-3 rounded-lg border border-green-300">
+                                                    <div className="flex items-center">
+                                                        <svg className="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <div>
+                                                            <p className="font-semibold text-green-800">Payment Successful!</p>
+                                                            {onlinePaymentDetails?.paymentId && (
+                                                                <p className="text-sm text-green-700">Payment ID: {onlinePaymentDetails.paymentId}</p>
+                                                            )}
+                                                            {onlinePaymentDetails?.amount > 0 && (
+                                                                <p className="text-sm text-green-700">Amount Paid: ₹{onlinePaymentDetails.amount}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    <p className="text-sm text-purple-700">
+                                                        Click the button below to collect online payment of <span className="font-bold">₹{costBreakdown ? costBreakdown.remainingAmount.toFixed(2) : '0.00'}</span>
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleOnlinePayment}
+                                                        disabled={loading || !costBreakdown}
+                                                        className="w-full py-3 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+                                                        data-testid="pay-online-button"
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                <svg className="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                </svg>
+                                                                Processing...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                                                </svg>
+                                                                Pay ₹{costBreakdown ? costBreakdown.remainingAmount.toFixed(2) : '0.00'} via Razorpay
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                    {errors.payment_confirmation && paymentMethod === 'online' && (
+                                                        <p className="text-sm text-red-600" data-testid="payment-confirmation-error">
+                                                            {errors.payment_confirmation}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -644,7 +874,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                                 <div className="bg-white rounded-lg p-3 border-2 border-blue-200">
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm font-medium text-gray-700">Amount to be Collected:</span>
-                                        <span className="text-xl font-bold text-blue-900">₹{costBreakdown.totalCost.toFixed(2)}</span>
+                                        <span className="text-xl font-bold text-blue-900">₹{costBreakdown.remainingAmount.toFixed(2)}</span>
                                     </div>
                                 </div>
                             )}
@@ -663,7 +893,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                         </button>
                         <button
                             type="submit"
-                            disabled={loading || !costBreakdown || paymentMethod === 'upi' || (paymentMethod === 'cash' && !cashPaymentConfirmed)}
+                            disabled={loading || !costBreakdown || (paymentMethod === 'cash' && !cashPaymentConfirmed) || (paymentMethod === 'online' && !onlinePaymentCompleted)}
                             className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             data-testid="confirm-return-submit-button"
                         >
