@@ -21,9 +21,19 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         const result = await authService.register(userData);
+        return result;
+    };
+
+    const verifyOtp = async (email, otp) => {
+        const result = await authService.verifyOtp(email, otp);
         if (result.success) {
             setUser(result.data.user);
         }
+        return result;
+    };
+
+    const resendOtp = async (email) => {
+        const result = await authService.resendOtp(email);
         return result;
     };
 
@@ -71,6 +81,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!user,
         register,
+        verifyOtp,
+        resendOtp,
         registerVendor,
         login,
         logout,

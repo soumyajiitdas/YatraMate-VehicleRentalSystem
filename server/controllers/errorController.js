@@ -6,7 +6,24 @@ const handleCastErrorDB = err => {
 };
 
 const handleDuplicateFieldsDB = err => {
-    const value = err.errmsg.match(/(?<=")(\?*|.*)(?=")/)[0];
+    // Handle both old (errmsg) and new (keyValue) MongoDB error formats
+    let value;
+    
+    if (err.keyValue) {
+        // New MongoDB driver format - keyValue contains the duplicate field(s)
+        value = Object.values(err.keyValue).join(', ');
+    } else if (err.errmsg) {
+        // Old MongoDB format
+        const match = err.errmsg.match(/(?<=")([^"]*?)(?=")/);
+        value = match ? match[0] : 'unknown';
+    } else if (err.message) {
+        // Try to extract from error message
+        const match = err.message.match(/dup key: \{ [^:]+: "([^"]+)" \}/);
+        value = match ? match[1] : 'unknown';
+    } else {
+        value = 'unknown';
+    }
+    
     const message = `Duplicate field value: ${value}. Please use another value!`;
     return new AppError(message, 400);
 };
@@ -57,7 +74,19 @@ module.exports = (err, req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         sendErrorDev(err, res);
     } else if (process.env.NODE_ENV === 'production') {
-        let error = { ...err };
+        // Create error copy with all necessary properties
+        // Note: spread operator doesn't copy non-enumerable properties like name, message
+        let error = { 
+            ...err,
+            name: err.name,
+            message: err.message,
+            code: err.code,
+            keyValue: err.keyValue,
+            errmsg: err.errmsg,
+            errors: err.errors,
+            path: err.path,
+            value: err.value
+        };
 
         if (error.name === 'CastError') error = handleCastErrorDB(error);
         if (error.code === 11000) error = handleDuplicateFieldsDB(error);

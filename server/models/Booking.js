@@ -35,6 +35,51 @@ const bookingSchema = new mongoose.Schema({
         required: true
     },
     
+    // Estimated cost at booking time
+    estimated_cost: {
+        type: Number,
+        default: 0
+    },
+    
+    // Advance payment details (40% of estimated cost)
+    advance_payment: {
+        amount: {
+            type: Number,
+            default: 0
+        },
+        razorpay_order_id: String,
+        razorpay_payment_id: String,
+        razorpay_signature: String,
+        status: {
+            type: String,
+            enum: ['pending', 'completed', 'failed', 'refunded'],
+            default: 'pending'
+        },
+        paid_at: Date
+    },
+    
+    // Final payment details (remaining amount at return)
+    final_payment: {
+        amount: {
+            type: Number,
+            default: 0
+        },
+        method: {
+            type: String,
+            enum: ['cash', 'online'],
+            default: 'cash'
+        },
+        razorpay_order_id: String,
+        razorpay_payment_id: String,
+        razorpay_signature: String,
+        status: {
+            type: String,
+            enum: ['pending', 'completed', 'failed'],
+            default: 'pending'
+        },
+        paid_at: Date
+    },
+    
     // Bill ID generated on pickup confirmation
     bill_id: {
         type: String,

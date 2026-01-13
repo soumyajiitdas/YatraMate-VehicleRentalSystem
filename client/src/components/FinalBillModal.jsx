@@ -222,6 +222,51 @@ const FinalBillModal = ({ booking, onClose }) => {
                         </div>
                     </div>
 
+                    {/* Payment Summary */}
+                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4 bg-green-50">
+                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-green-800 uppercase border-b-2 border-green-600 pb-2">Payment Summary</div>
+                        <div className="space-y-2">
+                            {booking.advance_payment?.amount > 0 && (
+                                <div className="flex justify-between py-2 border-b border-green-200 text-xs sm:text-sm">
+                                    <span className="text-green-700">
+                                        Advance Payment (at booking)
+                                        {booking.advance_payment?.razorpay_payment_id && (
+                                            <span className="text-xs block text-gray-500">ID: {booking.advance_payment.razorpay_payment_id}</span>
+                                        )}
+                                    </span>
+                                    <span className="text-green-600 font-medium">₹{booking.advance_payment.amount?.toFixed(2) || '0.00'}</span>
+                                </div>
+                            )}
+                            {booking.final_payment?.amount > 0 && (
+                                <div className="flex justify-between py-2 border-b border-green-200 text-xs sm:text-sm">
+                                    <span className="text-green-700">
+                                        Final Payment ({booking.final_payment?.method === 'online' ? 'Online' : 'Cash'})
+                                        {booking.final_payment?.razorpay_payment_id && (
+                                            <span className="text-xs block text-gray-500">ID: {booking.final_payment.razorpay_payment_id}</span>
+                                        )}
+                                    </span>
+                                    <span className="text-green-600 font-medium">₹{booking.final_payment.amount?.toFixed(2) || '0.00'}</span>
+                                </div>
+                            )}
+                            {returnDetails.amount_paid > 0 && !booking.final_payment?.amount && (
+                                <div className="flex justify-between py-2 border-b border-green-200 text-xs sm:text-sm">
+                                    <span className="text-green-700">Amount Collected at Return</span>
+                                    <span className="text-green-600 font-medium">₹{returnDetails.amount_paid?.toFixed(2) || '0.00'}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between py-3 border-t-2 border-green-600 mt-3 text-base sm:text-lg font-bold bg-green-100 -mx-3 px-3 rounded">
+                                <span className="text-green-800">TOTAL PAID</span>
+                                <span className="text-green-600">
+                                    ₹{(
+                                        (booking.advance_payment?.amount || 0) + 
+                                        (booking.final_payment?.amount || 0) + 
+                                        ((!booking.final_payment?.amount && returnDetails.amount_paid) ? (returnDetails.amount_paid - (booking.advance_payment?.amount || 0)) : 0)
+                                    ).toFixed(2)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Damage Notes (if any) */}
                     {returnDetails.damage_description && (
                         <div className="mb-4 sm:mb-6 border border-red-600 p-3 sm:p-4">

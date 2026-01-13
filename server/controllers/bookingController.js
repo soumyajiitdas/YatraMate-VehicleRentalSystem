@@ -102,44 +102,72 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         return next(new AppError('Booking is not in requested state', 400));
     }
     
-    // Generate unique Bill ID in format: BILL-YYYYMMDD-XXXXX
-    const generateBillId = async () => {
+    // Generate unique Bill ID in format: BILL-YYYYMMDD-XXXXX with retry mechanism
+    const generateBillId = async (retryCount = 0) => {
         const today = new Date();
         const dateStr = today.getFullYear() + 
             String(today.getMonth() + 1).padStart(2, '0') + 
             String(today.getDate()).padStart(2, '0');
         
-        // Find the count of bills created today
-        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const todayEnd = new Date(todayStart);
-        todayEnd.setDate(todayEnd.getDate() + 1);
+        // Find the highest bill number for today
+        const latestBill = await Booking.findOne({
+            bill_id: { $regex: `^BILL-${dateStr}-` }
+        }).sort({ bill_id: -1 }).select('bill_id');
         
-        const todayBillsCount = await Booking.countDocuments({
-            bill_id: { $regex: `^BILL-${dateStr}-` },
-            createdAt: { $gte: todayStart, $lt: todayEnd }
-        });
+        let nextNumber = 1;
+        if (latestBill && latestBill.bill_id) {
+            const match = latestBill.bill_id.match(/BILL-\d{8}-(\d+)/);
+            if (match) {
+                nextNumber = parseInt(match[1], 10) + 1;
+            }
+        }
         
-        const sequenceNumber = String(todayBillsCount + 1).padStart(5, '0');
+        // Add retry count to handle race conditions
+        nextNumber += retryCount;
+        
+        const sequenceNumber = String(nextNumber).padStart(5, '0');
         return `BILL-${dateStr}-${sequenceNumber}`;
     };
     
-    const billId = await generateBillId();
+    // Try to save with retry mechanism for duplicate bill_id
+    let billId;
+    let saveSuccess = false;
+    let retryCount = 0;
+    const maxRetries = 5;
     
-    // Update pickup details
-    booking.pickup_details = {
-        staff_id,
-        actual_pickup_date: actual_pickup_date || new Date(),
-        actual_pickup_time,
-        odometer_reading_start,
-        vehicle_plate_number,
-        id_proof_type,
-        id_number,
-        pickup_notes
-    };
-    
-    booking.bill_id = billId;
-    booking.status = 'picked_up';
-    await booking.save();
+    while (!saveSuccess && retryCount < maxRetries) {
+        try {
+            billId = await generateBillId(retryCount);
+            
+            // Update pickup details
+            booking.pickup_details = {
+                staff_id,
+                actual_pickup_date: actual_pickup_date || new Date(),
+                actual_pickup_time,
+                odometer_reading_start,
+                vehicle_plate_number,
+                id_proof_type,
+                id_number,
+                pickup_notes
+            };
+            
+            booking.bill_id = billId;
+            booking.status = 'picked_up';
+            await booking.save();
+            saveSuccess = true;
+        } catch (err) {
+            // If it's a duplicate key error on bill_id, retry with next number
+            if (err.code === 11000 && err.keyValue && err.keyValue.bill_id) {
+                retryCount++;
+                if (retryCount >= maxRetries) {
+                    return next(new AppError('Failed to generate unique bill ID. Please try again.', 500));
+                }
+            } else {
+                // Re-throw other errors
+                throw err;
+            }
+        }
+    }
     
     const populatedBooking = await Booking.findById(booking._id)
         .populate('vehicle_id')

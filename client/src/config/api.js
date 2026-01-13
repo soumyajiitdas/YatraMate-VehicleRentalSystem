@@ -4,11 +4,15 @@ export const API_ENDPOINTS = {
     // Auth endpoints
     login: `${API_BASE_URL}/auth/login`,
     register: `${API_BASE_URL}/auth/register`,
+    verifyOtp: `${API_BASE_URL}/auth/verify-otp`,
+    resendOtp: `${API_BASE_URL}/auth/resend-otp`,
     registerVendor: `${API_BASE_URL}/auth/register-vendor`,
     logout: `${API_BASE_URL}/auth/logout`,
     currentUser: `${API_BASE_URL}/auth/me`,
     updatePassword: `${API_BASE_URL}/auth/update-password`,
     updateProfile: `${API_BASE_URL}/auth/update-profile`,
+    forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
+    resetPassword: `${API_BASE_URL}/auth/reset-password`,
 
     // User endpoints
     users: `${API_BASE_URL}/users`,
@@ -45,6 +49,13 @@ export const API_ENDPOINTS = {
     // Payment endpoints
     payments: `${API_BASE_URL}/payments`,
     paymentById: (id) => `${API_BASE_URL}/payments/${id}`,
+
+    // Razorpay endpoints
+    razorpayKey: `${API_BASE_URL}/razorpay/key`,
+    createAdvanceOrder: `${API_BASE_URL}/razorpay/create-advance-order`,
+    verifyAdvancePayment: `${API_BASE_URL}/razorpay/verify-advance-payment`,
+    createFinalOrder: `${API_BASE_URL}/razorpay/create-final-order`,
+    verifyFinalPayment: `${API_BASE_URL}/razorpay/verify-final-payment`,
 
     // Upload endpoints
     uploadAuth: `${API_BASE_URL}/upload/auth`,
