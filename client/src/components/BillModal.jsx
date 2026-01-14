@@ -17,21 +17,112 @@ const BillModal = ({ booking, onClose }) => {
         });
     };
 
+    // Inline styles for PDF generation (using standard hex colors instead of oklch)
+    const styles = {
+        billContainer: {
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '32px',
+            backgroundColor: '#ffffff',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            color: '#000000',
+        },
+        header: {
+            textAlign: 'center',
+            borderBottom: '3px solid #000000',
+            paddingBottom: '20px',
+            marginBottom: '32px',
+        },
+        companyName: {
+            fontSize: '28px',
+            fontWeight: 'bold',
+            margin: '0 0 4px 0',
+            color: '#000000',
+        },
+        tagline: {
+            fontSize: '14px',
+            color: '#6b7280',
+            margin: '4px 0',
+        },
+        row: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '32px',
+        },
+        label: {
+            fontSize: '12px',
+            color: '#6b7280',
+            marginBottom: '4px',
+        },
+        value: {
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#000000',
+        },
+        section: {
+            marginBottom: '24px',
+            border: '1px solid #000000',
+            padding: '16px',
+        },
+        sectionTitle: {
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#000000',
+            textTransform: 'uppercase',
+            borderBottom: '2px solid #000000',
+            paddingBottom: '8px',
+            marginBottom: '16px',
+        },
+        detailRow: {
+            display: 'flex',
+            marginBottom: '8px',
+        },
+        detailLabel: {
+            fontSize: '13px',
+            color: '#4b5563',
+            fontWeight: '500',
+            width: '150px',
+            flexShrink: 0,
+        },
+        detailValue: {
+            fontSize: '13px',
+            color: '#000000',
+        },
+        footer: {
+            marginTop: '40px',
+            paddingTop: '20px',
+            borderTop: '3px solid #000000',
+            textAlign: 'center',
+        },
+        footerText: {
+            fontSize: '11px',
+            color: '#6b7280',
+            marginBottom: '48px',
+        },
+    };
+
     const downloadPDF = async () => {
         try {
             const element = billRef.current;
-            if (!element) return;
+            if (!element) {
+                toast.error('Bill content not found. Please try again.');
+                return;
+            }
 
-            // Wait for any rendering to complete
-            await new Promise((resolve) => setTimeout(resolve, 300));
+            toast.info('Generating PDF, please wait...');
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
             const canvas = await html2canvas(element, {
                 scale: 2,
                 logging: false,
                 useCORS: true,
+                allowTaint: true,
                 backgroundColor: '#ffffff',
-                windowWidth: element.scrollWidth,
-                windowHeight: element.scrollHeight,
+                width: element.scrollWidth,
+                height: element.scrollHeight,
+                scrollX: 0,
+                scrollY: 0,
             });
 
             const imgData = canvas.toDataURL('image/png');
@@ -45,10 +136,11 @@ const BillModal = ({ booking, onClose }) => {
             const imgY = 10;
 
             pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-            pdf.save(`YM-${booking.bill_id}.pdf`);
+            pdf.save(`YM-${booking.bill_id || 'bill'}.pdf`);
+            toast.success('Bill downloaded successfully!');
         } catch (error) {
             console.error('Error generating PDF:', error);
-            toast.error('Failed to generate PDF. Please try again.');
+            toast.error('Failed to generate PDF: ' + (error.message || 'Unknown error'));
         }
     };
 
@@ -74,120 +166,88 @@ const BillModal = ({ booking, onClose }) => {
                     </button>
                 </div>
 
-                {/* Bill Content */}
-                <div ref={billRef} className="max-w-[800px] mx-auto p-4 sm:p-6 md:p-8 bg-white font-sans">
+                {/* Bill Content - Using inline styles for PDF compatibility */}
+                <div ref={billRef} style={styles.billContainer}>
                     {/* Company Header */}
-                    <div className="text-center border-b-[3px] border-black pb-4 sm:pb-5 mb-4 sm:mb-6 md:mb-8">
-                        <h1 className="text-xl sm:text-2xl md:text-[32px] font-bold m-0 mb-1 text-black">YatraMate Rental Services</h1>
-                        <p className="text-sm sm:text-base text-gray-500 my-1">Travel made effortless ~</p>
+                    <div style={styles.header}>
+                        <h1 style={styles.companyName}>YatraMate Rental Services</h1>
+                        <p style={styles.tagline}>Travel made effortless ~</p>
                     </div>
 
                     {/* Bill ID and Date */}
-                    <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0 mb-4 sm:mb-6 md:mb-8">
-                        <div className="flex-1">
-                            <div className="text-xs text-gray-500 mb-1">Bill ID</div>
-                            <div className="text-sm sm:text-base font-bold text-black" data-testid="bill-id">{booking.bill_id}</div>
+                    <div style={styles.row}>
+                        <div>
+                            <div style={styles.label}>Bill ID</div>
+                            <div style={styles.value} data-testid="bill-id">{booking.bill_id}</div>
                         </div>
-                        <div className="flex-1 sm:text-right">
-                            <div className="text-xs text-gray-500 mb-1">Date</div>
-                            <div className="text-sm sm:text-base font-bold text-black">{formatDate(booking.pickup_details?.actual_pickup_date)}</div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={styles.label}>Date</div>
+                            <div style={styles.value}>{formatDate(booking.pickup_details?.actual_pickup_date)}</div>
                         </div>
                     </div>
 
                     {/* Customer Details */}
-                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
-                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Customer Details</div>
-                        <div className="space-y-2">
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Name:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.user_id?.name || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Email:</div>
-                                <div className="text-xs sm:text-sm text-black break-all">{booking.user_id?.email || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Phone:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.user_id?.phone || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Govt. ID Proof:</div>
-                                <div className="text-xs sm:text-sm text-black">
-                                    {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'}
-                                </div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">ID Number:</div>
-                                <div className="text-xs sm:text-sm text-black">
-                                    {booking.pickup_details?.id_number || 'N/A'}
-                                </div>
+                    <div style={styles.section}>
+                        <div style={styles.sectionTitle}>Customer Details</div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Name:</div>
+                            <div style={styles.detailValue}>{booking.user_id?.name || 'N/A'}</div>
+                        </div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Contact Details:</div>
+                            <div style={styles.detailValue}>{booking.user_id?.phone || 'N/A'}, {booking.user_id?.email || 'N/A'}</div>
+                        </div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Govt. ID Proof:</div>
+                            <div style={styles.detailValue}>
+                                {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'} - {booking.pickup_details?.id_number || 'N/A'}
                             </div>
                         </div>
                     </div>
 
                     {/* Vehicle Details */}
-                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
-                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Vehicle Details</div>
-                        <div className="space-y-2">
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Vehicle:</div>
-                                <div className="text-xs sm:text-sm text-black">
-                                    {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
-                                </div>
+                    <div style={styles.section}>
+                        <div style={styles.sectionTitle}>Vehicle Details</div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Vehicle ({booking.vehicle_id?.type || 'N/A'}):</div>
+                            <div style={styles.detailValue}>
+                                {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}, {booking.vehicle_id?.cc_engine || 'N/A'}cc
                             </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Type:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.vehicle_id?.type || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Registration No:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.vehicle_id?.registration_number || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Engine CC:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.vehicle_id?.cc_engine || 'N/A'}cc</div>
-                            </div>
+                        </div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Registration No:</div>
+                            <div style={styles.detailValue}>{booking.vehicle_id?.registration_number || 'N/A'}</div>
                         </div>
                     </div>
 
                     {/* Pickup Details */}
-                    <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
-                        <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Pickup Details</div>
-                        <div className="space-y-2">
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Pickup Date:</div>
-                                <div className="text-xs sm:text-sm text-black">
-                                    {formatDate(booking.pickup_details?.actual_pickup_date)}
-                                </div>
+                    <div style={styles.section}>
+                        <div style={styles.sectionTitle}>Pickup Details</div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Pickup Date & Time:</div>
+                            <div style={styles.detailValue}>
+                                {formatDate(booking.pickup_details?.actual_pickup_date)} at {booking.pickup_details?.actual_pickup_time || 'N/A'}
                             </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Pickup Time:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.pickup_details?.actual_pickup_time || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Pickup Location:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.start_location || 'N/A'}</div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row sm:items-start">
-                                <div className="text-xs sm:text-sm text-gray-600 font-medium sm:w-[120px] md:w-[150px] sm:shrink-0">Odometer Start:</div>
-                                <div className="text-xs sm:text-sm text-black">{booking.pickup_details?.odometer_reading_start || 'N/A'} km</div>
-                            </div>
+                        </div>
+                        <div style={styles.detailRow}>
+                            <div style={styles.detailLabel}>Pickup Location:</div>
+                            <div style={styles.detailValue}>{booking.start_location || 'N/A'}</div>
                         </div>
                     </div>
 
                     {/* Notes */}
                     {booking.pickup_details?.pickup_notes && (
-                        <div className="mb-4 sm:mb-6 border border-black p-3 sm:p-4">
-                            <div className="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-black uppercase border-b-2 border-black pb-2">Notes</div>
-                            <p className="text-xs sm:text-sm text-gray-600 m-0">
+                        <div style={styles.section}>
+                            <div style={styles.sectionTitle}>Notes</div>
+                            <p style={{ fontSize: '13px', color: '#4b5563', margin: 0 }}>
                                 {booking.pickup_details.pickup_notes}
                             </p>
                         </div>
                     )}
 
                     {/* Footer */}
-                    <div className="mt-6 sm:mt-8 md:mt-10 pt-4 sm:pt-5 border-t-[3px] border-black text-center">
-                        <p className="text-[10px] sm:text-xs text-gray-500 mb-8 sm:mb-12">
+                    <div style={styles.footer}>
+                        <p style={styles.footerText}>
                             Final charges will be calculated upon vehicle return. Thank you for choosing YatraMate!
                         </p>
                     </div>

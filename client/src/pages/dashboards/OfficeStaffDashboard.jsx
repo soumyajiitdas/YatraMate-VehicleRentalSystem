@@ -403,7 +403,7 @@ const OfficeStaffDashboard = () => {
                                                     >
                                                         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
                                                             <h3 className="text-base md:text-lg font-semibold text-gray-900">
-                                                                {booking.vehicle_id.name} - {booking.vehicle_id.model_name}
+                                                                {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
                                                             </h3>
                                                             
                                                         </div>
@@ -422,7 +422,7 @@ const OfficeStaffDashboard = () => {
                                                     {/* Collapsed Summary - Always visible */}
                                                     {!expandedCards[booking._id] && (
                                                         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-                                                            <span>Customer: <span className="font-medium text-gray-900">{booking.user_id.name}</span></span>
+                                                            <span>Customer: <span className="font-medium text-gray-900">{booking.user_id?.name || 'N/A'}</span></span>
                                                             <span>•</span>
                                                             <span>Returned: <span className="font-medium text-gray-900">{formatDateDDMMYYYY(booking.return_details?.actual_return_date)}</span></span>
                                                             {booking.bill_id && (
@@ -447,15 +447,15 @@ const OfficeStaffDashboard = () => {
                                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                                                 <div>
                                                                     <p className="text-gray-500">Customer</p>
-                                                                    <p className="font-medium text-gray-900">{booking.user_id.name}</p>
-                                                                    <p className="text-gray-600 wrap-break-words">{booking.user_id.email}</p>
-                                                                    <p className="text-gray-600">{booking.user_id.phone}</p>
+                                                                    <p className="font-medium text-gray-900">{booking.user_id?.name || 'N/A'}</p>
+                                                                    <p className="text-gray-600 wrap-break-words">{booking.user_id?.email || 'N/A'}</p>
+                                                                    <p className="text-gray-600">{booking.user_id?.phone || 'N/A'}</p>
                                                                 </div>
 
                                                                 <div>
                                                                     <p className="text-gray-500">Vehicle Details</p>
-                                                                    <p className="font-medium text-gray-900">{booking.vehicle_id.registration_number}</p>
-                                                                    <p className="text-gray-600">{booking.vehicle_id.type} - {booking.vehicle_id.cc_engine}cc</p>
+                                                                    <p className="font-medium text-gray-900">{booking.vehicle_id?.registration_number || 'N/A'}</p>
+                                                                    <p className="text-gray-600">{booking.vehicle_id?.type || 'N/A'} - {booking.vehicle_id?.cc_engine || 'N/A'}cc</p>
                                                                 </div>
 
                                                                 <div>
@@ -535,7 +535,7 @@ const OfficeStaffDashboard = () => {
                                                     <div className="flex-1">
                                                         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-3">
                                                             <h3 className="text-base md:text-lg font-semibold text-gray-900">
-                                                                {booking.vehicle_id.name} - {booking.vehicle_id.model_name}
+                                                                {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
                                                             </h3>
                                                             {getStatusBadge(booking.status)}
                                                         </div>
@@ -543,15 +543,15 @@ const OfficeStaffDashboard = () => {
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                                             <div>
                                                                 <p className="text-gray-500">Customer</p>
-                                                                <p className="font-medium text-gray-900">{booking.user_id.name}</p>
-                                                                <p className="text-gray-600 wrap-break-words">{booking.user_id.email}</p>
-                                                                <p className="text-gray-600">{booking.user_id.phone}</p>
+                                                                <p className="font-medium text-gray-900">{booking.user_id?.name || 'N/A'}</p>
+                                                                <p className="text-gray-600 wrap-break-words">{booking.user_id?.email || 'N/A'}</p>
+                                                                <p className="text-gray-600">{booking.user_id?.phone || 'N/A'}</p>
                                                             </div>
 
                                                             <div>
                                                                 <p className="text-gray-500">Vehicle Details</p>
-                                                                <p className="font-medium text-gray-900">{booking.vehicle_id.registration_number}</p>
-                                                                <p className="text-gray-600">{booking.vehicle_id.type} - {booking.vehicle_id.cc_engine}cc</p>
+                                                                <p className="font-medium text-gray-900">{booking.vehicle_id?.registration_number || 'N/A'}</p>
+                                                                <p className="text-gray-600">{booking.vehicle_id?.type || 'N/A'} - {booking.vehicle_id?.cc_engine || 'N/A'}cc</p>
                                                             </div>
 
                                                             <div>
@@ -682,10 +682,10 @@ const OfficeStaffDashboard = () => {
 
                         <div className="mb-4">
                             <p className="text-sm text-gray-600 mb-2">
-                                Customer: <span className="font-medium text-gray-900">{selectedBooking.user_id.name}</span>
+                                Customer: <span className="font-medium text-gray-900">{selectedBooking.user_id?.name || 'N/A'}</span>
                             </p>
                             <p className="text-sm text-gray-600 mb-4">
-                                Vehicle: <span className="font-medium text-gray-900">{selectedBooking.vehicle_id.name}</span>
+                                Vehicle: <span className="font-medium text-gray-900">{selectedBooking.vehicle_id?.name || 'N/A'}</span>
                             </p>
                         </div>
 
