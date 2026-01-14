@@ -277,7 +277,6 @@ const AdminDashboard = () => {
                 <div className="mb-8 md:mb-12">
                     {/* Mobile and Desktop Layout */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
-                        {/* Logo - Left on desktop, top on mobile */}
                         <div className="flex items-center justify-between md:justify-start mb-6">
                             <div className="flex items-center space-x-2 group">
                                 <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
@@ -323,124 +322,217 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="bg-white border border-primary-200 rounded-lg shadow-sm mb-6 overflow-x-auto">
-                    <div className="border-b border-gray-200">
-                        <nav className="flex -mb-px min-w-max md:min-w-0">
+                {/* Tabs - Horizontal on Mobile, Vertical on Desktop */}
+                <div className="flex flex-col md:flex-row gap-6">
+                    {/* Mobile Horizontal Tabs */}
+                    <div className="md:hidden bg-white border border-primary-200 rounded-lg shadow-sm overflow-x-auto">
+                        <nav className="flex -mb-px min-w-max">
                             <button
                                 onClick={() => setActiveTab('customers')}
-                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'customers'
-                                    ? 'border-red-500 text-red-600'
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'customers'
+                                    ? 'border-red-500 text-red-600 bg-red-50'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
+                                data-testid="tab-customers"
                             >
                                 Customers
                             </button>
                             <button
                                 onClick={() => setActiveTab('office-staff')}
-                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'office-staff'
-                                    ? 'border-red-500 text-red-600'
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'office-staff'
+                                    ? 'border-red-500 text-red-600 bg-red-50'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
+                                data-testid="tab-office-staff"
                             >
                                 Office Staff
                             </button>
                             <button
                                 onClick={() => setActiveTab('vendors')}
-                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'vendors'
-                                    ? 'border-red-500 text-red-600'
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'vendors'
+                                    ? 'border-red-500 text-red-600 bg-red-50'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
+                                data-testid="tab-vendors"
                             >
                                 Vendors
                             </button>
                             <button
                                 onClick={() => setActiveTab('packages')}
-                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'packages'
-                                    ? 'border-red-500 text-red-600'
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'packages'
+                                    ? 'border-red-500 text-red-600 bg-red-50'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
+                                data-testid="tab-packages"
                             >
                                 Packages
                             </button>
                             <button
                                 onClick={() => setActiveTab('vehicle-requests')}
-                                className={`px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'vehicle-requests'
-                                    ? 'border-red-500 text-red-600'
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'vehicle-requests'
+                                    ? 'border-red-500 text-red-600 bg-red-50'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
+                                data-testid="tab-vehicle-requests"
                             >
                                 Vehicle Requests
                             </button>
                         </nav>
                     </div>
+
+                    {/* Desktop Vertical Sidebar */}
+                    <aside className="hidden md:block md:w-60 shrink-0">
+                        <div className="bg-white border border-primary-200 rounded-lg shadow-sm overflow-hidden sticky top-4">
+                            <nav className="flex flex-col">
+                                <button
+                                    onClick={() => setActiveTab('customers')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'customers'
+                                        ? 'border-red-500 text-red-600 bg-red-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-customers"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        Customers
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('office-staff')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'office-staff'
+                                        ? 'border-red-500 text-red-600 bg-red-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-office-staff"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Office Staff
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('vendors')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'vendors'
+                                        ? 'border-red-500 text-red-600 bg-red-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-vendors"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        Vendors
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('packages')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'packages'
+                                        ? 'border-red-500 text-red-600 bg-red-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-packages"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                        Packages
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('vehicle-requests')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'vehicle-requests'
+                                        ? 'border-red-500 text-red-600 bg-red-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-vehicle-requests"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Vehicle Requests
+                                    </div>
+                                </button>
+                            </nav>
+                        </div>
+                    </aside>
+
+                    {/* Content Area */}
+                    <div className="flex-1 min-w-0">
+                        {/* Action Button */}
+                        {(activeTab === 'office-staff' || activeTab === 'packages') && (
+                            <div className="mb-6">
+                                <button
+                                    onClick={handleCreate}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center"
+                                    data-testid="add-button"
+                                >
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    {activeTab === 'office-staff' ? 'Add Office Staff' : 'Create Package'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Content */}
+                        {loading ? (
+                            <div className="flex justify-center items-center py-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Users Table (Customers, Office Staff) */}
+                                {(activeTab === 'customers' || activeTab === 'office-staff') && (
+                                    <UsersTable
+                                        users={getFilteredUsers()}
+                                        vendors={[]}
+                                        onEdit={handleEdit}
+                                        onDelete={handleDelete}
+                                        type={activeTab}
+                                        onViewVendorDetails={handleViewVendorDetails}
+                                        onVerifyVendor={handleVerifyVendor}
+                                    />
+                                )}
+
+                                {/* Vendors Table */}
+                                {activeTab === 'vendors' && (
+                                    <VendorsTable
+                                        vendors={vendors}
+                                        onViewVendorDetails={handleViewVendorDetails}
+                                        onVerifyVendor={handleVerifyVendor}
+                                        onDelete={handleDelete}
+                                    />
+                                )}
+
+                                {/* Packages Table */}
+                                {activeTab === 'packages' && (
+                                    <PackagesTable
+                                        packages={packages}
+                                        onEdit={handleEdit}
+                                        onDelete={handleDelete}
+                                    />
+                                )}
+
+                                {/* Vehicle Requests Table */}
+                                {activeTab === 'vehicle-requests' && (
+                                    <VehicleRequestsTable
+                                        requests={vehicleRequests}
+                                        vehicles={vehicles}
+                                        onViewDetails={handleViewRequestDetails}
+                                        onToggleFeature={handleToggleFeature}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </div>
                 </div>
-
-                {/* Action Button */}
-                {(activeTab === 'office-staff' || activeTab === 'packages') && (
-                    <div className="mb-6">
-                        <button
-                            onClick={handleCreate}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center"
-                        >
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            {activeTab === 'office-staff' ? 'Add Office Staff' : 'Create Package'}
-                        </button>
-                    </div>
-                )}
-
-                {/* Content */}
-                {loading ? (
-                    <div className="flex justify-center items-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-                    </div>
-                ) : (
-                    <>
-                        {/* Users Table (Customers, Office Staff) */}
-                        {(activeTab === 'customers' || activeTab === 'office-staff') && (
-                            <UsersTable
-                                users={getFilteredUsers()}
-                                vendors={[]}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                                type={activeTab}
-                                onViewVendorDetails={handleViewVendorDetails}
-                                onVerifyVendor={handleVerifyVendor}
-                            />
-                        )}
-
-                        {/* Vendors Table */}
-                        {activeTab === 'vendors' && (
-                            <VendorsTable
-                                vendors={vendors}
-                                onViewVendorDetails={handleViewVendorDetails}
-                                onVerifyVendor={handleVerifyVendor}
-                                onDelete={handleDelete}
-                            />
-                        )}
-
-                        {/* Packages Table */}
-                        {activeTab === 'packages' && (
-                            <PackagesTable
-                                packages={packages}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                            />
-                        )}
-
-                        {/* Vehicle Requests Table */}
-                        {activeTab === 'vehicle-requests' && (
-                            <VehicleRequestsTable
-                                requests={vehicleRequests}
-                                vehicles={vehicles}
-                                onViewDetails={handleViewRequestDetails}
-                                onToggleFeature={handleToggleFeature}
-                            />
-                        )}
-                    </>
-                )}
             </div>
 
             {/* Modal */}
@@ -685,7 +777,6 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Type</th>
@@ -699,8 +790,6 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                             <tr key={vendor._id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-600">{vendor.email}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -1094,7 +1183,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
     };
 
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-2 md:p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-150 p-2 md:p-4">
             <div className="bg-white border-2 border-primary-200 rounded-xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
                 <div className="p-4 md:p-6">
                     <h2 className="text-xl md:text-2xl font-bold text-red-600 mb-4 md:mb-6">
@@ -1604,7 +1693,7 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
 // Vendor Details Modal
 const VendorDetailsModal = ({ vendor, onClose }) => {
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-150 p-4">
             <div className="bg-white border-2 border-primary-200 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
@@ -1691,7 +1780,7 @@ const VendorDetailsModal = ({ vendor, onClose }) => {
 // Vehicle Request Details Modal
 const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) => {
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-150 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-150 p-4">
             <div className="bg-white border-2 border-primary-200 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
