@@ -26,6 +26,8 @@ const AdminDashboard = () => {
     const [selectedVendor, setSelectedVendor] = useState(null);
     const [showRequestDetailsModal, setShowRequestDetailsModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [showVerifyVendorConfirm, setShowVerifyVendorConfirm] = useState(false);
+    const [vendorToVerify, setVendorToVerify] = useState(null);
 
     useEffect(() => {
         if (authLoading) {
@@ -162,15 +164,24 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleVerifyVendor = async (vendorId) => {
+    const handleVerifyVendor = (vendor) => {
+        setVendorToVerify(vendor);
+        setShowVerifyVendorConfirm(true);
+    };
+
+    const confirmVerifyVendor = async () => {
+        if (!vendorToVerify) return;
+        
         try {
-            const response = await fetch(API_ENDPOINTS.verifyVendor(vendorId), {
+            const response = await fetch(API_ENDPOINTS.verifyVendor(vendorToVerify._id), {
                 method: 'PATCH',
                 credentials: 'include'
             });
 
             if (response.ok) {
                 toast.success('Vendor verified successfully!');
+                setShowVerifyVendorConfirm(false);
+                setVendorToVerify(null);
                 fetchData();
             }
         } catch (error) {
@@ -581,6 +592,18 @@ const AdminDashboard = () => {
                     onReject={handleRejectRequest}
                 />
             )}
+
+            {/* Vendor Verification Confirmation Modal */}
+            {showVerifyVendorConfirm && vendorToVerify && (
+                <VendorVerifyConfirmModal
+                    vendor={vendorToVerify}
+                    onConfirm={confirmVerifyVendor}
+                    onCancel={() => {
+                        setShowVerifyVendorConfirm(false);
+                        setVendorToVerify(null);
+                    }}
+                />
+            )}
         </div>
     );
 };
@@ -656,8 +679,9 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetail
                                                 </button>
                                                 {!vendorDetails.is_verified && (
                                                     <button
-                                                        onClick={() => onVerifyVendor(vendorDetails._id)}
+                                                        onClick={() => onVerifyVendor(vendorDetails)}
                                                         className="text-green-600 hover:text-green-900"
+                                                        data-testid="verify-vendor-btn"
                                                     >
                                                         Verify
                                                     </button>
@@ -730,8 +754,9 @@ const UsersTable = ({ users, vendors, onEdit, onDelete, type, onViewVendorDetail
                                         </button>
                                         {!vendorDetails.is_verified && (
                                             <button
-                                                onClick={() => onVerifyVendor(vendorDetails._id)}
+                                                onClick={() => onVerifyVendor(vendorDetails)}
                                                 className="px-3 py-1.5 text-sm text-green-600 bg-green-50 rounded-lg hover:bg-green-100"
+                                                data-testid="verify-vendor-btn-mobile"
                                             >
                                                 Verify
                                             </button>
@@ -816,8 +841,9 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                                     </button>
                                     {!vendor.is_verified && (
                                         <button
-                                            onClick={() => onVerifyVendor(vendor._id)}
+                                            onClick={() => onVerifyVendor(vendor)}
                                             className="text-green-600 hover:text-green-900"
+                                            data-testid="verify-vendor-table-btn"
                                         >
                                             Verify
                                         </button>
@@ -877,8 +903,9 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                             </button>
                             {!vendor.is_verified && (
                                 <button
-                                    onClick={() => onVerifyVendor(vendor._id)}
+                                    onClick={() => onVerifyVendor(vendor)}
                                     className="px-3 py-1.5 text-sm text-green-600 bg-green-50 rounded-lg hover:bg-green-100"
+                                    data-testid="verify-vendor-card-btn"
                                 >
                                     Verify
                                 </button>
@@ -1929,6 +1956,52 @@ const VehicleRequestDetailsModal = ({ request, onClose, onApprove, onReject }) =
                                 </button>
                             </>
                         )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Vendor Verification Confirmation Modal
+const VendorVerifyConfirmModal = ({ vendor, onConfirm, onCancel }) => {
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-150 p-4">
+            <div className="bg-white border-2 border-primary-200 rounded-xl max-w-md w-full shadow-2xl">
+                <div className="p-6">
+                    <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full mb-4">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">Verify Vendor</h2>
+                    <p className="text-gray-600 mb-6 text-center">
+                        Are you sure you want to verify this vendor? This action cannot be undone.
+                    </p>
+                    {vendor && (
+                        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                            <p className="text-sm text-gray-600 mb-1">Vendor:</p>
+                            <p className="font-semibold text-gray-900">{vendor.name || vendor.vendor_name}</p>
+                            {vendor.company_name && (
+                                <p className="text-sm text-gray-600 mt-1">{vendor.company_name}</p>
+                            )}
+                        </div>
+                    )}
+                    <div className="flex gap-3">
+                        <button
+                            onClick={onCancel}
+                            className="flex-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                            data-testid="cancel-verify-vendor-btn"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                            data-testid="confirm-verify-vendor-btn"
+                        >
+                            Verify
+                        </button>
                     </div>
                 </div>
             </div>

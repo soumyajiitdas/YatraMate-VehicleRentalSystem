@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { X, MapPin, Calendar, Clock, CreditCard, Car, FileText } from 'lucide-react';
 import FinalBillModal from './FinalBillModal';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { useToast } from '../contexts/ToastContext';
 
 const BookingDetailsModal = ({ booking, onClose }) => {
     const [showBillModal, setShowBillModal] = useState(false);
+    const billRef = useRef(null);
+    const { toast } = useToast();
 
     if (!booking) return null;
 
@@ -38,19 +43,64 @@ const BookingDetailsModal = ({ booking, onClose }) => {
         }
     };
 
+    const downloadBillDirectly = async () => {
+        try {
+            // Show loading state
+            toast.info('Generating PDF, please wait...');
+
+            // Wait for rendering
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            const element = billRef.current;
+            if (!element) {
+                toast.error('Bill content not found. Please try again.');
+                return;
+            }
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                logging: false,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                width: element.scrollWidth,
+                height: element.scrollHeight,
+                scrollX: 0,
+                scrollY: 0,
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+            const imgX = (pdfWidth - imgWidth * ratio) / 2;
+            const imgY = 10;
+
+            pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+            pdf.save(`YM-FINAL-${booking.bill_id || booking._id || 'bill'}.pdf`);
+            toast.success('Final bill downloaded successfully!');
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            toast.error('Failed to generate PDF: ' + (error.message || 'Unknown error'));
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-black/60 z-150 flex items-center justify-center p-2 sm:p-4 animate-fadeIn" onClick={onClose}>
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slideUp" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
-                <div className="sticky top-0 bg-linear-to-r from-red-500 to-red-600 p-4 sm:p-6">
-                    <div className="flex items-center justify-between">
+                <div className="sticky top-0 bg-linear-to-r from-red-500 to-red-600 p-3 sm:p-4 md:p-6 z-10">
+                    <div className="flex items-center justify-between gap-2">
                         <div className="flex-1 min-w-0 text-white">
-                            <h2 className="text-lg sm:text-2xl font-bold">Booking Details</h2>
-                            <p className="text-red-100 text-xs sm:text-sm mt-1 truncate">ID: {booking._id}</p>
+                            <h2 className="text-base sm:text-xl md:text-2xl font-bold">Booking Details</h2>
+                            <p className="text-red-100 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">ID: {booking._id}</p>
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-1.5 sm:p-2 hover:bg-red-400 rounded-full transition-all shrink-0 ml-2"
+                            className="p-1.5 sm:p-2 hover:bg-red-400 rounded-full transition-all shrink-0"
                             data-testid="close-details-modal"
                         >
                             <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -59,11 +109,11 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                 </div>
 
                 {/* Content */}
-                <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+                <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
                     {/* Vehicle Information */}
                     <div className="bg-linear-to-br from-red-50 to-orange-50 border-l-4 border-red-500 rounded-lg p-3 sm:p-4 shadow-sm">
-                        <div className="flex items-center gap-2 mb-2 text-red-700">
-                            <Car className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <div className="flex items-center gap-2 mb-2 sm:mb-3 text-red-700">
+                            <Car className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                             <h3 className="font-bold text-sm sm:text-base">Vehicle Information</h3>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -71,17 +121,17 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                 <img
                                     src={booking.vehicle.images[0]}
                                     alt={booking.vehicle.name}
-                                    className="w-full sm:w-28 h-32 sm:h-28 object-cover rounded-lg shadow-md"
+                                    className="w-full sm:w-24 md:w-28 h-32 sm:h-24 md:h-28 object-cover rounded-lg shadow-md"
                                 />
                             )}
-                            <div className="flex-1">
-                                <p className="text-base sm:text-lg font-bold text-red-600">{booking.vehicle.name}</p>
-                                <div className="flex flex-wrap items-center gap-2 mt-2">
-                                    <span className="px-2 sm:px-3 py-1 bg-red-500 text-white text-xs rounded-full font-semibold capitalize shadow-sm">
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm sm:text-base md:text-lg font-bold text-red-600 wrap-break-words">{booking.vehicle.name}</p>
+                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                                    <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-red-500 text-white text-xs rounded-full font-semibold capitalize shadow-sm">
                                         {booking.vehicle.type}
                                     </span>
                                     {booking.vehicle.registration_number && booking.status === 'confirmed' && (
-                                        <span className="px-2 sm:px-3 py-1 bg-white border border-red-300 text-red-700 text-xs rounded-full font-semibold shadow-sm">
+                                        <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-white border border-red-300 text-red-700 text-xs rounded-full font-semibold shadow-sm">
                                             {booking.vehicle.registration_number}
                                         </span>
                                     )}
@@ -92,15 +142,15 @@ const BookingDetailsModal = ({ booking, onClose }) => {
 
                     {/* Status */}
                     <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                        <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
-                            <p className="text-xs text-gray-500 mb-1.5 font-medium">Booking Status</p>
-                            <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-bold capitalize shadow-sm ${getStatusColor(booking.status)}`}>
+                        <div className="bg-white border border-gray-200 rounded-lg p-2.5 sm:p-3 shadow-sm">
+                            <p className="text-xs text-gray-500 mb-1 sm:mb-1.5 font-medium">Booking Status</p>
+                            <span className={`inline-block px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold capitalize shadow-sm ${getStatusColor(booking.status)}`}>
                                 {booking.status}
                             </span>
                         </div>
-                        <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
-                            <p className="text-xs text-gray-500 mb-1.5 font-medium">Payment Status</p>
-                            <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-bold capitalize shadow-sm ${getPaymentStatusColor(booking.payment_status)}`}>
+                        <div className="bg-white border border-gray-200 rounded-lg p-2.5 sm:p-3 shadow-sm">
+                            <p className="text-xs text-gray-500 mb-1 sm:mb-1.5 font-medium">Payment Status</p>
+                            <span className={`inline-block px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold capitalize shadow-sm ${getPaymentStatusColor(booking.payment_status)}`}>
                                 {booking.payment_status}
                             </span>
                         </div>
@@ -114,16 +164,16 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                     <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 shrink-0" />
                                     <div>
                                         <p className="font-bold text-green-800 text-sm sm:text-base">Final Bill Available</p>
-                                        <p className="text-xs sm:text-sm text-green-600">View and download invoice</p>
+                                        <p className="text-xs sm:text-sm text-green-600">Download invoice PDF</p>
                                     </div>
                                 </div>
                                 <button
-                                    onClick={() => setShowBillModal(true)}
+                                    onClick={downloadBillDirectly}
                                     className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all flex items-center justify-center gap-2 text-sm shadow-md"
-                                    data-testid="view-bill-button"
+                                    data-testid="download-bill-button"
                                 >
                                     <FileText className="w-4 h-4" />
-                                    View Bill
+                                    Download Bill
                                 </button>
                             </div>
                         </div>
@@ -228,17 +278,17 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                             <h3 className="font-bold text-sm sm:text-base">Cost Breakdown</h3>
                         </div>
                         <div className="space-y-1.5">
-                            {/* Show Advance Payment when pickup is confirmed */}
-                            {booking.status === 'confirmed' && booking.advance_payment && booking.advance_payment.amount > 0 && (
+                            {/* Show Advance Payment when pickup is confirmed or completed */}
+                            {(booking.status === 'confirmed' || booking.status === 'completed') && booking.advance_payment && booking.advance_payment.amount > 0 && (
                                 <div className="bg-green-100 border border-green-300 rounded-lg p-2.5 mb-2">
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                         <span className="text-green-800 font-bold text-xs sm:text-sm flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
-                                            Advance Paid
+                                            <span className="wrap-break-words">Advance Paid</span>
                                         </span>
-                                        <span className="text-green-900 font-bold text-sm sm:text-base">₹{booking.advance_payment.amount}</span>
+                                        <span className="text-green-900 font-bold text-sm sm:text-base">₹{booking.advance_payment.amount.toFixed(2)}</span>
                                     </div>
                                     <p className="text-xs text-green-700 mt-1">40% advance payment received</p>
                                 </div>
@@ -293,6 +343,184 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                     </button>
                 </div>
             </div>
+
+            {/* Hidden Bill Content for PDF Generation */}
+            {booking.status === 'completed' && (
+                <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                    <div 
+                        ref={billRef} 
+                        className="max-w-[800px] mx-auto p-8 font-sans" 
+                        style={{ backgroundColor: '#ffffff', width: '800px' }}
+                    >
+                        {/* Bill content from FinalBillModal - same structure */}
+                        <div className="text-center pb-5 mb-5" style={{ borderBottom: '3px solid #000' }}>
+                            <h1 className="text-[32px] font-bold m-0 mb-1" style={{ color: '#000' }}>YatraMate Rental Services</h1>
+                            <p className="text-base my-1" style={{ color: '#6B7280' }}>Travel made effortless ~</p>
+                            <p className="text-sm font-bold mt-1" style={{ color: '#16A34A' }}>RETURN INVOICE</p>
+                        </div>
+
+                        {/* Bill ID, Booking ID, and Date */}
+                        <div className="flex justify-between gap-4 mb-8">
+                            <div className="flex-1">
+                                <div className="text-xs mb-1" style={{ color: '#6B7280' }}>Bill ID</div>
+                                <div className="text-base font-bold" style={{ color: '#000' }}>{booking.bill_id || 'N/A'}</div>
+                            </div>
+                            <div className="flex-1 text-center">
+                                <div className="text-xs mb-1" style={{ color: '#6B7280' }}>Booking ID</div>
+                                <div className="text-xs font-bold break-all" style={{ color: '#000' }}>{booking._id}</div>
+                            </div>
+                            <div className="flex-1 text-right">
+                                <div className="text-xs mb-1" style={{ color: '#6B7280' }}>Return Date</div>
+                                <div className="text-base font-bold" style={{ color: '#000' }}>{formatDate(booking.return_details?.actual_return_date)}</div>
+                            </div>
+                        </div>
+
+                        {/* Customer Details */}
+                        <div className="mb-6 border p-4" style={{ borderColor: '#000' }}>
+                            <div className="text-base font-bold mb-4 uppercase pb-2" style={{ color: '#000', borderBottom: '2px solid #000' }}>Customer Details</div>
+                            <div className="space-y-2">
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Name:</div>
+                                    <div className="text-sm" style={{ color: '#000' }}>{booking.user_id?.name || 'N/A'}</div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Contact Details:</div>
+                                    <div className="text-sm break-all" style={{ color: '#000' }}>{booking.user_id?.phone || 'N/A'}, {booking.user_id?.email || 'N/A'}</div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Govt. ID Proof:</div>
+                                    <div className="text-sm" style={{ color: '#000' }}>
+                                        {booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase() || 'N/A'} - {booking.pickup_details?.id_number || 'N/A'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Vehicle Details */}
+                        <div className="mb-6 border p-4" style={{ borderColor: '#000' }}>
+                            <div className="text-base font-bold mb-4 uppercase pb-2" style={{ color: '#000', borderBottom: '2px solid #000' }}>Vehicle Details</div>
+                            <div className="space-y-2">
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Vehicle ({booking.vehicle?.type || 'N/A'}):</div>
+                                    <div className="text-sm" style={{ color: '#000' }}>
+                                        {booking.vehicle?.name || 'N/A'} - {booking.vehicle?.model_name || 'N/A'}, {booking.vehicle?.cc_engine || 'N/A'}cc
+                                    </div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Registration No:</div>
+                                    <div className="text-sm" style={{ color: '#000' }}>{booking.vehicle?.registration_number || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Trip Summary */}
+                        <div className="mb-6 border p-4" style={{ borderColor: '#000' }}>
+                            <div className="text-base font-bold mb-4 uppercase pb-2" style={{ color: '#000', borderBottom: '2px solid #000' }}>Trip Summary</div>
+                            <div className="space-y-2">
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Pickup Details:</div>
+                                    <div className="text-sm" style={{ color: '#000' }}>
+                                        {formatDate(booking.pickup_details?.actual_pickup_date)} at {booking.pickup_details?.actual_pickup_time || 'N/A'} from {booking.start_location || 'N/A'}
+                                    </div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Return Date & Time:</div>
+                                    <div className="text-sm" style={{ color: '#000' }}>
+                                        {formatDate(booking.return_details?.actual_return_date)} at {booking.return_details?.actual_return_time || 'N/A'}
+                                    </div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Distance & Duration:</div>
+                                    <div className="text-sm font-bold" style={{ color: '#000' }}>{booking.distance_traveled_km || 'N/A'} km, {booking.duration_hours || 'N/A'} hours</div>
+                                </div>
+                                <div className="flex items-start">
+                                    <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Vehicle Condition:</div>
+                                    <div 
+                                        className="text-sm font-bold" 
+                                        style={{ color: booking.return_details?.vehicle_condition === 'damaged' ? '#DC2626' : '#16A34A' }}
+                                    >
+                                        {booking.return_details?.vehicle_condition?.toUpperCase() || 'N/A'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Cost Breakdown */}
+                        <div className="mb-6 border p-4" style={{ borderColor: '#000', backgroundColor: '#F9FAFB' }}>
+                            <div className="text-base font-bold mb-4 uppercase pb-2" style={{ color: '#000', borderBottom: '2px solid #000' }}>Cost Breakdown</div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between py-2 border-b text-sm" style={{ borderColor: '#E5E7EB' }}>
+                                    <span>Distance Cost ({booking.distance_traveled_km || 0} km)</span>
+                                    <span>₹{booking.cost_per_distance?.toFixed(2) || '0.00'}</span>
+                                </div>
+                                <div className="flex justify-between py-2 border-b text-sm" style={{ borderColor: '#E5E7EB' }}>
+                                    <span>Time Cost ({booking.duration_hours || 0} hours)</span>
+                                    <span>₹{booking.cost_per_time?.toFixed(2) || '0.00'}</span>
+                                </div>
+                                <div className="flex justify-between py-2 border-b text-sm italic" style={{ borderColor: '#E5E7EB', color: '#6B7280' }}>
+                                    <span>Applicable Cost (Higher of Distance/Time)</span>
+                                    <span>₹{Math.max(booking.cost_per_distance || 0, booking.cost_per_time || 0).toFixed(2)}</span>
+                                </div>
+                                {(booking.damage_cost > 0 || booking.return_details?.damage_cost > 0) && (
+                                    <div className="flex justify-between py-2 border-b text-sm" style={{ borderColor: '#E5E7EB', color: '#DC2626' }}>
+                                        <span>Damage Cost</span>
+                                        <span>₹{(booking.damage_cost || booking.return_details?.damage_cost || 0).toFixed(2)}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between py-3 mt-3 text-lg font-bold" style={{ borderTop: '2px solid #000' }}>
+                                    <span>TOTAL AMOUNT</span>
+                                    <span style={{ color: '#16A34A' }}>₹{booking.final_cost?.toFixed(2) || '0.00'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Payment Summary */}
+                        <div className="mb-6 border p-4" style={{ borderColor: '#000', backgroundColor: '#F0FDF4' }}>
+                            <div className="text-base font-bold mb-4 uppercase pb-2" style={{ color: '#166534', borderBottom: '2px solid #16A34A' }}>Payment Summary</div>
+                            <div className="space-y-2">
+                                {booking.advance_payment?.amount > 0 && (
+                                    <div className="flex justify-between py-2 border-b text-sm" style={{ borderColor: '#BBF7D0' }}>
+                                        <span style={{ color: '#15803D' }}>
+                                            Advance Payment (at booking)
+                                            {booking.advance_payment?.razorpay_payment_id && (
+                                                <span className="text-xs block" style={{ color: '#6B7280' }}>ID: {booking.advance_payment.razorpay_payment_id}</span>
+                                            )}
+                                        </span>
+                                        <span className="font-medium" style={{ color: '#16A34A' }}>₹{booking.advance_payment.amount?.toFixed(2) || '0.00'}</span>
+                                    </div>
+                                )}
+                                {booking.final_payment?.amount > 0 && (
+                                    <div className="flex justify-between py-2 border-b text-sm" style={{ borderColor: '#BBF7D0' }}>
+                                        <span style={{ color: '#15803D' }}>
+                                            Final Payment ({booking.final_payment?.method === 'online' ? 'Online' : 'Cash'})
+                                            {booking.final_payment?.razorpay_payment_id && (
+                                                <span className="text-xs block" style={{ color: '#6B7280' }}>ID: {booking.final_payment.razorpay_payment_id}</span>
+                                            )}
+                                        </span>
+                                        <span className="font-medium" style={{ color: '#16A34A' }}>₹{booking.final_payment.amount?.toFixed(2) || '0.00'}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between py-3 mt-3 text-lg font-bold -mx-3 px-3 rounded" style={{ borderTop: '2px solid #16A34A', backgroundColor: '#DCFCE7' }}>
+                                    <span style={{ color: '#166534' }}>TOTAL PAID</span>
+                                    <span style={{ color: '#16A34A' }}>
+                                        ₹{(
+                                            (booking.advance_payment?.amount || 0) + 
+                                            (booking.final_payment?.amount || 0)
+                                        ).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="mt-8 pt-5 text-center" style={{ borderTop: '3px solid #000' }}>
+                            <p className="text-xs mb-12" style={{ color: '#6B7280' }}>
+                                Thank you for choosing YatraMate! We hope you had a great journey.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Final Bill Modal */}
             {showBillModal && (
