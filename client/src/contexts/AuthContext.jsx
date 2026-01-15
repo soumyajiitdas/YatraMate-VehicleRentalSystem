@@ -42,6 +42,16 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const verifyVendorOtp = async (email, otp) => {
+        const result = await authService.verifyVendorOtp(email, otp);
+        return result;
+    };
+
+    const resendVendorOtp = async (email) => {
+        const result = await authService.resendVendorOtp(email);
+        return result;
+    };
+
     const login = async (credentials) => {
         const result = await authService.login(credentials);
         if (result.success) {
@@ -76,6 +86,24 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const requestPasswordChangeOTP = async (currentPassword) => {
+        const result = await authService.requestPasswordChangeOTP(currentPassword);
+        return result;
+    };
+
+    const verifyPasswordChangeOTP = async (otp, newPassword) => {
+        const result = await authService.verifyPasswordChangeOTP(otp, newPassword);
+        if (result.success) {
+            setUser(result.data?.user);
+        }
+        return result;
+    };
+
+    const resendPasswordChangeOTP = async () => {
+        const result = await authService.resendPasswordChangeOTP();
+        return result;
+    };
+
     const value = {
         user,
         loading,
@@ -84,11 +112,16 @@ export const AuthProvider = ({ children }) => {
         verifyOtp,
         resendOtp,
         registerVendor,
+        verifyVendorOtp,
+        resendVendorOtp,
         login,
         logout,
         updatePassword,
         updateProfile,
-        refreshUser
+        refreshUser,
+        requestPasswordChangeOTP,
+        verifyPasswordChangeOTP,
+        resendPasswordChangeOTP
     };
 
     return (

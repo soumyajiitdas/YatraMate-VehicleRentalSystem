@@ -161,8 +161,74 @@ const sendPasswordResetEmail = async (email, resetURL, name) => {
     });
 };
 
+const sendPasswordChangeOTPEmail = async (email, otp, name) => {
+    const subject = 'Password Change Verification - YatraMate';
+    
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 40px;">
+                                <h2 style="margin: 0 0 20px; color: #1f2937; font-size: 22px; font-weight: 600;">Password Change Request</h2>
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi ${name},</p>
+                                <p style="margin: 0 0 30px; color: #4b5563; font-size: 16px; line-height: 1.6;">You have requested to change your password. Please use the following OTP to verify this action:</p>
+                                
+                                <!-- OTP Box -->
+                                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 30px; border: 2px solid #f59e0b;">
+                                    <p style="margin: 0 0 10px; color: #92400e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Your Verification Code</p>
+                                    <p style="margin: 0; color: #78350f; font-size: 36px; font-weight: 700; letter-spacing: 8px;">${otp}</p>
+                                </div>
+                                
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px; line-height: 1.6;">This OTP is valid for <strong>10 minutes</strong>.</p>
+                                <p style="margin: 0; color: #dc2626; font-size: 14px; line-height: 1.6; font-weight: 500;">⚠️ If you didn't request this password change, please ignore this email and ensure your account is secure.</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 20px 40px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${name},\n\nYou have requested to change your password.\n\nYour verification code is: ${otp}\n\nThis OTP is valid for 10 minutes.\n\nIf you didn't request this password change, please ignore this email and ensure your account is secure.\n\nBest regards,\nYatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
 module.exports = {
     sendEmail,
     sendOTPEmail,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    sendPasswordChangeOTPEmail
 };

@@ -94,7 +94,12 @@ const LoginPage = () => {
           // Check if email verification is required
           if (result.requiresVerification && result.email) {
             toast.error(result.message || 'Please verify your email first.');
-            navigate('/verify-otp', { state: { email: result.email } });
+            navigate('/verify-otp', { 
+              state: { 
+                email: result.email,
+                userType: result.userType || 'user'
+              } 
+            });
           } else {
             toast.error(result.message || 'Login failed. Please check your credentials.');
           }

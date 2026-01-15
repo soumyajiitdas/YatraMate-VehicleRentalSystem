@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { API_ENDPOINTS } from '../config/api';
@@ -34,11 +34,9 @@ const VendorPage = () => {
     if (name === 'contact_number') {
       // Remove any non-digit characters
       const digitsOnly = value.replace(/[^\d]/g, '');
-      // Ensure +91 prefix is always present and limit to 10 digits
       if (digitsOnly.length <= 10) {
         finalValue = digitsOnly ? `+91${digitsOnly}` : '';
       } else {
-        // Prevent more than 10 digits after +91
         return;
       }
     }
@@ -109,6 +107,9 @@ const VendorPage = () => {
     if (formData.password !== formData.confirm_password) {
       newErrors.confirm_password = 'Passwords do not match';
     }
+    if (!formData.agreeToTerms) {
+      newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -134,8 +135,18 @@ const VendorPage = () => {
         setLoading(false);
 
         if (result.success) {
-          toast.success(result.message || 'Vendor registration successful! Your account is pending verification. Please login after verification.');
-          navigate('/login');
+          if (result.requiresVerification) {
+            toast.success(result.message || 'Please verify your email with the OTP sent.');
+            navigate('/verify-otp', { 
+              state: { 
+                email: formData.email,
+                userType: 'vendor'
+              } 
+            });
+          } else {
+            toast.success(result.message || 'Vendor registration successful!');
+            navigate('/login');
+          }
         } else {
           toast.error(result.message || 'Error registering vendor. Please try again.');
         }
@@ -556,7 +567,37 @@ const VendorPage = () => {
                 </div>
               </div>
 
-              <div className="pt-4">
+              {/* Terms */}
+            <div>
+              <label className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  name="agreeToTerms"
+                  checked={formData.agreeToTerms}
+                  onChange={handleChange}
+                  className="w-4 h-4 mt-1 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                  data-testid="register-terms-checkbox"
+                />
+                <span className="text-sm text-neutral-700">
+                  I agree to the{' '}
+                  <Link to="/terms" className="text-primary-600 hover:text-primary-700 font-medium">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link to="/privacy" className="text-primary-600 hover:text-primary-700 font-medium">
+                    Privacy Policy
+                  </Link>
+                </span>
+              </label>
+              {errors.agreeToTerms && <p className="mt-1 text-sm text-secondary-600 p-0.5 flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {errors.agreeToTerms}
+              </p>}
+            </div>
+
+              <div className="">
                 <button
                   type="submit"
                   disabled={loading || uploadingDoc}

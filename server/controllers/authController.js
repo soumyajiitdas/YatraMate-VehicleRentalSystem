@@ -3,9 +3,11 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/User');
 const Vendor = require('../models/Vendor');
+const PendingUser = require('../models/PendingUser');
+const PendingVendor = require('../models/PendingVendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const { sendOTPEmail, sendPasswordResetEmail } = require('../utils/email');
+const { sendOTPEmail, sendPasswordResetEmail, sendPasswordChangeOTPEmail } = require('../utils/email');
 
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
@@ -80,74 +82,54 @@ const generateOTP = () => {
 };
 
 // Register new user (customer) - Now requires email verification
+// User is stored in PendingUser collection until email is verified
 exports.register = catchAsync(async (req, res, next) => {
     const { name, email, password, phone, address } = req.body;
 
-    // Check if user already exists
+    // Check if user already exists in verified users
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        // If user exists but is not verified, allow re-registration
-        if (!existingUser.is_verified) {
-            // Generate new OTP
-            const otp = generateOTP();
-            const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-            // Update existing user with new data and OTP
-            existingUser.name = name;
-            existingUser.password_hash = await bcrypt.hash(password, 12);
-            existingUser.phone = phone;
-            existingUser.address = address;
-            existingUser.email_otp = otp;
-            existingUser.email_otp_expires = otpExpires;
-            await existingUser.save();
-
-            // Send OTP email
-            try {
-                await sendOTPEmail(email, otp, name);
-            } catch (emailError) {
-                console.error('Email sending failed:', emailError);
-                return next(new AppError('Failed to send verification email. Please try again.', 500));
-            }
-
-            return res.status(200).json({
-                status: 'success',
-                message: 'Verification OTP has been sent to your email.',
-                data: {
-                    email: email,
-                    requiresVerification: true
-                }
-            });
-        }
         return next(new AppError('User with this email already exists', 400));
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Generate OTP
     const otp = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // Create new user (unverified)
-    const newUser = await User.create({
-        name,
-        email,
-        password_hash: hashedPassword,
-        phone,
-        address,
-        role: 'user',
-        is_verified: false,
-        email_otp: otp,
-        email_otp_expires: otpExpires
-    });
+    // Check if there's already a pending registration for this email
+    const existingPending = await PendingUser.findOne({ email });
+    
+    if (existingPending) {
+        // Update existing pending registration with new data and OTP
+        existingPending.name = name;
+        existingPending.password_hash = hashedPassword;
+        existingPending.phone = phone;
+        existingPending.address = address;
+        existingPending.email_otp = otp;
+        existingPending.email_otp_expires = otpExpires;
+        await existingPending.save();
+    } else {
+        // Create new pending user registration
+        await PendingUser.create({
+            name,
+            email,
+            password_hash: hashedPassword,
+            phone,
+            address,
+            email_otp: otp,
+            email_otp_expires: otpExpires
+        });
+    }
 
     // Send OTP email
     try {
         await sendOTPEmail(email, otp, name);
     } catch (emailError) {
         console.error('Email sending failed:', emailError);
-        // Delete the user if email fails
-        await User.findByIdAndDelete(newUser._id);
+        // Delete the pending user if email fails
+        await PendingUser.findOneAndDelete({ email });
         return next(new AppError('Failed to send verification email. Please try again.', 500));
     }
 
@@ -161,7 +143,7 @@ exports.register = catchAsync(async (req, res, next) => {
     });
 });
 
-// Verify email OTP
+// Verify email OTP - Move user from PendingUser to User collection
 exports.verifyOTP = catchAsync(async (req, res, next) => {
     const { email, otp } = req.body;
 
@@ -169,38 +151,49 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
         return next(new AppError('Please provide email and OTP', 400));
     }
 
-    // Find user with OTP fields
-    const user = await User.findOne({ email }).select('+email_otp +email_otp_expires');
-
-    if (!user) {
-        return next(new AppError('No user found with this email', 404));
-    }
-
-    if (user.is_verified) {
+    // First check if user already exists and is verified
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
         return next(new AppError('Email is already verified', 400));
     }
 
+    // Find pending user
+    const pendingUser = await PendingUser.findOne({ email });
+
+    if (!pendingUser) {
+        return next(new AppError('No pending registration found with this email. Please register again.', 404));
+    }
+
     // Check if OTP matches
-    if (user.email_otp !== otp) {
+    if (pendingUser.email_otp !== otp) {
         return next(new AppError('Invalid OTP', 400));
     }
 
     // Check if OTP has expired
-    if (user.email_otp_expires < Date.now()) {
+    if (pendingUser.email_otp_expires < Date.now()) {
         return next(new AppError('OTP has expired. Please request a new one.', 400));
     }
 
-    // Mark user as verified and clear OTP
-    user.is_verified = true;
-    user.email_otp = undefined;
-    user.email_otp_expires = undefined;
-    await user.save({ validateBeforeSave: false });
+    // Create verified user in User collection
+    const newUser = await User.create({
+        name: pendingUser.name,
+        email: pendingUser.email,
+        password_hash: pendingUser.password_hash,
+        phone: pendingUser.phone,
+        address: pendingUser.address,
+        role: 'user',
+        is_verified: true,
+        is_active: true
+    });
+
+    // Delete pending registration
+    await PendingUser.findByIdAndDelete(pendingUser._id);
 
     // Log in the user
-    createSendToken(req, res, user, 200);
+    createSendToken(req, res, newUser, 200);
 });
 
-// Resend OTP
+// Resend OTP - For pending user registrations
 exports.resendOTP = catchAsync(async (req, res, next) => {
     const { email } = req.body;
 
@@ -208,27 +201,30 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
         return next(new AppError('Please provide email', 400));
     }
 
-    const user = await User.findOne({ email }).select('+email_otp +email_otp_expires');
-
-    if (!user) {
-        return next(new AppError('No user found with this email', 404));
+    // Check if user already exists and is verified
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return next(new AppError('Email is already verified', 400));
     }
 
-    if (user.is_verified) {
-        return next(new AppError('Email is already verified', 400));
+    // Find pending user
+    const pendingUser = await PendingUser.findOne({ email });
+
+    if (!pendingUser) {
+        return next(new AppError('No pending registration found with this email. Please register again.', 404));
     }
 
     // Generate new OTP
     const otp = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    user.email_otp = otp;
-    user.email_otp_expires = otpExpires;
-    await user.save({ validateBeforeSave: false });
+    pendingUser.email_otp = otp;
+    pendingUser.email_otp_expires = otpExpires;
+    await pendingUser.save();
 
     // Send OTP email
     try {
-        await sendOTPEmail(email, otp, user.name);
+        await sendOTPEmail(email, otp, pendingUser.name);
     } catch (emailError) {
         console.error('Email sending failed:', emailError);
         return next(new AppError('Failed to send verification email. Please try again.', 500));
@@ -258,6 +254,17 @@ exports.login = catchAsync(async (req, res, next) => {
         if (!user) {
             return next(new AppError('Incorrect email or password', 401));
         }
+
+        // Check if vendor email is verified
+        if (!user.email_verified) {
+            return res.status(401).json({
+                status: 'fail',
+                message: 'Please verify your email before logging in.',
+                requiresVerification: true,
+                email: email,
+                userType: 'vendor'
+            });
+        }
     } else {
         // For user, admin, office_staff
         user = await User.findOne({ email });
@@ -271,7 +278,8 @@ exports.login = catchAsync(async (req, res, next) => {
                 status: 'fail',
                 message: 'Please verify your email before logging in.',
                 requiresVerification: true,
-                email: email
+                email: email,
+                userType: 'user'
             });
         }
 
@@ -294,7 +302,7 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Your account has been deactivated', 401));
     }
 
-    // Check if vendor is verified
+    // Check if vendor is verified (admin verification)
     if (userRole === 'vendor' && !user.is_verified) {
         return next(new AppError('Your vendor account is pending verification', 401));
     }
@@ -429,45 +437,183 @@ exports.logout = catchAsync(async (req, res, next) => {
     });
 });
 
-// Register vendor
+// Register vendor - Now requires email verification
+// Vendor is stored in PendingVendor collection until email is verified
 exports.registerVendor = catchAsync(async (req, res, next) => {
     const { name, email, password, is_organization, company_name, contact_number, id_type, document_url, address } = req.body;
 
-    // Check if vendor already exists
+    // Check if vendor already exists in verified vendors
     const existingVendor = await Vendor.findOne({ email });
     if (existingVendor) {
         return next(new AppError('Vendor with this email already exists', 400));
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create new vendor
-    const newVendor = await Vendor.create({
-        name,
-        email,
-        password_hash: hashedPassword,
-        is_organization: is_organization || false,
-        company_name,
-        contact_number,
-        id_type,
-        document_url,
-        address,
-        role: 'vendor'
-    });
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Don't auto-login, vendor needs to be verified first
+    // Check if there's already a pending registration for this email
+    const existingPending = await PendingVendor.findOne({ email });
+    
+    if (existingPending) {
+        // Update existing pending registration with new data and OTP
+        existingPending.name = name;
+        existingPending.password_hash = hashedPassword;
+        existingPending.is_organization = is_organization || false;
+        existingPending.company_name = company_name;
+        existingPending.contact_number = contact_number;
+        existingPending.id_type = id_type;
+        existingPending.document_url = document_url;
+        existingPending.address = address;
+        existingPending.email_otp = otp;
+        existingPending.email_otp_expires = otpExpires;
+        await existingPending.save();
+    } else {
+        // Create new pending vendor registration
+        await PendingVendor.create({
+            name,
+            email,
+            password_hash: hashedPassword,
+            is_organization: is_organization || false,
+            company_name,
+            contact_number,
+            id_type,
+            document_url,
+            address,
+            email_otp: otp,
+            email_otp_expires: otpExpires
+        });
+    }
+
+    // Send OTP email
+    try {
+        await sendOTPEmail(email, otp, name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Delete the pending vendor if email fails
+        await PendingVendor.findOneAndDelete({ email });
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
     res.status(201).json({
         status: 'success',
-        message: 'Vendor registration successful! Your account is pending verification.',
+        message: 'Registration successful! Please verify your email with the OTP sent.',
+        data: {
+            email: email,
+            requiresVerification: true,
+            userType: 'vendor'
+        }
+    });
+});
+
+// Verify vendor email OTP - Move vendor from PendingVendor to Vendor collection
+exports.verifyVendorOTP = catchAsync(async (req, res, next) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return next(new AppError('Please provide email and OTP', 400));
+    }
+
+    // First check if vendor already exists
+    const existingVendor = await Vendor.findOne({ email });
+    if (existingVendor) {
+        return next(new AppError('Email is already verified', 400));
+    }
+
+    // Find pending vendor
+    const pendingVendor = await PendingVendor.findOne({ email });
+
+    if (!pendingVendor) {
+        return next(new AppError('No pending registration found with this email. Please register again.', 404));
+    }
+
+    // Check if OTP matches
+    if (pendingVendor.email_otp !== otp) {
+        return next(new AppError('Invalid OTP', 400));
+    }
+
+    // Check if OTP has expired
+    if (pendingVendor.email_otp_expires < Date.now()) {
+        return next(new AppError('OTP has expired. Please request a new one.', 400));
+    }
+
+    // Create verified vendor in Vendor collection (email verified but not admin verified yet)
+    const newVendor = await Vendor.create({
+        name: pendingVendor.name,
+        email: pendingVendor.email,
+        password_hash: pendingVendor.password_hash,
+        is_organization: pendingVendor.is_organization,
+        company_name: pendingVendor.company_name,
+        contact_number: pendingVendor.contact_number,
+        id_type: pendingVendor.id_type,
+        document_url: pendingVendor.document_url,
+        address: pendingVendor.address,
+        role: 'vendor',
+        email_verified: true,
+        is_verified: false // Still needs admin verification
+    });
+
+    // Delete pending registration
+    await PendingVendor.findByIdAndDelete(pendingVendor._id);
+
+    // Don't auto-login, vendor still needs admin verification
+    res.status(200).json({
+        status: 'success',
+        message: 'Email verified successfully! Your vendor account is now pending admin verification.',
         data: {
             vendor: {
                 id: newVendor._id,
                 name: newVendor.name,
                 email: newVendor.email,
+                email_verified: newVendor.email_verified,
                 is_verified: newVendor.is_verified
             }
         }
+    });
+});
+
+// Resend vendor OTP - For pending vendor registrations
+exports.resendVendorOTP = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return next(new AppError('Please provide email', 400));
+    }
+
+    // Check if vendor already exists
+    const existingVendor = await Vendor.findOne({ email });
+    if (existingVendor) {
+        return next(new AppError('Email is already verified', 400));
+    }
+
+    // Find pending vendor
+    const pendingVendor = await PendingVendor.findOne({ email });
+
+    if (!pendingVendor) {
+        return next(new AppError('No pending registration found with this email. Please register again.', 404));
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    pendingVendor.email_otp = otp;
+    pendingVendor.email_otp_expires = otpExpires;
+    await pendingVendor.save();
+
+    // Send OTP email
+    try {
+        await sendOTPEmail(email, otp, pendingVendor.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'New OTP has been sent to your email.'
     });
 });
 
@@ -561,3 +707,149 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
         message: 'Password has been reset successfully. You can now login with your new password.'
     });
 });
+
+
+// Request OTP for password change (for logged-in users)
+exports.requestPasswordChangeOTP = catchAsync(async (req, res, next) => {
+    const { currentPassword } = req.body;
+
+    if (!currentPassword) {
+        return next(new AppError('Please provide your current password', 400));
+    }
+
+    // Get user based on role
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findById(req.user.id);
+    } else {
+        user = await User.findById(req.user.id);
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Verify current password
+    const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isPasswordCorrect) {
+        return next(new AppError('Current password is incorrect', 401));
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Store OTP in user document
+    if (req.user.role === 'vendor') {
+        user.password_change_otp = otp;
+        user.password_change_otp_expires = otpExpires;
+        await user.save({ validateBeforeSave: false });
+    } else {
+        user.password_change_otp = otp;
+        user.password_change_otp_expires = otpExpires;
+        await user.save({ validateBeforeSave: false });
+    }
+
+    // Send OTP email
+    try {
+        await sendPasswordChangeOTPEmail(user.email, otp, user.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Clear OTP on failure
+        user.password_change_otp = undefined;
+        user.password_change_otp_expires = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Verification OTP has been sent to your email.'
+    });
+});
+
+// Verify OTP and change password
+exports.verifyPasswordChangeOTP = catchAsync(async (req, res, next) => {
+    const { otp, newPassword } = req.body;
+
+    if (!otp || !newPassword) {
+        return next(new AppError('Please provide OTP and new password', 400));
+    }
+
+    if (newPassword.length < 6) {
+        return next(new AppError('Password must be at least 6 characters long', 400));
+    }
+
+    // Get user based on role with OTP fields
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findById(req.user.id).select('+password_change_otp +password_change_otp_expires');
+    } else {
+        user = await User.findById(req.user.id).select('+password_change_otp +password_change_otp_expires');
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Check if OTP exists
+    if (!user.password_change_otp) {
+        return next(new AppError('No password change request found. Please request OTP first.', 400));
+    }
+
+    // Check if OTP matches
+    if (user.password_change_otp !== otp) {
+        return next(new AppError('Invalid OTP', 400));
+    }
+
+    // Check if OTP has expired
+    if (user.password_change_otp_expires < Date.now()) {
+        return next(new AppError('OTP has expired. Please request a new one.', 400));
+    }
+
+    // Update password and clear OTP
+    user.password_hash = await bcrypt.hash(newPassword, 12);
+    user.password_change_otp = undefined;
+    user.password_change_otp_expires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    // Send success response with new token
+    createSendToken(req, res, user, 200, req.user.role);
+});
+
+// Resend password change OTP
+exports.resendPasswordChangeOTP = catchAsync(async (req, res, next) => {
+    // Get user based on role
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findById(req.user.id);
+    } else {
+        user = await User.findById(req.user.id);
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.password_change_otp = otp;
+    user.password_change_otp_expires = otpExpires;
+    await user.save({ validateBeforeSave: false });
+
+    // Send OTP email
+    try {
+        await sendPasswordChangeOTPEmail(user.email, otp, user.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'New OTP has been sent to your email.'
+    });
+});
+

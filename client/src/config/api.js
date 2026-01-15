@@ -7,12 +7,17 @@ export const API_ENDPOINTS = {
     verifyOtp: `${API_BASE_URL}/auth/verify-otp`,
     resendOtp: `${API_BASE_URL}/auth/resend-otp`,
     registerVendor: `${API_BASE_URL}/auth/register-vendor`,
+    verifyVendorOtp: `${API_BASE_URL}/auth/verify-vendor-otp`,
+    resendVendorOtp: `${API_BASE_URL}/auth/resend-vendor-otp`,
     logout: `${API_BASE_URL}/auth/logout`,
     currentUser: `${API_BASE_URL}/auth/me`,
     updatePassword: `${API_BASE_URL}/auth/update-password`,
     updateProfile: `${API_BASE_URL}/auth/update-profile`,
     forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
     resetPassword: `${API_BASE_URL}/auth/reset-password`,
+    requestPasswordChangeOTP: `${API_BASE_URL}/auth/request-password-change-otp`,
+    verifyPasswordChangeOTP: `${API_BASE_URL}/auth/verify-password-change-otp`,
+    resendPasswordChangeOTP: `${API_BASE_URL}/auth/resend-password-change-otp`,
 
     // User endpoints
     users: `${API_BASE_URL}/users`,

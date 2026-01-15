@@ -93,9 +93,63 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
-                return { success: true, message: data.message };
+                return { 
+                    success: true, 
+                    message: data.message,
+                    data: data.data,
+                    requiresVerification: data.data?.requiresVerification,
+                    userType: data.data?.userType
+                };
             } else {
                 return { success: false, message: data.message || 'Vendor registration failed' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Verify Vendor OTP
+    async verifyVendorOtp(email, otp) {
+        try {
+            const response = await fetch(API_ENDPOINTS.verifyVendorOtp, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email, otp })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, data: data.data, message: data.message };
+            } else {
+                return { success: false, message: data.message || 'OTP verification failed' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Resend Vendor OTP
+    async resendVendorOtp(email) {
+        try {
+            const response = await fetch(API_ENDPOINTS.resendVendorOtp, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, message: data.message };
+            } else {
+                return { success: false, message: data.message || 'Failed to resend OTP' };
             }
         } catch (error) {
             return { success: false, message: error.message };
@@ -123,7 +177,8 @@ class AuthService {
                     success: false, 
                     message: data.message || 'Login failed',
                     requiresVerification: data.requiresVerification,
-                    email: data.email
+                    email: data.email,
+                    userType: data.userType
                 };
             }
         } catch (error) {
@@ -267,6 +322,77 @@ class AuthService {
                 return { success: true, message: data.message };
             } else {
                 return { success: false, message: data.message || 'Failed to reset password' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Request OTP for password change
+    async requestPasswordChangeOTP(currentPassword) {
+        try {
+            const response = await fetch(API_ENDPOINTS.requestPasswordChangeOTP, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ currentPassword })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, message: data.message };
+            } else {
+                return { success: false, message: data.message || 'Failed to send OTP' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Verify OTP and change password
+    async verifyPasswordChangeOTP(otp, newPassword) {
+        try {
+            const response = await fetch(API_ENDPOINTS.verifyPasswordChangeOTP, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ otp, newPassword })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, data: data.data, message: 'Password changed successfully' };
+            } else {
+                return { success: false, message: data.message || 'Failed to change password' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Resend password change OTP
+    async resendPasswordChangeOTP() {
+        try {
+            const response = await fetch(API_ENDPOINTS.resendPasswordChangeOTP, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                return { success: true, message: data.message };
+            } else {
+                return { success: false, message: data.message || 'Failed to resend OTP' };
             }
         } catch (error) {
             return { success: false, message: error.message };
