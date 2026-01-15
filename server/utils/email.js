@@ -226,9 +226,461 @@ const sendPasswordChangeOTPEmail = async (email, otp, name) => {
     });
 };
 
+// Send email for vehicle pickup confirmation
+const sendPickupConfirmationEmail = async (email, bookingData) => {
+    const { 
+        customerName, 
+        billId, 
+        vehicleName, 
+        vehicleModel,
+        vehicleBrand,
+        vehicleType,
+        registrationNumber,
+        pickupLocation, 
+        pickupDate, 
+        pickupTime,
+        odometerReading,
+        packageName,
+        pricePerKm,
+        pricePerHour
+    } = bookingData;
+
+    const subject = `🚗 Vehicle Pickup Confirmed - ${billId} | YatraMate`;
+    
+    const formatDate = (date) => {
+        if (!date) return 'N/A';
+        const d = new Date(date);
+        return d.toLocaleDateString('en-IN', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    };
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Success Banner -->
+                        <tr>
+                            <td style="padding: 30px 40px 20px; text-align: center;">
+                                <div style="display: inline-block; background: #d1fae5; border-radius: 50%; padding: 15px; margin-bottom: 15px;">
+                                    <span style="font-size: 40px;">✅</span>
+                                </div>
+                                <h2 style="margin: 0 0 10px; color: #059669; font-size: 24px; font-weight: 700;">Vehicle Pickup Confirmed!</h2>
+                                <p style="margin: 0; color: #6b7280; font-size: 16px;">Your journey has begun. Drive safe!</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 20px 40px;">
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi <strong>${customerName}</strong>,</p>
+                                <p style="margin: 0 0 25px; color: #4b5563; font-size: 16px; line-height: 1.6;">We're pleased to confirm that you have successfully picked up your vehicle. Below are the details of your booking:</p>
+                                
+                                <!-- Bill ID Box -->
+                                <div style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; border: 2px dashed #9ca3af;">
+                                    <p style="margin: 0 0 5px; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Bill ID</p>
+                                    <p style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 700; letter-spacing: 2px;">${billId}</p>
+                                </div>
+                                
+                                <!-- Vehicle Details -->
+                                <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">🚗 Vehicle Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Vehicle</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${vehicleBrand} ${vehicleName} (${vehicleModel})</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Type</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right; text-transform: capitalize;">${vehicleType}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Registration No.</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${registrationNumber}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pickup Details -->
+                                <div style="background: #ecfdf5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #d1fae5; padding-bottom: 10px;">📍 Pickup Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${pickupLocation}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Date</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${formatDate(pickupDate)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Time</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${pickupTime}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Odometer Reading</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${odometerReading} km</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Package Details -->
+                                <div style="background: #fef3c7; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #fde68a; padding-bottom: 10px;">💰 Pricing Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Package</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${packageName || 'Standard'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Rate per KM</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">₹${pricePerKm}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Rate per Hour</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">₹${pricePerHour}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Important Notes -->
+                                <div style="background: #fef2f2; border-radius: 12px; padding: 20px; border-left: 4px solid #ef4444;">
+                                    <h4 style="margin: 0 0 10px; color: #991b1b; font-size: 14px; font-weight: 600;">⚠️ Important Reminders</h4>
+                                    <ul style="margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 13px; line-height: 1.8;">
+                                        <li>Please carry your ID proof during the rental period</li>
+                                        <li>Return the vehicle to the same location</li>
+                                        <li>Fuel charges are not included in the rental</li>
+                                        <li>Report any issues immediately to our support team</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0 0 16px 16px;">
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px;">Need help? Contact us at</p>
+                                <p style="margin: 0 0 15px; color: #059669; font-size: 14px; font-weight: 600;">support@yatramate.com</p>
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${customerName},
+
+Vehicle Pickup Confirmed!
+
+Your journey has begun. Drive safe!
+
+BILL ID: ${billId}
+
+VEHICLE DETAILS:
+- Vehicle: ${vehicleBrand} ${vehicleName} (${vehicleModel})
+- Type: ${vehicleType}
+- Registration No.: ${registrationNumber}
+
+PICKUP DETAILS:
+- Location: ${pickupLocation}
+- Date: ${formatDate(pickupDate)}
+- Time: ${pickupTime}
+- Odometer Reading: ${odometerReading} km
+
+PRICING:
+- Package: ${packageName || 'Standard'}
+- Rate per KM: ₹${pricePerKm}
+- Rate per Hour: ₹${pricePerHour}
+
+IMPORTANT REMINDERS:
+- Please carry your ID proof during the rental period
+- Return the vehicle to the same location
+- Fuel charges are not included in the rental
+- Report any issues immediately to our support team
+
+Need help? Contact us at support@yatramate.com
+
+Best regards,
+YatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
+// Send email for successful vehicle return
+const sendReturnConfirmationEmail = async (email, bookingData) => {
+    const {
+        customerName,
+        billId,
+        vehicleName,
+        vehicleModel,
+        vehicleBrand,
+        vehicleType,
+        registrationNumber,
+        pickupLocation,
+        pickupDate,
+        pickupTime,
+        returnDate,
+        returnTime,
+        odometerStart,
+        odometerEnd,
+        distanceTraveled,
+        durationHours,
+        costPerDistance,
+        costPerTime,
+        damageCost,
+        finalCost,
+        amountPaid,
+        vehicleCondition
+    } = bookingData;
+
+    const subject = `🎉 Vehicle Returned Successfully - ${billId} | YatraMate`;
+    
+    const formatDate = (date) => {
+        if (!date) return 'N/A';
+        const d = new Date(date);
+        return d.toLocaleDateString('en-IN', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 2
+        }).format(amount || 0);
+    };
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Success Banner -->
+                        <tr>
+                            <td style="padding: 30px 40px 20px; text-align: center;">
+                                <div style="display: inline-block; background: #ede9fe; border-radius: 50%; padding: 15px; margin-bottom: 15px;">
+                                    <span style="font-size: 40px;">🎉</span>
+                                </div>
+                                <h2 style="margin: 0 0 10px; color: #6366f1; font-size: 24px; font-weight: 700;">Vehicle Returned Successfully!</h2>
+                                <p style="margin: 0; color: #6b7280; font-size: 16px;">Thank you for choosing YatraMate!</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 20px 40px;">
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi <strong>${customerName}</strong>,</p>
+                                <p style="margin: 0 0 25px; color: #4b5563; font-size: 16px; line-height: 1.6;">Your vehicle has been successfully returned. Here's a complete summary of your trip:</p>
+                                
+                                <!-- Bill ID Box -->
+                                <div style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; border: 2px dashed #9ca3af;">
+                                    <p style="margin: 0 0 5px; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Bill ID</p>
+                                    <p style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 700; letter-spacing: 2px;">${billId}</p>
+                                </div>
+                                
+                                <!-- Vehicle Details -->
+                                <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">🚗 Vehicle Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Vehicle</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${vehicleBrand} ${vehicleName} (${vehicleModel})</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Type</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right; text-transform: capitalize;">${vehicleType}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Registration No.</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${registrationNumber}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Condition at Return</td>
+                                            <td style="padding: 8px 0; color: ${vehicleCondition === 'perfect' ? '#10b981' : '#ef4444'}; font-size: 14px; font-weight: 600; text-align: right; text-transform: capitalize;">${vehicleCondition === 'perfect' ? '✅ Perfect' : '⚠️ Damaged'}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Trip Summary -->
+                                <div style="background: #ecfdf5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #d1fae5; padding-bottom: 10px;">📊 Trip Summary</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Pickup Location</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${pickupLocation}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Pickup Date & Time</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${formatDate(pickupDate)} at ${pickupTime}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Return Date & Time</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${formatDate(returnDate)} at ${returnTime}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Odometer (Start → End)</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${odometerStart} km → ${odometerEnd} km</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Total Distance</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${distanceTraveled} km</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Total Duration</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${durationHours} hours</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Cost Breakdown -->
+                                <div style="background: #fef3c7; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #fde68a; padding-bottom: 10px;">💰 Cost Breakdown</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Distance Charges (${distanceTraveled} km)</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${formatCurrency(costPerDistance)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Time Charges (${durationHours} hours)</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${formatCurrency(costPerTime)}</td>
+                                        </tr>
+                                        ${damageCost > 0 ? `
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #ef4444; font-size: 14px;">Damage Charges</td>
+                                            <td style="padding: 8px 0; color: #ef4444; font-size: 14px; font-weight: 600; text-align: right;">${formatCurrency(damageCost)}</td>
+                                        </tr>
+                                        ` : ''}
+                                        <tr style="border-top: 2px solid #fde68a;">
+                                            <td style="padding: 12px 0; color: #1f2937; font-size: 16px; font-weight: 700;">Total Amount</td>
+                                            <td style="padding: 12px 0; color: #1f2937; font-size: 18px; font-weight: 700; text-align: right;">${formatCurrency(finalCost)}</td>
+                                        </tr>
+                                        <tr style="background: #d1fae5; border-radius: 8px;">
+                                            <td style="padding: 12px 8px; color: #059669; font-size: 14px; font-weight: 600;">Amount Paid</td>
+                                            <td style="padding: 12px 8px; color: #059669; font-size: 16px; font-weight: 700; text-align: right;">${formatCurrency(amountPaid)}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Thank You Message -->
+                                <div style="background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-radius: 12px; padding: 25px; text-align: center;">
+                                    <p style="margin: 0 0 10px; color: #6366f1; font-size: 18px; font-weight: 600;">Thank you for riding with us! 🙏</p>
+                                    <p style="margin: 0; color: #6b7280; font-size: 14px;">We hope you had a wonderful journey. See you again soon!</p>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0 0 16px 16px;">
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px;">Need help? Contact us at</p>
+                                <p style="margin: 0 0 15px; color: #6366f1; font-size: 14px; font-weight: 600;">support@yatramate.com</p>
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${customerName},
+
+Vehicle Returned Successfully! 🎉
+
+Thank you for choosing YatraMate!
+
+BILL ID: ${billId}
+
+VEHICLE DETAILS:
+- Vehicle: ${vehicleBrand} ${vehicleName} (${vehicleModel})
+- Type: ${vehicleType}
+- Registration No.: ${registrationNumber}
+- Condition at Return: ${vehicleCondition === 'perfect' ? 'Perfect' : 'Damaged'}
+
+TRIP SUMMARY:
+- Pickup Location: ${pickupLocation}
+- Pickup: ${formatDate(pickupDate)} at ${pickupTime}
+- Return: ${formatDate(returnDate)} at ${returnTime}
+- Odometer: ${odometerStart} km → ${odometerEnd} km
+- Total Distance: ${distanceTraveled} km
+- Total Duration: ${durationHours} hours
+
+COST BREAKDOWN:
+- Distance Charges (${distanceTraveled} km): ${formatCurrency(costPerDistance)}
+- Time Charges (${durationHours} hours): ${formatCurrency(costPerTime)}
+${damageCost > 0 ? `- Damage Charges: ${formatCurrency(damageCost)}` : ''}
+- Total Amount: ${formatCurrency(finalCost)}
+- Amount Paid: ${formatCurrency(amountPaid)}
+
+Thank you for riding with us! We hope you had a wonderful journey.
+
+Need help? Contact us at support@yatramate.com
+
+Best regards,
+YatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
 module.exports = {
     sendEmail,
     sendOTPEmail,
     sendPasswordResetEmail,
-    sendPasswordChangeOTPEmail
+    sendPasswordChangeOTPEmail,
+    sendPickupConfirmationEmail,
+    sendReturnConfirmationEmail
 };
