@@ -26,11 +26,9 @@ const RegisterPage = () => {
     if (name === 'phone') {
       // Remove any non-digit characters except +
       const digitsOnly = value.replace(/[^\d]/g, '');
-      // Ensure +91 prefix is always present
       if (digitsOnly.length <= 10) {
         finalValue = digitsOnly ? `+91${digitsOnly}` : '';
       } else {
-        // Prevent more than 10 digits after +91
         return;
       }
     }

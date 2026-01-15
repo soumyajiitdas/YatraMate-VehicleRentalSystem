@@ -258,6 +258,17 @@ exports.login = catchAsync(async (req, res, next) => {
         if (!user) {
             return next(new AppError('Incorrect email or password', 401));
         }
+
+        // Check if vendor email is verified
+        if (!user.email_verified) {
+            return res.status(401).json({
+                status: 'fail',
+                message: 'Please verify your email before logging in.',
+                requiresVerification: true,
+                email: email,
+                userType: 'vendor'
+            });
+        }
     } else {
         // For user, admin, office_staff
         user = await User.findOne({ email });
@@ -271,7 +282,8 @@ exports.login = catchAsync(async (req, res, next) => {
                 status: 'fail',
                 message: 'Please verify your email before logging in.',
                 requiresVerification: true,
-                email: email
+                email: email,
+                userType: 'user'
             });
         }
 
@@ -294,7 +306,7 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Your account has been deactivated', 401));
     }
 
-    // Check if vendor is verified
+    // Check if vendor is verified (admin verification)
     if (userRole === 'vendor' && !user.is_verified) {
         return next(new AppError('Your vendor account is pending verification', 401));
     }
@@ -429,20 +441,61 @@ exports.logout = catchAsync(async (req, res, next) => {
     });
 });
 
-// Register vendor
+// Register vendor - Now requires email verification
 exports.registerVendor = catchAsync(async (req, res, next) => {
     const { name, email, password, is_organization, company_name, contact_number, id_type, document_url, address } = req.body;
 
     // Check if vendor already exists
     const existingVendor = await Vendor.findOne({ email });
     if (existingVendor) {
+        // If vendor exists but email is not verified, allow re-registration
+        if (!existingVendor.email_verified) {
+            // Generate new OTP
+            const otp = generateOTP();
+            const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+            // Update existing vendor with new data and OTP
+            existingVendor.name = name;
+            existingVendor.password_hash = await bcrypt.hash(password, 12);
+            existingVendor.is_organization = is_organization || false;
+            existingVendor.company_name = company_name;
+            existingVendor.contact_number = contact_number;
+            existingVendor.id_type = id_type;
+            existingVendor.document_url = document_url;
+            existingVendor.address = address;
+            existingVendor.email_otp = otp;
+            existingVendor.email_otp_expires = otpExpires;
+            await existingVendor.save();
+
+            // Send OTP email
+            try {
+                await sendOTPEmail(email, otp, name);
+            } catch (emailError) {
+                console.error('Email sending failed:', emailError);
+                return next(new AppError('Failed to send verification email. Please try again.', 500));
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                message: 'Verification OTP has been sent to your email.',
+                data: {
+                    email: email,
+                    requiresVerification: true,
+                    userType: 'vendor'
+                }
+            });
+        }
         return next(new AppError('Vendor with this email already exists', 400));
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create new vendor
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Create new vendor (email unverified)
     const newVendor = await Vendor.create({
         name,
         email,
@@ -453,21 +506,121 @@ exports.registerVendor = catchAsync(async (req, res, next) => {
         id_type,
         document_url,
         address,
-        role: 'vendor'
+        role: 'vendor',
+        email_verified: false,
+        email_otp: otp,
+        email_otp_expires: otpExpires
     });
 
-    // Don't auto-login, vendor needs to be verified first
+    // Send OTP email
+    try {
+        await sendOTPEmail(email, otp, name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Delete the vendor if email fails
+        await Vendor.findByIdAndDelete(newVendor._id);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
     res.status(201).json({
         status: 'success',
-        message: 'Vendor registration successful! Your account is pending verification.',
+        message: 'Registration successful! Please verify your email with the OTP sent.',
+        data: {
+            email: email,
+            requiresVerification: true,
+            userType: 'vendor'
+        }
+    });
+});
+
+// Verify vendor email OTP
+exports.verifyVendorOTP = catchAsync(async (req, res, next) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return next(new AppError('Please provide email and OTP', 400));
+    }
+
+    // Find vendor with OTP fields
+    const vendor = await Vendor.findOne({ email }).select('+email_otp +email_otp_expires');
+
+    if (!vendor) {
+        return next(new AppError('No vendor found with this email', 404));
+    }
+
+    if (vendor.email_verified) {
+        return next(new AppError('Email is already verified', 400));
+    }
+
+    // Check if OTP matches
+    if (vendor.email_otp !== otp) {
+        return next(new AppError('Invalid OTP', 400));
+    }
+
+    // Check if OTP has expired
+    if (vendor.email_otp_expires < Date.now()) {
+        return next(new AppError('OTP has expired. Please request a new one.', 400));
+    }
+
+    // Mark vendor email as verified and clear OTP
+    vendor.email_verified = true;
+    vendor.email_otp = undefined;
+    vendor.email_otp_expires = undefined;
+    await vendor.save({ validateBeforeSave: false });
+
+    // Don't auto-login, vendor still needs admin verification
+    res.status(200).json({
+        status: 'success',
+        message: 'Email verified successfully! Your vendor account is now pending admin verification.',
         data: {
             vendor: {
-                id: newVendor._id,
-                name: newVendor.name,
-                email: newVendor.email,
-                is_verified: newVendor.is_verified
+                id: vendor._id,
+                name: vendor.name,
+                email: vendor.email,
+                email_verified: vendor.email_verified,
+                is_verified: vendor.is_verified
             }
         }
+    });
+});
+
+// Resend vendor OTP
+exports.resendVendorOTP = catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return next(new AppError('Please provide email', 400));
+    }
+
+    const vendor = await Vendor.findOne({ email }).select('+email_otp +email_otp_expires');
+
+    if (!vendor) {
+        return next(new AppError('No vendor found with this email', 404));
+    }
+
+    if (vendor.email_verified) {
+        return next(new AppError('Email is already verified', 400));
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    vendor.email_otp = otp;
+    vendor.email_otp_expires = otpExpires;
+    await vendor.save({ validateBeforeSave: false });
+
+    // Send OTP email
+    try {
+        await sendOTPEmail(email, otp, vendor.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'New OTP has been sent to your email.'
     });
 });
 

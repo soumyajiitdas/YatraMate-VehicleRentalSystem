@@ -6,10 +6,11 @@ import { useToast } from '../../contexts/ToastContext';
 const VerifyOtpPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { verifyOtp, resendOtp } = useAuth();
+    const { verifyOtp, resendOtp, verifyVendorOtp, resendVendorOtp } = useAuth();
     const { toast } = useToast();
     
     const email = location.state?.email || '';
+    const userType = location.state?.userType || 'user'; // 'user' or 'vendor'
     
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -22,9 +23,9 @@ const VerifyOtpPage = () => {
     // Redirect if no email in state
     useEffect(() => {
         if (!email) {
-            navigate('/register');
+            navigate(userType === 'vendor' ? '/vendor' : '/register');
         }
-    }, [email, navigate]);
+    }, [email, navigate, userType]);
 
     // Countdown timer for resend
     useEffect(() => {
@@ -85,11 +86,22 @@ const VerifyOtpPage = () => {
         setLoading(true);
         
         try {
-            const result = await verifyOtp(email, otpString);
+            let result;
+            
+            if (userType === 'vendor') {
+                result = await verifyVendorOtp(email, otpString);
+            } else {
+                result = await verifyOtp(email, otpString);
+            }
             
             if (result.success) {
-                toast.success('Email verified successfully!');
-                navigate('/');
+                if (userType === 'vendor') {
+                    toast.success(result.message || 'Email verified successfully! Your account is pending admin verification.');
+                    navigate('/login');
+                } else {
+                    toast.success('Email verified successfully!');
+                    navigate('/');
+                }
             } else {
                 toast.error(result.message || 'OTP verification failed');
                 // Clear OTP on error
@@ -109,7 +121,13 @@ const VerifyOtpPage = () => {
         setResendLoading(true);
         
         try {
-            const result = await resendOtp(email);
+            let result;
+            
+            if (userType === 'vendor') {
+                result = await resendVendorOtp(email);
+            } else {
+                result = await resendOtp(email);
+            }
             
             if (result.success) {
                 toast.success('New OTP sent successfully!');
@@ -127,6 +145,14 @@ const VerifyOtpPage = () => {
         }
     };
 
+    const getBackLink = () => {
+        return userType === 'vendor' ? '/vendor' : '/register';
+    };
+
+    const getBackLinkText = () => {
+        return userType === 'vendor' ? 'Go back to vendor registration' : 'Go back to registration';
+    };
+
     return (
         <div className="min-h-screen bg-linear-to-r from-primary-600 via-secondary-600 to-primary-700 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
@@ -141,6 +167,11 @@ const VerifyOtpPage = () => {
                         <h2 className="text-3xl font-display font-bold text-neutral-900 mb-2">
                             Verify Your <span className='text-red-500'>Email</span>
                         </h2>
+                        {userType === 'vendor' && (
+                            <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-semibold mb-2">
+                                Vendor Registration
+                            </span>
+                        )}
                         <p className="text-neutral-600 text-sm">
                             We've sent a 6-digit OTP to
                         </p>
@@ -209,6 +240,22 @@ const VerifyOtpPage = () => {
                         </button>
                     </form>
 
+                    {/* Vendor Info Box */}
+                    {userType === 'vendor' && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div className="flex items-start space-x-3">
+                                <svg className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div>
+                                    <p className="text-sm text-amber-800">
+                                        <span className="font-semibold">Note:</span> After email verification, your vendor account will be reviewed by our admin team before activation.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Info Box */}
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                         <div className="flex items-start space-x-3">
@@ -230,8 +277,8 @@ const VerifyOtpPage = () => {
                     <div className="text-center">
                         <p className="text-sm text-neutral-600">
                             Wrong email?{' '}
-                            <Link to="/register" className="font-semibold text-primary-600 hover:text-primary-700 transition-colors duration-200">
-                                Go back to registration
+                            <Link to={getBackLink()} className="font-semibold text-primary-600 hover:text-primary-700 transition-colors duration-200">
+                                {getBackLinkText()}
                             </Link>
                         </p>
                     </div>

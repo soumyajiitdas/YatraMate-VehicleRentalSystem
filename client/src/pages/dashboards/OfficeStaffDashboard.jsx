@@ -221,7 +221,6 @@ const OfficeStaffDashboard = () => {
                 <div className="mb-8 md:mb-12">
                     {/* Mobile and Desktop Layout */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
-                        {/* Logo - Left on desktop, top on mobile */}
                         <div className="flex items-center justify-between md:justify-start mb-6">
                             <div className="flex items-center space-x-2 group">
                                 <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
@@ -310,7 +309,7 @@ const OfficeStaffDashboard = () => {
                     </div>
 
                     {/* Desktop Vertical Sidebar */}
-                    <aside className="hidden md:block md:w-64 shrink-0">
+                    <aside className="hidden md:block md:w-60 shrink-0">
                         <div className="bg-white border border-primary-200 rounded-lg shadow-sm overflow-hidden sticky top-4">
                             <nav className="flex flex-col">
                                 <button

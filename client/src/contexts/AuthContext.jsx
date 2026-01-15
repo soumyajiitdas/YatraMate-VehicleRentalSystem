@@ -42,6 +42,16 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const verifyVendorOtp = async (email, otp) => {
+        const result = await authService.verifyVendorOtp(email, otp);
+        return result;
+    };
+
+    const resendVendorOtp = async (email) => {
+        const result = await authService.resendVendorOtp(email);
+        return result;
+    };
+
     const login = async (credentials) => {
         const result = await authService.login(credentials);
         if (result.success) {
@@ -84,6 +94,8 @@ export const AuthProvider = ({ children }) => {
         verifyOtp,
         resendOtp,
         registerVendor,
+        verifyVendorOtp,
+        resendVendorOtp,
         login,
         logout,
         updatePassword,

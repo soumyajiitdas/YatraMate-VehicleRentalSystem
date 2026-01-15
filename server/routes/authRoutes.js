@@ -9,6 +9,8 @@ router.post('/register', authController.register);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/resend-otp', authController.resendOTP);
 router.post('/register-vendor', authController.registerVendor);
+router.post('/verify-vendor-otp', authController.verifyVendorOTP);
+router.post('/resend-vendor-otp', authController.resendVendorOTP);
 router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 router.post('/forgot-password', authController.forgotPassword);
