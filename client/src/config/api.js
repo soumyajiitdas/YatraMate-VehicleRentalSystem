@@ -15,6 +15,9 @@ export const API_ENDPOINTS = {
     updateProfile: `${API_BASE_URL}/auth/update-profile`,
     forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
     resetPassword: `${API_BASE_URL}/auth/reset-password`,
+    requestPasswordChangeOTP: `${API_BASE_URL}/auth/request-password-change-otp`,
+    verifyPasswordChangeOTP: `${API_BASE_URL}/auth/verify-password-change-otp`,
+    resendPasswordChangeOTP: `${API_BASE_URL}/auth/resend-password-change-otp`,
 
     // User endpoints
     users: `${API_BASE_URL}/users`,

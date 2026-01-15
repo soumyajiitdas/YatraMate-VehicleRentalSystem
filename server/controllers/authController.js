@@ -5,7 +5,7 @@ const User = require('../models/User');
 const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const { sendOTPEmail, sendPasswordResetEmail } = require('../utils/email');
+const { sendOTPEmail, sendPasswordResetEmail, sendPasswordChangeOTPEmail } = require('../utils/email');
 
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
@@ -714,3 +714,149 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
         message: 'Password has been reset successfully. You can now login with your new password.'
     });
 });
+
+
+// Request OTP for password change (for logged-in users)
+exports.requestPasswordChangeOTP = catchAsync(async (req, res, next) => {
+    const { currentPassword } = req.body;
+
+    if (!currentPassword) {
+        return next(new AppError('Please provide your current password', 400));
+    }
+
+    // Get user based on role
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findById(req.user.id);
+    } else {
+        user = await User.findById(req.user.id);
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Verify current password
+    const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isPasswordCorrect) {
+        return next(new AppError('Current password is incorrect', 401));
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Store OTP in user document
+    if (req.user.role === 'vendor') {
+        user.password_change_otp = otp;
+        user.password_change_otp_expires = otpExpires;
+        await user.save({ validateBeforeSave: false });
+    } else {
+        user.password_change_otp = otp;
+        user.password_change_otp_expires = otpExpires;
+        await user.save({ validateBeforeSave: false });
+    }
+
+    // Send OTP email
+    try {
+        await sendPasswordChangeOTPEmail(user.email, otp, user.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Clear OTP on failure
+        user.password_change_otp = undefined;
+        user.password_change_otp_expires = undefined;
+        await user.save({ validateBeforeSave: false });
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Verification OTP has been sent to your email.'
+    });
+});
+
+// Verify OTP and change password
+exports.verifyPasswordChangeOTP = catchAsync(async (req, res, next) => {
+    const { otp, newPassword } = req.body;
+
+    if (!otp || !newPassword) {
+        return next(new AppError('Please provide OTP and new password', 400));
+    }
+
+    if (newPassword.length < 6) {
+        return next(new AppError('Password must be at least 6 characters long', 400));
+    }
+
+    // Get user based on role with OTP fields
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findById(req.user.id).select('+password_change_otp +password_change_otp_expires');
+    } else {
+        user = await User.findById(req.user.id).select('+password_change_otp +password_change_otp_expires');
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Check if OTP exists
+    if (!user.password_change_otp) {
+        return next(new AppError('No password change request found. Please request OTP first.', 400));
+    }
+
+    // Check if OTP matches
+    if (user.password_change_otp !== otp) {
+        return next(new AppError('Invalid OTP', 400));
+    }
+
+    // Check if OTP has expired
+    if (user.password_change_otp_expires < Date.now()) {
+        return next(new AppError('OTP has expired. Please request a new one.', 400));
+    }
+
+    // Update password and clear OTP
+    user.password_hash = await bcrypt.hash(newPassword, 12);
+    user.password_change_otp = undefined;
+    user.password_change_otp_expires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    // Send success response with new token
+    createSendToken(req, res, user, 200, req.user.role);
+});
+
+// Resend password change OTP
+exports.resendPasswordChangeOTP = catchAsync(async (req, res, next) => {
+    // Get user based on role
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findById(req.user.id);
+    } else {
+        user = await User.findById(req.user.id);
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.password_change_otp = otp;
+    user.password_change_otp_expires = otpExpires;
+    await user.save({ validateBeforeSave: false });
+
+    // Send OTP email
+    try {
+        await sendPasswordChangeOTPEmail(user.email, otp, user.name);
+    } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'New OTP has been sent to your email.'
+    });
+});
+

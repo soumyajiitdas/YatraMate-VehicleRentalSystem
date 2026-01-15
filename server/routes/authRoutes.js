@@ -22,5 +22,8 @@ router.use(protect);
 router.get('/me', authController.getCurrentUser);
 router.patch('/update-password', authController.updatePassword);
 router.patch('/update-profile', authController.updateProfile);
+router.post('/request-password-change-otp', authController.requestPasswordChangeOTP);
+router.post('/verify-password-change-otp', authController.verifyPasswordChangeOTP);
+router.post('/resend-password-change-otp', authController.resendPasswordChangeOTP);
 
 module.exports = router;

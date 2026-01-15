@@ -86,6 +86,24 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const requestPasswordChangeOTP = async (currentPassword) => {
+        const result = await authService.requestPasswordChangeOTP(currentPassword);
+        return result;
+    };
+
+    const verifyPasswordChangeOTP = async (otp, newPassword) => {
+        const result = await authService.verifyPasswordChangeOTP(otp, newPassword);
+        if (result.success) {
+            setUser(result.data?.user);
+        }
+        return result;
+    };
+
+    const resendPasswordChangeOTP = async () => {
+        const result = await authService.resendPasswordChangeOTP();
+        return result;
+    };
+
     const value = {
         user,
         loading,
@@ -100,7 +118,10 @@ export const AuthProvider = ({ children }) => {
         logout,
         updatePassword,
         updateProfile,
-        refreshUser
+        refreshUser,
+        requestPasswordChangeOTP,
+        verifyPasswordChangeOTP,
+        resendPasswordChangeOTP
     };
 
     return (

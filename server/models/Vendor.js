@@ -60,6 +60,14 @@ const vendorSchema = new mongoose.Schema({
         type: Date,
         select: false
     },
+    password_change_otp: {
+        type: String,
+        select: false
+    },
+    password_change_otp_expires: {
+        type: Date,
+        select: false
+    },
     total_earnings: {
         type: Number,
         default: 0

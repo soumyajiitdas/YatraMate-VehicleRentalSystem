@@ -3,22 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
-import { MapPinned } from 'lucide-react';
+import { MapPinned, Mail, Shield, Settings, LockKeyhole } from 'lucide-react';
 import CustomDropdown from '../../components/common/CustomDropdown';
 
 const VendorDashboard = () => {
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
+    const { user, isAuthenticated, logout, loading: authLoading, requestPasswordChangeOTP, verifyPasswordChangeOTP, resendPasswordChangeOTP } = useAuth();
     const { toast } = useToast();
     const [vehicles, setVehicles] = useState([]);
     const [vendorInfo, setVendorInfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
-    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles' or 'earnings'
+    const [activeTab, setActiveTab] = useState('vehicles'); // 'vehicles', 'earnings', or 'settings'
     const [earnings, setEarnings] = useState([]);
     const [earningsFilter, setEarningsFilter] = useState('all');
     const [totalEarnings, setTotalEarnings] = useState(0);
     const [earningsLoading, setEarningsLoading] = useState(false);
+
+    // Password change states
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    });
+    const [passwordChangeStep, setPasswordChangeStep] = useState('form'); // 'form', 'otp'
+    const [otp, setOtp] = useState('');
+    const [isRequestingOTP, setIsRequestingOTP] = useState(false);
+    const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+    const [isResendingOTP, setIsResendingOTP] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -64,6 +77,14 @@ const VendorDashboard = () => {
             }
         }
     }, [activeTab, earningsFilter, user]);
+
+    // Resend cooldown timer
+    useEffect(() => {
+        if (resendCooldown > 0) {
+            const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [resendCooldown]);
 
     const fetchVendorInfo = async (vendorId) => {
         try {
@@ -298,6 +319,108 @@ const VendorDashboard = () => {
         }
     };
 
+    // Password change handlers
+    const handlePasswordChange = (e) => {
+        setPasswordData(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
+    };
+
+    const handleRequestPasswordChangeOTP = async () => {
+        if (!passwordData.currentPassword) {
+            toast.warning('Please enter your current password');
+            return;
+        }
+
+        if (!passwordData.newPassword) {
+            toast.warning('Please enter your new password');
+            return;
+        }
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            toast.error('New passwords do not match');
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            toast.warning('Password must be at least 6 characters');
+            return;
+        }
+
+        setIsRequestingOTP(true);
+        try {
+            const result = await requestPasswordChangeOTP(passwordData.currentPassword);
+
+            if (result.success) {
+                toast.success('Verification OTP sent to your email!');
+                setPasswordChangeStep('otp');
+                setResendCooldown(60);
+            } else {
+                toast.error(result.message || 'Failed to send OTP');
+            }
+        } catch (error) {
+            toast.error('Error sending OTP: ' + error.message);
+        } finally {
+            setIsRequestingOTP(false);
+        }
+    };
+
+    const handleVerifyOTPAndChangePassword = async () => {
+        if (!otp || otp.length !== 6) {
+            toast.warning('Please enter the 6-digit OTP');
+            return;
+        }
+
+        setIsVerifyingOTP(true);
+        try {
+            const result = await verifyPasswordChangeOTP(otp, passwordData.newPassword);
+
+            if (result.success) {
+                toast.success('Password changed successfully!');
+                // Reset all states
+                setPasswordData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                });
+                setOtp('');
+                setPasswordChangeStep('form');
+            } else {
+                toast.error(result.message || 'Failed to change password');
+            }
+        } catch (error) {
+            toast.error('Error changing password: ' + error.message);
+        } finally {
+            setIsVerifyingOTP(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        if (resendCooldown > 0) return;
+
+        setIsResendingOTP(true);
+        try {
+            const result = await resendPasswordChangeOTP();
+
+            if (result.success) {
+                toast.success('New OTP sent to your email!');
+                setResendCooldown(60);
+            } else {
+                toast.error(result.message || 'Failed to resend OTP');
+            }
+        } catch (error) {
+            toast.error('Error resending OTP: ' + error.message);
+        } finally {
+            setIsResendingOTP(false);
+        }
+    };
+
+    const handleCancelOTPStep = () => {
+        setPasswordChangeStep('form');
+        setOtp('');
+    };
+
     const handleLogout = async () => {
         await logout();
         navigate('/login');
@@ -354,10 +477,10 @@ const VendorDashboard = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 {/* Tab Navigation */}
-                <div className="mb-6 flex justify-center gap-4">
+                <div className="mb-6 flex justify-center gap-2 sm:gap-4 flex-wrap">
                     <button
                         onClick={() => setActiveTab('vehicles')}
-                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
                             activeTab === 'vehicles'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
                                 : 'bg-white text-neutral-700 hover:bg-neutral-100'
@@ -368,7 +491,7 @@ const VendorDashboard = () => {
                     </button>
                     <button
                         onClick={() => setActiveTab('earnings')}
-                        className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
                             activeTab === 'earnings'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
                                 : 'bg-white text-neutral-700 hover:bg-neutral-100'
@@ -376,6 +499,18 @@ const VendorDashboard = () => {
                         data-testid="earnings-tab"
                     >
                         My Earnings
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('settings')}
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base flex items-center gap-2 ${
+                            activeTab === 'settings'
+                                ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
+                                : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                        }`}
+                        data-testid="settings-tab"
+                    >
+                        <Settings className="w-4 h-4" />
+                        Settings
                     </button>
                 </div>
 
@@ -855,6 +990,174 @@ const VendorDashboard = () => {
                             </div>
                         )}
                     </>
+                )}
+
+                {/* Settings Tab */}
+                {activeTab === 'settings' && (
+                    <div className="max-w-2xl mx-auto">
+                        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+                            <div className="flex items-center space-x-3 mb-6">
+                                <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
+                                    <LockKeyhole className="w-6 h-6 text-primary-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-neutral-900">Change Password</h2>
+                                    <p className="text-sm text-neutral-600">Secure your account with a new password</p>
+                                </div>
+                            </div>
+
+                            {passwordChangeStep === 'form' ? (
+                                <div className="space-y-5">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                                            Current Password
+                                        </label>
+                                        <input
+                                            type="password"
+                                            name="currentPassword"
+                                            value={passwordData.currentPassword}
+                                            onChange={handlePasswordChange}
+                                            placeholder="Enter current password"
+                                            data-testid="vendor-current-password-input"
+                                            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                                            New Password
+                                        </label>
+                                        <input
+                                            type="password"
+                                            name="newPassword"
+                                            value={passwordData.newPassword}
+                                            onChange={handlePasswordChange}
+                                            placeholder="Enter new password (min. 6 characters)"
+                                            data-testid="vendor-new-password-input"
+                                            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                                            Confirm New Password
+                                        </label>
+                                        <input
+                                            type="password"
+                                            name="confirmPassword"
+                                            value={passwordData.confirmPassword}
+                                            onChange={handlePasswordChange}
+                                            placeholder="Confirm new password"
+                                            data-testid="vendor-confirm-password-input"
+                                            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
+                                        />
+                                    </div>
+
+                                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                        <div className="flex items-start space-x-3">
+                                            <Mail className="w-5 h-5 text-amber-600 mt-0.5" />
+                                            <div>
+                                                <p className="text-sm font-medium text-amber-800">Email Verification Required</p>
+                                                <p className="text-xs text-amber-700 mt-1">A verification OTP will be sent to your registered email address to confirm the password change.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={handleRequestPasswordChangeOTP}
+                                        disabled={isRequestingOTP}
+                                        data-testid="vendor-request-otp-btn"
+                                        className="w-full px-6 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                                    >
+                                        {isRequestingOTP ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                <span>Sending OTP...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Mail className="w-5 h-5" />
+                                                <span>Send Verification OTP</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-5">
+                                    {/* OTP Verification Step */}
+                                    <div className="bg-primary-50 border border-primary-200 rounded-xl p-6 text-center">
+                                        <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Mail className="w-8 h-8 text-primary-600" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-neutral-900 mb-2">Verify Your Email</h3>
+                                        <p className="text-sm text-neutral-600 mb-4">
+                                            We've sent a 6-digit verification code to <span className="font-semibold">{user?.email}</span>
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                                            Enter OTP Code
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                            placeholder="Enter 6-digit OTP"
+                                            maxLength={6}
+                                            data-testid="vendor-otp-input"
+                                            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200 text-center text-2xl tracking-[0.5em] font-mono"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <button
+                                            onClick={handleVerifyOTPAndChangePassword}
+                                            disabled={isVerifyingOTP || otp.length !== 6}
+                                            data-testid="vendor-verify-otp-btn"
+                                            className="flex-1 px-6 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                                        >
+                                            {isVerifyingOTP ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                    <span>Verifying...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Shield className="w-5 h-5" />
+                                                    <span>Verify & Change Password</span>
+                                                </>
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={handleCancelOTPStep}
+                                            data-testid="vendor-cancel-otp-btn"
+                                            className="px-6 py-3 border-2 border-neutral-300 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-50 transition-all duration-200"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+
+                                    <div className="text-center pt-2">
+                                        <button
+                                            onClick={handleResendOTP}
+                                            disabled={isResendingOTP || resendCooldown > 0}
+                                            data-testid="vendor-resend-otp-btn"
+                                            className="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:text-neutral-400 disabled:cursor-not-allowed"
+                                        >
+                                            {isResendingOTP ? (
+                                                'Sending...'
+                                            ) : resendCooldown > 0 ? (
+                                                `Resend OTP in ${resendCooldown}s`
+                                            ) : (
+                                                'Resend OTP'
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 )}
             </div>
         </div>
