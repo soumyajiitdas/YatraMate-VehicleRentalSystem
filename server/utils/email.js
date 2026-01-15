@@ -336,10 +336,6 @@ const sendPickupConfirmationEmail = async (email, bookingData) => {
                                             <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Time</td>
                                             <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${pickupTime}</td>
                                         </tr>
-                                        <tr>
-                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Odometer Reading</td>
-                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${odometerReading} km</td>
-                                        </tr>
                                     </table>
                                 </div>
                                 
@@ -366,7 +362,7 @@ const sendPickupConfirmationEmail = async (email, bookingData) => {
                                 <div style="background: #fef2f2; border-radius: 12px; padding: 20px; border-left: 4px solid #ef4444;">
                                     <h4 style="margin: 0 0 10px; color: #991b1b; font-size: 14px; font-weight: 600;">⚠️ Important Reminders</h4>
                                     <ul style="margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 13px; line-height: 1.8;">
-                                        <li>Please carry your ID proof during the rental period</li>
+                                        <li><strong>ID Proof Collected:</strong> We have collected your original government ID proof for security purposes. You will receive it back when you return the vehicle.</li>
                                         <li>Return the vehicle to the same location</li>
                                         <li>Fuel charges are not included in the rental</li>
                                         <li>Report any issues immediately to our support team</li>
@@ -416,7 +412,7 @@ PRICING:
 - Rate per Hour: ₹${pricePerHour}
 
 IMPORTANT REMINDERS:
-- Please carry your ID proof during the rental period
+- ID Proof Collected: We have collected your original government ID proof for security purposes. You will receive it back when you return the vehicle.
 - Return the vehicle to the same location
 - Fuel charges are not included in the rental
 - Report any issues immediately to our support team
@@ -676,11 +672,304 @@ YatraMate Team`;
     });
 };
 
+// Send email for vendor verification
+const sendVendorVerificationEmail = async (email, vendorData) => {
+    const { vendorName, businessName } = vendorData;
+
+    const subject = `🎉 Vendor Account Verified - Welcome to YatraMate!`;
+    
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Success Banner -->
+                        <tr>
+                            <td style="padding: 30px 40px 20px; text-align: center;">
+                                <div style="display: inline-block; background: #d1fae5; border-radius: 50%; padding: 15px; margin-bottom: 15px;">
+                                    <span style="font-size: 40px;">🎉</span>
+                                </div>
+                                <h2 style="margin: 0 0 10px; color: #059669; font-size: 24px; font-weight: 700;">Your Vendor Account is Verified!</h2>
+                                <p style="margin: 0; color: #6b7280; font-size: 16px;">You can now login and start adding vehicles</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 20px 40px;">
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi <strong>${vendorName}</strong>,</p>
+                                <p style="margin: 0 0 25px; color: #4b5563; font-size: 16px; line-height: 1.6;">Congratulations! Your vendor account for <strong>${businessName || 'your business'}</strong> has been successfully verified by our admin team.</p>
+                                
+                                <!-- Welcome Box -->
+                                <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 12px; padding: 25px; margin-bottom: 25px; border: 2px solid #10b981;">
+                                    <h3 style="margin: 0 0 15px; color: #059669; font-size: 18px; font-weight: 600; text-align: center;">🚀 What's Next?</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #065f46; font-size: 14px; line-height: 1.8;">
+                                        <li><strong>Login to your account</strong> using your registered email and password</li>
+                                        <li><strong>Add your vehicles</strong> to the platform with complete details</li>
+                                        <li><strong>Manage bookings</strong> and track your earnings</li>
+                                        <li><strong>Grow your business</strong> with YatraMate's customer base</li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Account Details -->
+                                <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📋 Account Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Vendor Name</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${vendorName}</td>
+                                        </tr>
+                                        ${businessName ? `
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Business Name</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${businessName}</td>
+                                        </tr>
+                                        ` : ''}
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Email</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${email}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Account Status</td>
+                                            <td style="padding: 8px 0; color: #10b981; font-size: 14px; font-weight: 600; text-align: right;">✅ Verified</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Important Notes -->
+                                <div style="background: #fffbeb; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
+                                    <h4 style="margin: 0 0 10px; color: #92400e; font-size: 14px; font-weight: 600;">💡 Important Guidelines</h4>
+                                    <ul style="margin: 0; padding-left: 20px; color: #78350f; font-size: 13px; line-height: 1.8;">
+                                        <li>Ensure all vehicle documents are valid and up-to-date</li>
+                                        <li>Provide accurate vehicle information and high-quality images</li>
+                                        <li>Maintain your vehicles in excellent condition</li>
+                                        <li>Respond promptly to booking requests</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0 0 16px 16px;">
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px;">Need help? Contact us at</p>
+                                <p style="margin: 0 0 15px; color: #059669; font-size: 14px; font-weight: 600;">support@yatramate.com</p>
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${vendorName},
+
+Congratulations! Your vendor account for ${businessName || 'your business'} has been successfully verified by our admin team.
+
+ACCOUNT STATUS: ✅ Verified
+
+WHAT'S NEXT?
+- Login to your account using your registered email and password
+- Add your vehicles to the platform with complete details
+- Manage bookings and track your earnings
+- Grow your business with YatraMate's customer base
+
+ACCOUNT DETAILS:
+- Vendor Name: ${vendorName}
+${businessName ? `- Business Name: ${businessName}` : ''}
+- Email: ${email}
+- Account Status: Verified
+
+IMPORTANT GUIDELINES:
+- Ensure all vehicle documents are valid and up-to-date
+- Provide accurate vehicle information and high-quality images
+- Maintain your vehicles in excellent condition
+- Respond promptly to booking requests
+
+Need help? Contact us at support@yatramate.com
+
+Best regards,
+YatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
+// Send email for vehicle approval
+const sendVehicleApprovalEmail = async (email, vehicleData) => {
+    const { vendorName, vehicleName, vehicleBrand, vehicleModel, registrationNumber, vehicleType } = vehicleData;
+
+    const subject = `✅ Vehicle Approved - ${vehicleBrand} ${vehicleName} | YatraMate`;
+    
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Success Banner -->
+                        <tr>
+                            <td style="padding: 30px 40px 20px; text-align: center;">
+                                <div style="display: inline-block; background: #ddd6fe; border-radius: 50%; padding: 15px; margin-bottom: 15px;">
+                                    <span style="font-size: 40px;">✅</span>
+                                </div>
+                                <h2 style="margin: 0 0 10px; color: #6366f1; font-size: 24px; font-weight: 700;">Vehicle Approved Successfully!</h2>
+                                <p style="margin: 0; color: #6b7280; font-size: 16px;">Your vehicle is now listed on YatraMate</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 20px 40px;">
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi <strong>${vendorName}</strong>,</p>
+                                <p style="margin: 0 0 25px; color: #4b5563; font-size: 16px; line-height: 1.6;">Great news! Your vehicle has been reviewed and approved by our admin team. It is now live on the YatraMate platform and available for customers to book.</p>
+                                
+                                <!-- Vehicle Details -->
+                                <div style="background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-radius: 12px; padding: 25px; margin-bottom: 25px; border: 2px solid #6366f1;">
+                                    <h3 style="margin: 0 0 15px; color: #4c1d95; font-size: 18px; font-weight: 600; text-align: center;">🚗 Approved Vehicle Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #5b21b6; font-size: 14px;">Vehicle</td>
+                                            <td style="padding: 8px 0; color: #4c1d95; font-size: 14px; font-weight: 600; text-align: right;">${vehicleBrand} ${vehicleName}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #5b21b6; font-size: 14px;">Model</td>
+                                            <td style="padding: 8px 0; color: #4c1d95; font-size: 14px; font-weight: 600; text-align: right;">${vehicleModel}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #5b21b6; font-size: 14px;">Type</td>
+                                            <td style="padding: 8px 0; color: #4c1d95; font-size: 14px; font-weight: 600; text-align: right; text-transform: capitalize;">${vehicleType}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #5b21b6; font-size: 14px;">Registration No.</td>
+                                            <td style="padding: 8px 0; color: #4c1d95; font-size: 14px; font-weight: 600; text-align: right;">${registrationNumber}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #5b21b6; font-size: 14px;">Status</td>
+                                            <td style="padding: 8px 0; color: #10b981; font-size: 14px; font-weight: 600; text-align: right;">✅ Approved & Listed</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- What's Next -->
+                                <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">📊 What Happens Now?</h3>
+                                    <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px; line-height: 1.8;">
+                                        <li>Your vehicle is now <strong>visible to all customers</strong> on the platform</li>
+                                        <li>Customers can search, view, and book your vehicle</li>
+                                        <li>You will receive notifications for new booking requests</li>
+                                        <li>Track your bookings and earnings from the vendor dashboard</li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Tips for Success -->
+                                <div style="background: #ecfdf5; border-radius: 12px; padding: 20px; border-left: 4px solid #10b981;">
+                                    <h4 style="margin: 0 0 10px; color: #065f46; font-size: 14px; font-weight: 600;">💡 Tips for Success</h4>
+                                    <ul style="margin: 0; padding-left: 20px; color: #047857; font-size: 13px; line-height: 1.8;">
+                                        <li>Keep your vehicle clean and well-maintained</li>
+                                        <li>Ensure timely availability for confirmed bookings</li>
+                                        <li>Respond quickly to customer inquiries</li>
+                                        <li>Update vehicle status if it becomes unavailable</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0 0 16px 16px;">
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px;">Need help? Contact us at</p>
+                                <p style="margin: 0 0 15px; color: #6366f1; font-size: 14px; font-weight: 600;">support@yatramate.com</p>
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${vendorName},
+
+Great news! Your vehicle has been reviewed and approved by our admin team. It is now live on the YatraMate platform and available for customers to book.
+
+APPROVED VEHICLE DETAILS:
+- Vehicle: ${vehicleBrand} ${vehicleName}
+- Model: ${vehicleModel}
+- Type: ${vehicleType}
+- Registration No.: ${registrationNumber}
+- Status: ✅ Approved & Listed
+
+WHAT HAPPENS NOW?
+- Your vehicle is now visible to all customers on the platform
+- Customers can search, view, and book your vehicle
+- You will receive notifications for new booking requests
+- Track your bookings and earnings from the vendor dashboard
+
+TIPS FOR SUCCESS:
+- Keep your vehicle clean and well-maintained
+- Ensure timely availability for confirmed bookings
+- Respond quickly to customer inquiries
+- Update vehicle status if it becomes unavailable
+
+Need help? Contact us at support@yatramate.com
+
+Best regards,
+YatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
 module.exports = {
     sendEmail,
     sendOTPEmail,
     sendPasswordResetEmail,
     sendPasswordChangeOTPEmail,
     sendPickupConfirmationEmail,
-    sendReturnConfirmationEmail
+    sendReturnConfirmationEmail,
+    sendVendorVerificationEmail,
+    sendVehicleApprovalEmail
 };

@@ -205,7 +205,6 @@ const VehicleDetailsPage = () => {
                 </div>
               </div>
 
-
               {/* Description */}
               <div className="mb-8 pb-8 border-b border-neutral-200">
                 <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center gap-2">
@@ -238,6 +237,13 @@ const VehicleDetailsPage = () => {
                     </div>
                   ))}
                 </div>
+
+                <div className="mt-4 flex items-center gap-2 rounded-lg border border-yellow-400 bg-yellow-50 px-3 py-2 text-sm text-yellow-800 shadow-sm">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-xs font-bold text-white">!</span>
+                  <span className="font-semibold">Important:</span>
+                  <span>Please carry your <span className="font-semibold">original ID proof</span> during vehicle pickup.</span>
+              </div>
+
               </div>
             </div>
           </div>

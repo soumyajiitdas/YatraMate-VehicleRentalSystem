@@ -179,6 +179,25 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                         </div>
                     )}
 
+                    {booking?.status === "confirmed" && (
+                        <div className="mt-4 rounded-xl border border-yellow-400 bg-yellow-50 p-4 shadow-sm">
+                            <div className="flex items-start gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-400 text-white font-bold">
+                                    !
+                                </div>
+
+                                <div>
+                                    <p className="text-sm font-semibold text-yellow-800">
+                                        Important Notice
+                                    </p>
+                                    <p className="mt-1 text-sm text-yellow-700">
+                                        Please carry your <span className="font-semibold">original ID proof</span> during the pickup of the vehicle.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Pickup Details */}
                     <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-3 sm:p-4">
                         <div className="flex items-center gap-2 mb-2 sm:mb-3 text-gray-700">
@@ -293,7 +312,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                     <p className="text-xs text-green-700 mt-1">40% advance payment received</p>
                                 </div>
                             )}
-                            
+
                             {booking.return_details && (
                                 <>
                                     {booking.return_details.distance_cost && (
@@ -347,9 +366,9 @@ const BookingDetailsModal = ({ booking, onClose }) => {
             {/* Hidden Bill Content for PDF Generation */}
             {booking.status === 'completed' && (
                 <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-                    <div 
-                        ref={billRef} 
-                        className="max-w-[800px] mx-auto p-8 font-sans" 
+                    <div
+                        ref={billRef}
+                        className="max-w-[800px] mx-auto p-8 font-sans"
                         style={{ backgroundColor: '#ffffff', width: '800px' }}
                     >
                         {/* Bill content from FinalBillModal - same structure */}
@@ -435,8 +454,8 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                 </div>
                                 <div className="flex items-start">
                                     <div className="text-sm font-medium w-[180px] shrink-0" style={{ color: '#4B5563' }}>Vehicle Condition:</div>
-                                    <div 
-                                        className="text-sm font-bold" 
+                                    <div
+                                        className="text-sm font-bold"
                                         style={{ color: booking.return_details?.vehicle_condition === 'damaged' ? '#DC2626' : '#16A34A' }}
                                     >
                                         {booking.return_details?.vehicle_condition?.toUpperCase() || 'N/A'}
@@ -504,7 +523,7 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                     <span style={{ color: '#166534' }}>TOTAL PAID</span>
                                     <span style={{ color: '#16A34A' }}>
                                         ₹{(
-                                            (booking.advance_payment?.amount || 0) + 
+                                            (booking.advance_payment?.amount || 0) +
                                             (booking.final_payment?.amount || 0)
                                         ).toFixed(2)}
                                     </span>
