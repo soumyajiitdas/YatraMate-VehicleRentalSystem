@@ -3,6 +3,7 @@ const Vehicle = require('../models/Vehicle');
 const Package = require('../models/Package');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { sendPickupConfirmationEmail, sendReturnConfirmationEmail } = require('../utils/email');
 
 // Customer creates a booking request (no payment yet)
 exports.createBookingRequest = catchAsync(async (req, res, next) => {
@@ -174,6 +175,36 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         .populate('package_id')
         .populate('user_id', 'name email phone')
         .populate('pickup_details.staff_id', 'name');
+
+    // Send pickup confirmation email to customer
+    try {
+        const vehicle = populatedBooking.vehicle_id;
+        const packageData = populatedBooking.package_id;
+        const user = populatedBooking.user_id;
+        
+        if (user && user.email) {
+            await sendPickupConfirmationEmail(user.email, {
+                customerName: user.name,
+                billId: populatedBooking.bill_id,
+                vehicleName: vehicle.name,
+                vehicleModel: vehicle.model_name,
+                vehicleBrand: vehicle.brand,
+                vehicleType: vehicle.type,
+                registrationNumber: vehicle.registration_number,
+                pickupLocation: populatedBooking.start_location,
+                pickupDate: populatedBooking.pickup_details.actual_pickup_date,
+                pickupTime: populatedBooking.pickup_details.actual_pickup_time,
+                odometerReading: populatedBooking.pickup_details.odometer_reading_start,
+                packageName: packageData ? packageData.name : 'Standard',
+                pricePerKm: packageData ? packageData.price_per_km : 0,
+                pricePerHour: packageData ? packageData.price_per_hour : 0
+            });
+            console.log(`Pickup confirmation email sent to ${user.email}`);
+        }
+    } catch (emailError) {
+        console.error('Failed to send pickup confirmation email:', emailError);
+        // Don't fail the request if email fails
+    }
 
     res.status(200).json({
         status: 'success',
@@ -385,6 +416,43 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
         .populate('user_id', 'name email phone')
         .populate('pickup_details.staff_id', 'name')
         .populate('return_details.staff_id', 'name');
+
+    // Send return confirmation email to customer
+    try {
+        const vehicleData = populatedBooking.vehicle_id;
+        const user = populatedBooking.user_id;
+        
+        if (user && user.email) {
+            await sendReturnConfirmationEmail(user.email, {
+                customerName: user.name,
+                billId: populatedBooking.bill_id,
+                vehicleName: vehicleData.name,
+                vehicleModel: vehicleData.model_name,
+                vehicleBrand: vehicleData.brand,
+                vehicleType: vehicleData.type,
+                registrationNumber: vehicleData.registration_number,
+                pickupLocation: populatedBooking.start_location,
+                pickupDate: populatedBooking.pickup_details.actual_pickup_date,
+                pickupTime: populatedBooking.pickup_details.actual_pickup_time,
+                returnDate: populatedBooking.return_details.actual_return_date,
+                returnTime: populatedBooking.return_details.actual_return_time,
+                odometerStart: populatedBooking.pickup_details.odometer_reading_start,
+                odometerEnd: populatedBooking.return_details.odometer_reading_end,
+                distanceTraveled: populatedBooking.distance_traveled_km,
+                durationHours: populatedBooking.duration_hours,
+                costPerDistance: populatedBooking.cost_per_distance,
+                costPerTime: populatedBooking.cost_per_time,
+                damageCost: populatedBooking.damage_cost,
+                finalCost: populatedBooking.final_cost,
+                amountPaid: populatedBooking.return_details.amount_paid,
+                vehicleCondition: populatedBooking.return_details.vehicle_condition
+            });
+            console.log(`Return confirmation email sent to ${user.email}`);
+        }
+    } catch (emailError) {
+        console.error('Failed to send return confirmation email:', emailError);
+        // Don't fail the request if email fails
+    }
 
     res.status(200).json({
         status: 'success',

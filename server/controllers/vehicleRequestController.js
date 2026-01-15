@@ -3,6 +3,7 @@ const Vehicle = require('../models/Vehicle');
 const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { sendVehicleApprovalEmail } = require('../utils/email');
 
 // Create a new vehicle request
 exports.createVehicleRequest = catchAsync(async (req, res, next) => {
@@ -66,7 +67,7 @@ exports.getVehicleRequestsByVendor = catchAsync(async (req, res, next) => {
 
 // Approve vehicle request
 exports.approveVehicleRequest = catchAsync(async (req, res, next) => {
-    const request = await VehicleRequest.findById(req.params.id);
+    const request = await VehicleRequest.findById(req.params.id).populate('vendor_id');
 
     if (!request) {
         return next(new AppError('No vehicle request found with that ID', 404));
@@ -100,6 +101,24 @@ exports.approveVehicleRequest = catchAsync(async (req, res, next) => {
     request.status = 'approved';
     request.admin_notes = req.body.admin_notes || '';
     await request.save();
+
+    // Send vehicle approval email to vendor
+    try {
+        const vendor = request.vendor_id;
+        if (vendor && vendor.email) {
+            await sendVehicleApprovalEmail(vendor.email, {
+                vendorName: vendor.name,
+                vehicleName: request.name,
+                vehicleBrand: request.brand,
+                vehicleModel: request.model_name,
+                registrationNumber: request.registration_number,
+                vehicleType: request.type
+            });
+        }
+    } catch (emailError) {
+        console.error('Failed to send vehicle approval email:', emailError);
+        // Continue even if email fails - vehicle is still approved
+    }
 
     res.status(200).json({
         status: 'success',

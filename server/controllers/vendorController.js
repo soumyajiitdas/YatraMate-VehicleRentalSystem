@@ -1,6 +1,7 @@
 const Vendor = require('../models/Vendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { sendVendorVerificationEmail } = require('../utils/email');
 
 exports.getAllVendors = catchAsync(async (req, res, next) => {
     const vendors = await Vendor.find();
@@ -99,6 +100,17 @@ exports.verifyVendor = catchAsync(async (req, res, next) => {
         return next(new AppError('No vendor found with that ID', 404));
     }
 
+    // Send verification email to vendor
+    try {
+        await sendVendorVerificationEmail(vendor.email, {
+            vendorName: vendor.name,
+            businessName: vendor.business_name
+        });
+    } catch (emailError) {
+        console.error('Failed to send vendor verification email:', emailError);
+        // Continue even if email fails - vendor is still verified
+    }
+
     res.status(200).json({
         status: 'success',
         data: {
@@ -111,7 +123,7 @@ exports.verifyVendor = catchAsync(async (req, res, next) => {
 exports.getVendorEarnings = catchAsync(async (req, res, next) => {
     const Booking = require('../models/Booking');
     const vendorId = req.user.id; // Get vendor ID from authenticated user
-    const { filter } = req.query; // day, week, month, year
+    const { filter } = req.query;
     
     // Build date filter
     let dateFilter = {};
