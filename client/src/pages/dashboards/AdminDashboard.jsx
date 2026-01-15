@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState('');          // 'user', 'vendor', 'package'
+    const [modalType, setModalType] = useState('');       // 'user', 'vendor', 'package'
     const [editingItem, setEditingItem] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
@@ -778,7 +778,6 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Type</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
@@ -790,13 +789,11 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
                             <tr key={vendor._id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
-                                    <div className="text-sm text-gray-600">{vendor.email}</div>
+                                    <div className="text-sm text-gray-600">{vendor.company_name || 'Individual'}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-600">{vendor.contact_number}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-600">{vendor.company_name || 'N/A'}</div>
+                                    <div className="text-sm text-gray-600">{vendor.email}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-600 capitalize">{vendor.id_type?.replace('_', ' ')}</div>

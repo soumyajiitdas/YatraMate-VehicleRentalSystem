@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const vendorSchema = new mongoose.Schema({
+const pendingVendorSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Name is required'],
@@ -29,7 +29,7 @@ const vendorSchema = new mongoose.Schema({
     id_type: {
         type: String,
         required: [true, 'ID type is required'],
-        enum: ['pan_card', 'driving_license', 'passport', 'adhaar_card', 'business_reg_certificate', 'business_tax_id']
+        enum: ['pan', 'license', 'passport', 'adhaar', 'business_reg_certificate', 'business_tax_id']
     },
     document_url: {
         type: String,
@@ -44,38 +44,17 @@ const vendorSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is required']
     },
-    is_verified: {
-        type: Boolean,
-        default: false
-    },
-    email_verified: {
-        type: Boolean,
-        default: false
-    },
     email_otp: {
         type: String,
-        select: false
+        required: true,
     },
     email_otp_expires: {
         type: Date,
-        select: false
+        required: true,
     },
-    password_change_otp: {
-        type: String,
-        select: false
-    },
-    password_change_otp_expires: {
-        type: Date,
-        select: false
-    },
-    total_earnings: {
-        type: Number,
-        default: 0
-    },
-    role: {
-        type: String,
-        default: 'vendor'
-    }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Vendor', vendorSchema);
+// Auto-delete expired pending registrations after 15 minutes
+pendingVendorSchema.index({ email_otp_expires: 1 }, { expireAfterSeconds: 0 });
+
+module.exports = mongoose.model('PendingVendor', pendingVendorSchema);
