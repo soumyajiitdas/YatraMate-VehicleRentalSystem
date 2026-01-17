@@ -16,9 +16,9 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
         actual_return_date: new Date().toISOString().split('T')[0], // input expects YYYY-MM-DD
         actual_return_time: new Date().toTimeString().slice(0, 5),   // HH:MM 24h
         odometer_reading_end: '',
-        vehicle_plate_number: booking.vehicle_id.registration_number,
-        engine_number: booking.vehicle_id.engine_number || '',
-        chassis_number: booking.vehicle_id.chassis_number || '',
+        vehicle_plate_number: booking.vehicle_id?.registration_number || '',
+        engine_number: booking.vehicle_id?.engine_number || '',
+        chassis_number: booking.vehicle_id?.chassis_number || '',
         vehicle_condition: 'perfect',
         damage_cost: 0,
         damage_description: '',
@@ -206,7 +206,7 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
 
         if (!formData.odometer_reading_end) {
             newErrors.odometer_reading_end = 'Odometer reading is required';
-        } else if (isNaN(formData.odometer_reading_end) || formData.odometer_reading_end < booking.pickup_details.odometer_reading_start) {
+        } else if (isNaN(formData.odometer_reading_end) || (booking.pickup_details && formData.odometer_reading_end < booking.pickup_details.odometer_reading_start)) {
             newErrors.odometer_reading_end = 'End reading must be greater than start reading';
         }
 
@@ -493,23 +493,23 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <span className="text-gray-500">Customer:</span>
-                                <span className="ml-2 font-medium">{booking.user_id.name}</span>
+                                <span className="ml-2 font-medium">{booking.user_id?.name}</span>
                             </div>
                             <div>
                                 <span className="text-gray-500">Vehicle:</span>
-                                <span className="ml-2 font-medium">{booking.vehicle_id.name}</span>
+                                <span className="ml-2 font-medium">{booking.vehicle_id?.name}</span>
                             </div>
                             <div>
                                 <span className="text-gray-500">Pickup Odometer:</span>
-                                <span className="ml-2 font-medium">{booking.pickup_details.odometer_reading_start} km</span>
+                                <span className="ml-2 font-medium">{booking.pickup_details?.odometer_reading_start} km</span>
                             </div>
                             <div>
                                 <span className="text-gray-500">Govt. ID Proof:</span>
-                                <span className="ml-2 font-medium">{booking.pickup_details.id_proof_type?.replace('_', ' ').toUpperCase()}</span>
+                                <span className="ml-2 font-medium">{booking.pickup_details?.id_proof_type?.replace('_', ' ').toUpperCase()}</span>
                             </div>
                             <div>
                                 <span className="text-gray-500">ID Number:</span>
-                                <span className="ml-2 font-medium">{booking.pickup_details.id_number || 'N/A'}</span>
+                                <span className="ml-2 font-medium">{booking.pickup_details?.id_number || 'N/A'}</span>
                             </div>
                             {advancePaid > 0 && (
                                 <div>
