@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
-import { MapPinned, Mail, Shield, Settings, LockKeyhole } from 'lucide-react';
+import { MapPinned, Mail, Shield, Settings, LockKeyhole, Car, PiggyBank } from 'lucide-react';
 import CustomDropdown from '../../components/common/CustomDropdown';
 
 const VendorDashboard = () => {
@@ -480,25 +480,27 @@ const VendorDashboard = () => {
                 <div className="mb-6 flex justify-center gap-2 sm:gap-4 flex-wrap">
                     <button
                         onClick={() => setActiveTab('vehicles')}
-                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base flex items-center gap-2 ${
                             activeTab === 'vehicles'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
                                 : 'bg-white text-neutral-700 hover:bg-neutral-100'
                         }`}
                         data-testid="vehicles-tab"
                     >
-                        My Vehicles
+                        <Car className='w-5 h-5'/>
+                        Vehicles
                     </button>
                     <button
                         onClick={() => setActiveTab('earnings')}
-                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base flex items-center gap-2 ${
                             activeTab === 'earnings'
                                 ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-lg'
                                 : 'bg-white text-neutral-700 hover:bg-neutral-100'
                         }`}
                         data-testid="earnings-tab"
                     >
-                        My Earnings
+                        <PiggyBank className='w-5 h-5'/>
+                        Earnings
                     </button>
                     <button
                         onClick={() => setActiveTab('settings')}
@@ -509,7 +511,7 @@ const VendorDashboard = () => {
                         }`}
                         data-testid="settings-tab"
                     >
-                        <Settings className="w-4 h-4" />
+                        <Settings className="w-5 h-5" />
                         Settings
                     </button>
                 </div>
@@ -519,7 +521,7 @@ const VendorDashboard = () => {
                     <>
                         {/* Actions */}
                         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900"><span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Vehicles</span> <span className='text-red-600'>:</span></h2>
+                            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900">My <span className='text-red-600'>Vehicles</span></h2>
                             <button
                                 onClick={() => setShowAddForm(!showAddForm)}
                                 className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
@@ -792,8 +794,7 @@ const VendorDashboard = () => {
                         {/* Filter buttons */}
                         <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                             <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900">
-                                <span className='underline underline-offset-2 decoration-red-400 decoration-3'>My Earnings</span> 
-                                <span className='text-red-600'>:</span>
+                                My <span className='text-red-600'>Earnings</span>
                             </h2>
                             <div className="flex gap-2 flex-wrap justify-center">
                                 <button
@@ -929,6 +930,7 @@ const VendorDashboard = () => {
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Pickup Date & Time</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Return Date & Time</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Distance (km)</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Payment Mode</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Damage Cost</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Total Cost</th>
                                             </tr>
@@ -971,6 +973,15 @@ const VendorDashboard = () => {
                                                         <p className="text-sm font-medium text-neutral-900">
                                                             {earning.distance_traveled_km || 0}
                                                         </p>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                            earning.final_payment?.method === 'online' 
+                                                                ? 'bg-blue-100 text-blue-800' 
+                                                                : 'bg-green-100 text-green-800'
+                                                        }`}>
+                                                            {earning.final_payment?.method === 'online' ? 'Online' : 'Cash'}
+                                                        </span>
                                                     </td>
                                                     <td className="px-4 py-4">
                                                         <p className={`text-sm font-medium ${earning.damage_cost > 0 ? 'text-red-600' : 'text-neutral-900'}`}>

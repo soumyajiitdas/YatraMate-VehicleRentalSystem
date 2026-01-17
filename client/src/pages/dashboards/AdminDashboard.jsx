@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { API_ENDPOINTS } from '../../config/api';
 import CustomDropdown from '../../components/common/CustomDropdown';
-import { MapPinned } from 'lucide-react';
+import { MapPinned, ChevronDown, ChevronUp } from 'lucide-react';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -16,6 +16,7 @@ const AdminDashboard = () => {
     const [packages, setPackages] = useState([]);
     const [vehicleRequests, setVehicleRequests] = useState([]);
     const [vehicles, setVehicles] = useState([]);
+    const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');       // 'user', 'vendor', 'package'
@@ -85,6 +86,14 @@ const AdminDashboard = () => {
                 const vehiclesData = await vehiclesResponse.json();
                 if (vehiclesData.status === 'success') {
                     setVehicles(vehiclesData.data.vehicles);
+                }
+            } else if (activeTab === 'bookings-payments') {
+                const response = await fetch(API_ENDPOINTS.bookings, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    setBookings(data.data.bookings);
                 }
             }
 
@@ -388,6 +397,16 @@ const AdminDashboard = () => {
                             >
                                 Vehicle Requests
                             </button>
+                            <button
+                                onClick={() => setActiveTab('bookings-payments')}
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'bookings-payments'
+                                    ? 'border-red-500 text-red-600 bg-red-50'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                data-testid="tab-bookings-payments"
+                            >
+                                Bookings & Payments
+                            </button>
                         </nav>
                     </div>
 
@@ -470,6 +489,21 @@ const AdminDashboard = () => {
                                         Vehicle Requests
                                     </div>
                                 </button>
+                                <button
+                                    onClick={() => setActiveTab('bookings-payments')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'bookings-payments'
+                                        ? 'border-red-500 text-red-600 bg-red-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-bookings-payments"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                        </svg>
+                                        Bookings & Payments
+                                    </div>
+                                </button>
                             </nav>
                         </div>
                     </aside>
@@ -538,6 +572,13 @@ const AdminDashboard = () => {
                                         vehicles={vehicles}
                                         onViewDetails={handleViewRequestDetails}
                                         onToggleFeature={handleToggleFeature}
+                                    />
+                                )}
+
+                                {/* Bookings & Payments Table */}
+                                {activeTab === 'bookings-payments' && (
+                                    <BookingsPaymentsTable
+                                        bookings={bookings}
                                     />
                                 )}
                             </>
@@ -797,7 +838,7 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
     return (
         <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white border border-primary-200 rounded-lg shadow-sm overflow-x-auto">
+            <div className="hidden md:block bg-white border border-primary-200 rounded-lg shadow-sm overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -1540,16 +1581,14 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
             </div>
 
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -1564,14 +1603,11 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                 <tr key={request._id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{request.name}</div>
-                                        <div className="text-sm text-gray-500">{request.model_name}</div>
+                                        <div className="text-sm text-gray-500">{request.model_name}, {request.type}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
                                         <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-600 capitalize">{request.type}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-600">{request.registration_number}</div>
@@ -1583,22 +1619,6 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                             }`}>
                                             {request.status}
                                         </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {request.status === 'approved' && vehicle ? (
-                                            isFeatured ? (
-                                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                    Featured
-                                                </span>
-                                            ) : (
-                                                <span className="text-xs text-gray-500">No</span>
-                                            )
-                                        ) : (
-                                            <span className="text-xs text-gray-400">-</span>
-                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         {new Date(request.createdAt).toLocaleDateString()}
@@ -2005,6 +2025,291 @@ const VendorVerifyConfirmModal = ({ vendor, onConfirm, onCancel }) => {
                     </div>
                 </div>
             </div>
+        </div>
+    );
+};
+
+// Bookings & Payments Table Component
+const BookingsPaymentsTable = ({ bookings }) => {
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [expandedCards, setExpandedCards] = useState({});
+
+    const toggleCardExpansion = (bookingId) => {
+        setExpandedCards(prev => ({
+            ...prev,
+            [bookingId]: !prev[bookingId]
+        }));
+    };
+
+    const filteredBookings = statusFilter === 'all' 
+        ? bookings 
+        : bookings.filter(booking => booking.status === statusFilter);
+
+    if (bookings.length === 0) {
+        return (
+            <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
+                <p className="text-red-500">No bookings found.</p>
+            </div>
+        );
+    }
+
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'booking_requested':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'picked_up':
+                return 'bg-blue-100 text-blue-800';
+            case 'returned':
+                return 'bg-green-100 text-green-800';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getPaymentStatusBadge = (status) => {
+        switch (status) {
+            case 'completed':
+                return 'bg-green-100 text-green-800';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'failed':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const formatDate = (date) => {
+        if (!date) return 'N/A';
+        return new Date(date).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
+
+    const formatDateTime = (date) => {
+        if (!date) return 'N/A';
+        return new Date(date).toLocaleString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    return (
+        <div className="space-y-4">
+            {/* Filter Section */}
+            <div className="bg-white rounded-lg shadow-sm p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                        data-testid="status-filter"
+                    >
+                        <option value="all">All Bookings</option>
+                        <option value="booking_requested">Booking Requested</option>
+                        <option value="picked_up">Picked Up</option>
+                        <option value="returned">Returned</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <span className="text-sm text-gray-500">
+                        Showing {filteredBookings.length} of {bookings.length} bookings
+                    </span>
+                </div>
+            </div>
+
+            {/* Collapsible Cards */}
+            <div className="space-y-4">
+                {filteredBookings.map((booking) => (
+                    <div key={booking._id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6" data-testid="booking-card">
+                        {/* Card Header - Always Visible */}
+                        <div 
+                            className="flex items-center justify-between cursor-pointer"
+                            onClick={() => toggleCardExpansion(booking._id)}
+                            data-testid={`toggle-card-${booking._id}`}
+                        >
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 flex-1">
+                                <h4 className="text-base md:text-lg font-semibold text-gray-900">
+                                    {booking.user_id?.name || 'N/A'} - <span className='font-light'>{booking.user_id?.email || 'N/A'}</span>
+                                </h4>
+                                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusBadgeClass(booking.status)}`}>
+                                    {booking.status?.replace('_', ' ').toUpperCase()}
+                                </span>
+                            </div>
+                            <button 
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors ml-2"
+                                aria-label={expandedCards[booking._id] ? "Collapse details" : "Expand details"}
+                            >
+                                {expandedCards[booking._id] ? (
+                                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                                ) : (
+                                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Collapsed Summary - Visible when not expanded */}
+                        {!expandedCards[booking._id] && (
+                            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                                <span className="font-medium text-gray-900">{booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}</span>
+                                <span>•</span>
+                                <span>Vendor: <span className="font-medium text-gray-900">{booking.vendor_id?.name || 'N/A'}</span></span>
+                                {booking.bill_id && (
+                                    <>
+                                        <span>•</span>
+                                        <span>Bill: <span className="font-medium text-blue-600">{booking.bill_id}</span></span>
+                                    </>
+                                )}
+                                {booking.final_cost && (
+                                    <>
+                                        <span>•</span>
+                                        <span>Total: <span className="font-medium text-green-600">₹{booking.final_cost.toFixed(2)}</span></span>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Expandable Content - Full Details */}
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedCards[booking._id] ? 'max-h-[2000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                            <div className="border-t border-gray-200 pt-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                                    {/* Booking Reference */}
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Booking Reference</p>
+                                        <p className="font-bold text-blue-600 text-lg">{booking.bill_id || 'Pending'}</p>
+                                        <p className="text-xs text-gray-500 mt-1">ID: {booking._id?.slice(-12)}</p>
+                                    </div>
+
+                                    {/* Customer Information */}
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Customer Information</p>
+                                        <p className="font-semibold text-gray-900">{booking.user_id?.name || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs mt-1">{booking.user_id?.email || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs">{booking.user_id?.phone || 'N/A'}</p>
+                                    </div>
+
+                                    {/* Vendor Information */}
+                                    <div className="bg-purple-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Vendor Information</p>
+                                        <p className="font-semibold text-gray-900">{booking.vendor_id?.name || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs mt-1">{booking.vendor_id?.email || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs">{booking.vendor_id?.contact_number || 'N/A'}</p>
+                                    </div>
+
+                                    {/* Vehicle Details */}
+                                    <div className="bg-yellow-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Vehicle Details</p>
+                                        <p className="font-semibold text-gray-900">{booking.vehicle_id?.name || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs mt-1">Model: {booking.vehicle_id?.model_name || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs">Reg: {booking.vehicle_id?.registration_number || 'N/A'}</p>
+                                        <p className="text-gray-600 text-xs">Type: {booking.vehicle_id?.type || 'N/A'} - {booking.vehicle_id?.cc_engine || 'N/A'}cc</p>
+                                    </div>
+
+                                    {/* Advance Payment */}
+                                    <div className="bg-green-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Adv. Payment <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${getPaymentStatusBadge(booking.advance_payment?.status)}`}>
+                                            {booking.advance_payment?.status || 'pending'}
+                                        </span></p>
+                                        <p className="font-bold text-green-700 text-lg">₹{booking.advance_payment?.amount || 0}</p>
+                                        <p className="text-gray-600 text-xs mt-1">
+                                            Transaction ID: <span className="font-mono">{booking.advance_payment?.razorpay_payment_id || 'N/A'}</span>
+                                        </p>
+                                        {booking.advance_payment?.paid_at && (
+                                            <p className="text-gray-600 text-xs mt-1">Paid: {formatDateTime(booking.advance_payment.paid_at)}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Final Payment */}
+                                    <div className="bg-orange-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Final Payment <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${getPaymentStatusBadge(booking.final_payment?.status)}`}>
+                                            {booking.final_payment?.status || 'pending'}
+                                        </span></p>
+                                        <p className="font-bold text-orange-700 text-lg">₹{booking.final_payment?.amount || 0}</p>
+                                        <p className="text-gray-600 text-xs mt-1">
+                                            Transaction ID: <span className="font-mono">{booking.final_payment?.razorpay_payment_id || (booking.final_payment?.method === 'cash' ? 'Cash Payment' : 'N/A')}</span>
+                                        </p>
+                                        <p className="text-gray-600 text-xs">
+                                            Mode: <span className="font-semibold uppercase">{booking.final_payment?.method || 'N/A'}</span>
+                                        </p>
+                                        {booking.final_payment?.paid_at && (
+                                            <p className="text-gray-600 text-xs mt-1">Paid: {formatDateTime(booking.final_payment.paid_at)}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Total Amount */}
+                                    <div className="bg-indigo-50 p-3 rounded-lg border-2 border-indigo-200">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Total Amount</p>
+                                        <p className="font-bold text-indigo-700 text-2xl">₹{booking.final_cost || booking.estimated_cost || 0}</p>
+                                        {booking.estimated_cost && !booking.final_cost && (
+                                            <p className="text-xs text-gray-600 mt-1">(Estimated)</p>
+                                        )}
+                                    </div>
+
+                                    {/* Dates - Booking Created */}
+                                    <div className="bg-gray-50 p-3 rounded-lg">
+                                        <p className="text-gray-500 text-xs font-medium uppercase mb-1">Booking Created</p>
+                                        <p className="font-medium text-gray-900">{formatDate(booking.createdAt)}</p>
+                                        <p className="text-gray-600 text-xs">{new Date(booking.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</p>
+                                    </div>
+
+                                    {/* Pickup Date */}
+                                    {booking.pickup_details?.actual_pickup_date && (
+                                        <div className="bg-blue-50 p-3 rounded-lg">
+                                            <p className="text-gray-500 text-xs font-medium uppercase mb-1">Pickup Date</p>
+                                            <p className="font-medium text-gray-900">{formatDate(booking.pickup_details.actual_pickup_date)}, {booking.pickup_details.actual_pickup_time || 'N/A'}</p>
+                                            {booking.pickup_details.staff_id && (
+                                                <p className="text-gray-600 text-xs mt-1">Staff: {booking.pickup_details.staff_id.name}</p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Return Date */}
+                                    {booking.return_details?.actual_return_date && (
+                                        <div className="bg-green-50 p-3 rounded-lg">
+                                            <p className="text-gray-500 text-xs font-medium uppercase mb-1">Return Date</p>
+                                            <p className="font-medium text-gray-900">{formatDate(booking.return_details.actual_return_date)}, {booking.return_details.actual_return_time || 'N/A'}</p>
+                                            {booking.return_details.staff_id && (
+                                                <p className="text-gray-600 text-xs mt-1">Staff: {booking.return_details.staff_id.name}</p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Additional Info */}
+                                    {booking.distance_traveled_km && (
+                                        <div className="bg-gray-50 p-3 rounded-lg">
+                                            <p className="text-gray-500 text-xs font-medium uppercase mb-1">Trip Details</p>
+                                            <p className="text-gray-900">Distance: <span className="font-semibold">{booking.distance_traveled_km} km</span></p>
+                                            <p className="text-gray-900">Duration: <span className="font-semibold">{booking.duration_hours} hours</span></p>
+                                        </div>
+                                    )}
+
+                                    {/* Package Info */}
+                                    {booking.package_id && (
+                                        <div className="bg-yellow-50 p-3 rounded-lg">
+                                            <p className="text-gray-500 text-xs font-medium uppercase mb-1">Package</p>
+                                            <p className="font-semibold text-gray-900">{booking.package_id.name}</p>
+                                            <p className="text-gray-600 text-xs">₹{booking.package_id.price_per_hour}/hr | ₹{booking.package_id.price_per_km}/km</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {filteredBookings.length === 0 && (
+                <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                    <p className="text-gray-500">No bookings found for the selected filter.</p>
+                </div>
+            )}
         </div>
     );
 };

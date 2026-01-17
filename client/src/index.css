@@ -1,6 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
+/* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge, Opera) */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px; /* For horizontal scrollbar */
+    width: 8px;  /* For vertical scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light grey track */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #ccc; /* Grey scroll thumb */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #999; /* Darker grey on hover */
+}
+
+/* For Firefox (modern versions) */
+.custom-scrollbar {
+    scrollbar-width: thin; /* "auto" or "thin" */
+    scrollbar-color: #ccc #f1f1f1; /* thumb and track color */
+}
+
 @theme {
     --font-sans: 'Inter', system-ui, sans-serif;
     --font-display: 'Poppins', 'Inter', sans-serif;
