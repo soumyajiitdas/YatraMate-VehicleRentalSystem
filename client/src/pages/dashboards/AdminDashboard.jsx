@@ -838,7 +838,7 @@ const VendorsTable = ({ vendors, onViewVendorDetails, onVerifyVendor, onDelete }
     return (
         <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white border border-primary-200 rounded-lg shadow-sm overflow-x-auto">
+            <div className="hidden md:block bg-white border border-primary-200 rounded-lg shadow-sm overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -1581,16 +1581,14 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
             </div>
 
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-x-auto custom-scrollbar">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Featured</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -1605,14 +1603,11 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                 <tr key={request._id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{request.name}</div>
-                                        <div className="text-sm text-gray-500">{request.model_name}</div>
+                                        <div className="text-sm text-gray-500">{request.model_name}, {request.type}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-600">{request.vendor_id?.name || 'N/A'}</div>
                                         <div className="text-sm text-gray-500">{request.vendor_id?.email || ''}</div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-600 capitalize">{request.type}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-600">{request.registration_number}</div>
@@ -1624,22 +1619,6 @@ const VehicleRequestsTable = ({ requests, vehicles, onViewDetails, onToggleFeatu
                                             }`}>
                                             {request.status}
                                         </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {request.status === 'approved' && vehicle ? (
-                                            isFeatured ? (
-                                                <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                    Featured
-                                                </span>
-                                            ) : (
-                                                <span className="text-xs text-gray-500">No</span>
-                                            )
-                                        ) : (
-                                            <span className="text-xs text-gray-400">-</span>
-                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         {new Date(request.createdAt).toLocaleDateString()}
