@@ -229,7 +229,8 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
         damage_cost,
         damage_description,
         return_notes,
-        amount_paid
+        amount_paid,
+        payment_mode
     } = req.body;
     
     // Validate amount_paid is provided
@@ -400,6 +401,14 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     booking.final_cost = final_cost;
     booking.status = 'returned';
     booking.payment_status = 'paid';          // Set payment status to paid
+    
+    // Set final payment details with payment mode
+    booking.final_payment = {
+        amount: parseFloat(amount_paid),
+        method: payment_mode || 'cash',  // Default to cash if not specified
+        status: 'completed',
+        paid_at: new Date()
+    };
     
     await booking.save();
     

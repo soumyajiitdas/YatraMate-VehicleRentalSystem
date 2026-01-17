@@ -930,6 +930,7 @@ const VendorDashboard = () => {
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Pickup Date & Time</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Return Date & Time</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Distance (km)</th>
+                                                <th className="px-4 py-3 text-left text-sm font-semibold">Payment Mode</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Damage Cost</th>
                                                 <th className="px-4 py-3 text-left text-sm font-semibold">Total Cost</th>
                                             </tr>
@@ -972,6 +973,15 @@ const VendorDashboard = () => {
                                                         <p className="text-sm font-medium text-neutral-900">
                                                             {earning.distance_traveled_km || 0}
                                                         </p>
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                            earning.final_payment?.method === 'online' 
+                                                                ? 'bg-blue-100 text-blue-800' 
+                                                                : 'bg-green-100 text-green-800'
+                                                        }`}>
+                                                            {earning.final_payment?.method === 'online' ? 'Online' : 'Cash'}
+                                                        </span>
                                                     </td>
                                                     <td className="px-4 py-4">
                                                         <p className={`text-sm font-medium ${earning.damage_cost > 0 ? 'text-red-600' : 'text-neutral-900'}`}>

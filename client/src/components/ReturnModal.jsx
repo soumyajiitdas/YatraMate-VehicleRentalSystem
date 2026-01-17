@@ -396,7 +396,8 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                     ...formData,
                     staff_id: staffId,
                     payment_done: true,
-                    amount_paid: costBreakdown ? costBreakdown.totalCost : 0
+                    amount_paid: costBreakdown ? costBreakdown.totalCost : 0,
+                    payment_mode: paymentMethod  // Add payment mode to the payload
                 };
 
                 const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
@@ -442,7 +443,8 @@ const ReturnModal = ({ booking, onClose, onSuccess }) => {
                 ...formData,
                 staff_id: staffId,
                 payment_done: paymentMethod === 'cash' ? cashPaymentConfirmed : onlinePaymentCompleted,
-                amount_paid: costBreakdown ? costBreakdown.totalCost : 0
+                amount_paid: costBreakdown ? costBreakdown.totalCost : 0,
+                payment_mode: paymentMethod  // Add payment mode to the payload
             };
 
             const response = await fetch(API_ENDPOINTS.confirmReturn(booking._id), {
