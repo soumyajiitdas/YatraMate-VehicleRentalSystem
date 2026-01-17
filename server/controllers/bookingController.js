@@ -103,7 +103,7 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
         return next(new AppError('Booking is not in requested state', 400));
     }
     
-    // Generate unique Bill ID in format: BILL-YYYYMMDD-XXXXX with retry mechanism
+    // Generate unique Bill ID in format: BILL-YYYYMMDD-XXXXX
     const generateBillId = async (retryCount = 0) => {
         const today = new Date();
         const dateStr = today.getFullYear() + 
@@ -164,7 +164,6 @@ exports.confirmPickup = catchAsync(async (req, res, next) => {
                     return next(new AppError('Failed to generate unique bill ID. Please try again.', 500));
                 }
             } else {
-                // Re-throw other errors
                 throw err;
             }
         }
@@ -314,12 +313,10 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
         const day = dateObj.getDate();
         pickupDateTime = new Date(year, month, day, 0, 0, 0, 0);
         
-        // Parse and set the time component from the time string
         const pickupTimeParts = parseTimeString(rawPickupTime);
         if (pickupTimeParts) {
             pickupDateTime.setHours(pickupTimeParts.hours, pickupTimeParts.minutes, 0, 0);
         } else {
-            // If no time string or can't parse, try to use the time from the date object
             pickupDateTime.setHours(dateObj.getHours(), dateObj.getMinutes(), 0, 0);
         }
         
@@ -363,7 +360,6 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     const msDiff = returnDateTime.getTime() - pickupDateTime.getTime();
     const duration_hours = Math.ceil(msDiff / (1000 * 60 * 60));
     
-    // Ensure duration is positive
     if (duration_hours < 0) {
         return next(new AppError('Return time cannot be before pickup time', 400));
     }
@@ -400,15 +396,26 @@ exports.confirmReturn = catchAsync(async (req, res, next) => {
     booking.damage_cost = parseFloat(damage_cost) || 0;
     booking.final_cost = final_cost;
     booking.status = 'returned';
-    booking.payment_status = 'paid';          // Set payment status to paid
+    booking.payment_status = 'paid';
     
     // Set final payment details with payment mode
-    booking.final_payment = {
-        amount: parseFloat(amount_paid),
-        method: payment_mode || 'cash',  // Default to cash if not specified
-        status: 'completed',
-        paid_at: new Date()
-    };
+    if (booking.final_payment && booking.final_payment.razorpay_payment_id) {
+        booking.final_payment = {
+            ...booking.final_payment.toObject(),
+            amount: parseFloat(amount_paid),
+            method: 'online',
+            status: 'completed',
+            paid_at: booking.final_payment.paid_at || new Date()
+        };
+    } else {
+        // Cash payment or new payment - use payment_mode from request
+        booking.final_payment = {
+            amount: parseFloat(amount_paid),
+            method: payment_mode || 'cash',
+            status: 'completed',
+            paid_at: new Date()
+        };
+    }
     
     await booking.save();
     
@@ -518,7 +525,11 @@ exports.getAllBookings = catchAsync(async (req, res, next) => {
     const bookings = await Booking.find()
         .populate('vehicle_id')
         .populate('package_id')
-        .populate('user_id', 'name email phone');
+        .populate('user_id', 'name email phone')
+        .populate('vendor_id', 'name email contact_number')
+        .populate('pickup_details.staff_id', 'name')
+        .populate('return_details.staff_id', 'name')
+        .sort({ createdAt: -1 });
 
     res.status(200).json({
         status: 'success',
