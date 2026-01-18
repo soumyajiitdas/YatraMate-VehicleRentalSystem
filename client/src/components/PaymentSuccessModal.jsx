@@ -27,10 +27,10 @@ const PaymentSuccessModal = ({ paymentDetails, onClose, autoCloseDelay = 3000 })
     }, [autoCloseDelay, onClose]);
 
     return (
-        <div className="fixed inset-0 backdrop-blur-md bg-black/50 z-[200] flex items-center justify-center p-4" data-testid="payment-success-modal-overlay">
+        <div className="fixed inset-0 backdrop-blur-md bg-black/50 z-200 flex items-center justify-center p-4" data-testid="payment-success-modal-overlay">
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-bounce-in" data-testid="payment-success-modal">
                 {/* Success Header */}
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-8 text-center">
+                <div className="bg-linear-to-r from-green-500 to-emerald-600 px-6 py-8 text-center">
                     {/* Animated Checkmark */}
                     <div className="mx-auto w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-lg">
                         <svg 
@@ -89,7 +89,7 @@ const PaymentSuccessModal = ({ paymentDetails, onClose, autoCloseDelay = 3000 })
                 <div className="px-6 pb-6">
                     <button
                         onClick={onClose}
-                        className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full py-3 bg-linear-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                         data-testid="payment-success-close-button"
                     >
                         Continue

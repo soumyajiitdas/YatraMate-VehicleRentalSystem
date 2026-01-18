@@ -273,7 +273,7 @@ const PrivacyPage = () => {
             Your privacy is important to us. Learn how we collect, use, and protect your information across all user roles.
           </p>
           <p className="text-sm text-primary-200 mt-4">
-            Last Updated: August 2025
+            Last Updated: January 2026
           </p>
         </div>
       </section>

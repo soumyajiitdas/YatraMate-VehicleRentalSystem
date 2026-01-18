@@ -93,9 +93,9 @@ const AboutUsPage = () => {
 
   const stats = [
     { number: '1000+', label: 'Registered Users' },
-    { number: '500+', label: 'Vehicles Listed' },
-    { number: '100+', label: 'Verified Vendors' },
-    { number: '50+', label: 'Cities Covered' }
+    { number: '15+', label: 'Vehicles Listed' },
+    { number: '5+', label: 'Verified Vendors' },
+    { number: '3+', label: 'Cities Covered' }
   ];
 
   const howItWorks = [
@@ -155,7 +155,7 @@ const AboutUsPage = () => {
     {
       title: 'For Customers',
       description: 'Book cars and bikes hassle-free for daily commute, weekend getaways, or special occasions.',
-      features: ['Wide range of vehicles', 'Transparent pricing', 'Easy booking process', 'No advance payment', '24/7 support'],
+      features: ['Wide range of vehicles', 'Transparent pricing', 'Easy booking process', 'Small advance payment', '24/7 support'],
       icon: (
         <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -369,7 +369,7 @@ const AboutUsPage = () => {
                 Pay-Per-Use Pricing
               </h3>
               <p className="text-neutral-700 leading-relaxed">
-                No advance payment required! Pay only after you use the vehicle. Final cost is calculated based on actual distance traveled OR duration - whichever is higher. Completely transparent, no hidden charges.
+                Only a small advance payment is required! Pay full only after you use the vehicle. Final cost is calculated based on actual distance traveled OR duration. Completely transparent, no hidden charges.
               </p>
             </div>
             <div className="bg-linear-to-br from-blue-50 to-white p-8 rounded-xl border border-blue-100">

@@ -130,43 +130,40 @@ If approved: Vehicle listed and available for booking
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  BOOKING LIFECYCLE                                                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
+│  1. Customer Browse vehicles                                                │
 │                                                                             │
-│  [Customer]              [Office Staff]              [System]               │
-│                                                                             │
-│  1. Browse vehicles  ───────────────────────────────────────────────────►  │
-│                                                                             │
-│  2. Select vehicle   ───────────────────────────────────────────────────►  │
+│  2. Select vehicle                                                          │
 │     & create booking                                                        │
 │                                                                             │
-│  3. Booking Status: "booking_requested"                                    │
-│     Vehicle Status: "booked"                                               │
+│  3. Booking Status: "booking_requested"                                     │
+│     Vehicle Status: "booked"                                                │
 │                                                                             │
-│  4. Customer arrives  ──►  Staff confirms pickup:                          │
-│     at pickup location     - Verify ID (Aadhaar/PAN/Passport/DL)          │
+│  4. Customer arrives  ──►  Staff confirms pickup:                           │
+│     at pickup location     - Verify ID (Aadhaar/PAN/Passport/DL)            │
 │                            - Record odometer reading                        │
 │                            - Verify vehicle plate number                    │
-│                            - Generate Bill ID (BILL-YYYYMMDD-XXXXX)        │
+│                            - Generate Bill ID (BILL-YYYYMMDD-XXXXX)         │
 │                                                                             │
-│  5. Booking Status: "picked_up"                                            │
-│     Email: Pickup confirmation sent to customer                            │
+│  5. Booking Status: "picked_up"                                             │
+│     Email: Pickup confirmation sent to customer                             │
 │                                                                             │
-│  6. Customer uses vehicle ──────────────────────────────────────────────►  │
+│  6. Customer uses vehicle                                                   │
 │                                                                             │
-│  7. Customer returns  ──►  Staff processes return:                         │
+│  7. Customer returns  ──►  Staff processes return:                          │
 │     vehicle                - Record final odometer reading                  │
 │                            - Verify engine/chassis numbers                  │
 │                            - Assess vehicle condition                       │
 │                            - Calculate: Distance × Price/KM                 │
 │                                     OR  Hours × Price/Hour                  │
 │                            - Add damage costs (if any)                      │
-│                            - Final cost = MAX(distance_cost, time_cost)    │
+│                            - Final cost = MAX(distance_cost, time_cost)     │
 │                                         + damage_cost                       │
 │                                                                             │
-│  8. Payment processed (Cash/Online)                                        │
-│     Booking Status: "returned"                                             │
-│     Payment Status: "paid"                                                 │
-│     Vehicle Status: "available"                                            │
-│     Email: Return confirmation with bill sent to customer                  │
+│  8. Payment processed (Cash/Online)                                         │
+│     Booking Status: "returned"                                              │
+│     Payment Status: "paid"                                                  │
+│     Vehicle Status: "available"                                             │
+│     Email: Return confirmation with bill sent to customer                   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```

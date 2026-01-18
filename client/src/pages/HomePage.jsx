@@ -37,8 +37,8 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       ),
-      title: 'Instant Booking',
-      description: 'Book your vehicle in seconds with our quick and easy process',
+      title: 'Easy Booking',
+      description: 'Browse vehicles, select dates, and book instantly - no advance payment required at booking',
     },
     {
       icon: (
@@ -46,8 +46,8 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      title: 'Best Prices',
-      description: 'Competitive rates with no hidden charges. Pay only for what you use',
+      title: 'Pay-Per-Use Pricing',
+      description: 'Pay only for actual usage after return - based on distance traveled OR time used, whichever is higher',
     },
     {
       icon: (
@@ -55,8 +55,8 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
-      title: 'Safe & Secure',
-      description: 'All vehicles are regularly maintained and insured for your safety',
+      title: 'Verified & Insured',
+      description: 'All vehicles verified with proper RC, insurance, and regular maintenance checks for your safety',
     },
     {
       icon: (
@@ -65,13 +65,13 @@ const HomePage = () => {
         </svg>
       ),
       title: '24/7 Support',
-      description: 'Round-the-clock customer support for all your queries and concerns',
+      description: 'Round-the-clock customer support via phone, email, and live chat for assistance anytime',
     },
   ];
 
   const stats = [
     { label: 'Happy Customers', value: '1000+' },
-    { label: 'Vehicles Available', value: '10+' },
+    { label: 'Vehicles Available', value: '15+' },
     { label: 'Cities Covered', value: '3+' },
     { label: 'Years Experience', value: '2+' },
   ];
@@ -79,31 +79,31 @@ const HomePage = () => {
   const howItWorks = [
     {
       step: '1',
-      title: 'Choose Your Vehicle',
-      description: 'Browse our wide selection of cars and bikes available across multiple cities',
+      title: 'Browse & Select',
+      description: 'Search for cars or bikes based on location, dates, and preferences. Filter by type, price, and availability',
       icon: (
         <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       ),
     },
     {
       step: '2',
-      title: 'Book Online',
-      description: 'Select your dates, complete the booking form and make secure payment online',
+      title: 'Book & Pickup',
+      description: 'Choose pickup date, time, and location. Visit our office with your ID and driving license to collect the vehicle',
       icon: (
         <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
     },
     {
       step: '3',
-      title: 'Pick Up & Ride',
-      description: 'Collect your vehicle from the location and enjoy your journey hassle-free',
+      title: 'Return & Pay',
+      description: 'Return the vehicle at the designated location. Pay based on actual usage - distance OR time, whichever is higher',
       icon: (
         <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
     },
@@ -505,22 +505,8 @@ const HomePage = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Easy Mobile Booking</h3>
-                    <p className="text-neutral-600">Book vehicles on the go with our user-friendly mobile interface</p>
-                  </div>
-                </div>
-
-                <div className="flex space-x-4">
-                  <div className="shrink-0">
-                    <div className="w-12 h-12 bg-linear-to-br from-primary-500 to-secondary-500 text-white rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Flexible Payments</h3>
-                    <p className="text-neutral-600">Multiple payment options including cards, UPI, and wallets</p>
+                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Real-Time Booking System</h3>
+                    <p className="text-neutral-600">Book vehicles instantly with our automated system. Track booking status from request to return in your dashboard</p>
                   </div>
                 </div>
 
@@ -533,8 +519,22 @@ const HomePage = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Insurance Coverage</h3>
-                    <p className="text-neutral-600">Comprehensive insurance coverage for complete peace of mind</p>
+                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Document Verification</h3>
+                    <p className="text-neutral-600">All vehicles verified with valid RC, insurance, and fitness certificates. Secure ID verification at pickup</p>
+                  </div>
+                </div>
+
+                <div className="flex space-x-4">
+                  <div className="shrink-0">
+                    <div className="w-12 h-12 bg-linear-to-br from-primary-500 to-secondary-500 text-white rounded-xl flex items-center justify-center">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-neutral-900 mb-2">Flexible Payment Options</h3>
+                    <p className="text-neutral-600">Pay after usage with cash or online via Razorpay. Multiple payment options including cards, UPI, and wallets</p>
                   </div>
                 </div>
               </div>

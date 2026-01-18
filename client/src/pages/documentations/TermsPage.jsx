@@ -112,7 +112,7 @@ const TermsPage = () => {
             Complete terms and conditions for all users - customers, vendors, and staff
           </p>
           <p className="text-sm text-primary-200 mt-4">
-            Last Updated: August 2025
+            Last Updated: January 2026
           </p>
         </div>
       </section>
@@ -154,10 +154,10 @@ const TermsPage = () => {
                 Cancellation Quick Guide
               </h3>
               <ul className="text-sm text-neutral-600 space-y-1">
-                <li>• <strong>48+ hours:</strong> Full refund (minus 5% fee)</li>
-                <li>• <strong>24-48 hours:</strong> 75% refund</li>
-                <li>• <strong>&lt; 24 hours:</strong> 50% refund</li>
-                <li>• <strong>No-show:</strong> No refund</li>
+                <li>• <strong>Cancel</strong> pickups from your Bookings page</li>
+                <li>• <strong>Reject</strong> the pickup if the vehicle has issues</li>
+                <li>• <strong>Full refund</strong> applies if rejected during pickup</li>
+                <li>• <strong>No refunds</strong> after pickup acceptance</li>
               </ul>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
