@@ -20,7 +20,7 @@ const app = express();
 app.set('trust proxy', true);
 
 app.use(cors({
-    origin: ["https://yatramate.vercel.app", "http://localhost:5173"],
+    origin: ["https://yatramate.vercel.app", "http://localhost:5173", "https://yatramate.onrender.com"],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
