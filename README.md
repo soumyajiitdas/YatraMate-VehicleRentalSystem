@@ -4,186 +4,461 @@ YatraMate is a comprehensive online vehicle rental system designed to provide a 
 
 🌐 Live Demo: https://yatramate.vercel.app/
 
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [User Roles & Permissions](#-user-roles--permissions)
+- [Complete System Workflow](#-complete-system-workflow)
+- [Technologies Used](#-technologies-used)
+- [Installation](#️-installation)
+- [API Endpoints](#-api-endpoints)
+- [Pricing Model](#-pricing-model)
+- [Security Features](#-security-features)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
 ## ✨ Features
 
-*   **User Authentication & Authorization:** Secure login and registration for different user roles (User, Vendor, Office Staff, Admin) using JSON Web Tokens (JWT).
-*   **Vehicle Browsing & Search:** Users can browse available cars and bikes, with search and filtering options based on vehicle type, model, and location.
-*   **Vehicle Details:** A detailed view of each vehicle, including specifications, pricing, high-quality images, and availability.
-*   **Booking Management:** Users can easily book vehicles for specific dates, view their booking history, and manage upcoming rentals.
-*   **Vendor Dashboard:** A dedicated dashboard for vendors to add, update, and manage their vehicles, view bookings for their fleet, and track their earnings.
-*   **Office Staff Dashboard:** A specialized dashboard for office staff to manage vehicle pickups and returns, verify vehicle conditions, and handle customer inquiries.
-*   **Admin Dashboard:** A powerful dashboard for administrators to have full control over users, vendors, vehicles, and system settings.
-*   **Image Uploads:** Efficient image upload and management for vehicle images, powered by ImageKit.
-*   **Responsive Design:** A user-friendly and fully responsive interface that works seamlessly across desktops, tablets, and mobile devices.
+### For Customers
+- **User Registration & Authentication:** Secure registration with email OTP verification and JWT-based authentication
+- **Vehicle Browsing & Search:** Browse available cars and bikes with filters for type, location, and pricing
+- **Detailed Vehicle View:** High-quality images, specifications, pricing packages, and availability status
+- **Easy Booking:** Simple booking process with pickup location and date/time selection
+- **Booking Management:** View booking history, track active rentals, and cancel bookings
+- **Profile Management:** Update personal information, change password with OTP verification
+- **Password Recovery:** Forgot password with secure email reset link
+
+### For Vendors
+- **Vendor Registration:** Register as individual or organization with document verification
+- **Vehicle Management:** Add, update, and manage vehicle fleet with images and documents
+- **Vehicle Request System:** Submit new vehicles for admin approval
+- **Earnings Dashboard:** Track earnings with daily, weekly, monthly, and yearly filters
+- **Booking Overview:** View all bookings for your vehicles
+
+### For Office Staff
+- **Booking Management:** View and process all booking requests
+- **Pickup Confirmation:** Verify customer ID, record odometer reading, generate bill
+- **Return Processing:** Verify vehicle condition, calculate final cost, process payment
+- **Booking Rejection:** Reject bookings with reason notification to customer
+- **Refund Management:** Mark refunds as processed for cancelled bookings
+
+### For Administrators
+- **Full Dashboard:** Complete overview of system statistics
+- **User Management:** View, create, update, and delete users
+- **Vendor Management:** Approve/reject vendor registrations, manage vendor accounts
+- **Vehicle Approval:** Review and approve/reject vehicle listing requests
+- **Package Management:** Create and manage pricing packages
+- **Office Staff Management:** Create and manage office staff accounts
+- **System Reports:** Access to all bookings, payments, and analytics
+
+### General Features
+- **Responsive Design:** Fully responsive interface for desktop, tablet, and mobile
+- **Image Uploads:** Efficient image management powered by ImageKit
+- **Email Notifications:** Automated emails for booking confirmations, pickups, returns, and cancellations
+- **Payment Integration:** Razorpay integration for online payments
+- **Real-time Status:** Live booking status updates
+
+---
+
+## 👥 User Roles & Permissions
+
+### Customer (User Role)
+| Permission | Access |
+|-----------|--------|
+| Browse vehicles | ✅ |
+| Create bookings | ✅ |
+| View own bookings | ✅ |
+| Cancel own bookings | ✅ |
+| Update profile | ✅ |
+| Access dashboards | ❌ |
+
+### Vendor
+| Permission | Access |
+|-----------|--------|
+| Manage own vehicles | ✅ |
+| View vehicle bookings | ✅ |
+| Track earnings | ✅ |
+| Submit vehicle requests | ✅ |
+| Process bookings | ❌ |
+| Approve vendors | ❌ |
+
+### Office Staff
+| Permission | Access |
+|-----------|--------|
+| View all bookings | ✅ |
+| Confirm pickups | ✅ |
+| Process returns | ✅ |
+| Reject bookings | ✅ |
+| Mark refunds | ✅ |
+| Manage users/vendors | ❌ |
+
+### Administrator
+| Permission | Access |
+|-----------|--------|
+| All permissions | ✅ |
+| User management | ✅ |
+| Vendor verification | ✅ |
+| Vehicle approval | ✅ |
+| Package management | ✅ |
+| Staff management | ✅ |
+
+---
+
+## 🔄 Complete System Workflow
+
+### 1. User Registration Flow
+```
+User enters details → Email OTP sent → User verifies OTP → Account created → User logged in
+```
+
+### 2. Vendor Registration Flow
+```
+Vendor enters details + documents → Email OTP sent → Vendor verifies OTP → 
+Pending admin approval → Admin verifies documents → Vendor approved → Vendor can login
+```
+
+### 3. Vehicle Listing Flow (Vendor)
+```
+Vendor submits vehicle request → Admin reviews → Approved/Rejected → 
+If approved: Vehicle listed and available for booking
+```
+
+### 4. Complete Booking Flow
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  BOOKING LIFECYCLE                                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  [Customer]              [Office Staff]              [System]               │
+│                                                                             │
+│  1. Browse vehicles  ───────────────────────────────────────────────────►  │
+│                                                                             │
+│  2. Select vehicle   ───────────────────────────────────────────────────►  │
+│     & create booking                                                        │
+│                                                                             │
+│  3. Booking Status: "booking_requested"                                    │
+│     Vehicle Status: "booked"                                               │
+│                                                                             │
+│  4. Customer arrives  ──►  Staff confirms pickup:                          │
+│     at pickup location     - Verify ID (Aadhaar/PAN/Passport/DL)          │
+│                            - Record odometer reading                        │
+│                            - Verify vehicle plate number                    │
+│                            - Generate Bill ID (BILL-YYYYMMDD-XXXXX)        │
+│                                                                             │
+│  5. Booking Status: "picked_up"                                            │
+│     Email: Pickup confirmation sent to customer                            │
+│                                                                             │
+│  6. Customer uses vehicle ──────────────────────────────────────────────►  │
+│                                                                             │
+│  7. Customer returns  ──►  Staff processes return:                         │
+│     vehicle                - Record final odometer reading                  │
+│                            - Verify engine/chassis numbers                  │
+│                            - Assess vehicle condition                       │
+│                            - Calculate: Distance × Price/KM                 │
+│                                     OR  Hours × Price/Hour                  │
+│                            - Add damage costs (if any)                      │
+│                            - Final cost = MAX(distance_cost, time_cost)    │
+│                                         + damage_cost                       │
+│                                                                             │
+│  8. Payment processed (Cash/Online)                                        │
+│     Booking Status: "returned"                                             │
+│     Payment Status: "paid"                                                 │
+│     Vehicle Status: "available"                                            │
+│     Email: Return confirmation with bill sent to customer                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 5. Cancellation Flow
+```
+┌────────────────────────────────────────────────────────┐
+│  CANCELLATION SCENARIOS                                │
+├────────────────────────────────────────────────────────┤
+│                                                        │
+│  A. Customer Cancellation:                             │
+│     - Must provide cancellation reason                 │
+│     - Vehicle status returns to "available"            │
+│     - If advance payment made: Refund marked pending   │
+│                                                        │
+│  B. Staff Rejection:                                   │
+│     - Must provide rejection reason                    │
+│     - Customer notified via email                      │
+│     - Vehicle status returns to "available"            │
+│     - If advance payment made: Refund marked pending   │
+│                                                        │
+│  C. Refund Processing:                                 │
+│     - Staff marks refund as "completed"                │
+│     - Refund processed within 7-10 business days       │
+│                                                        │
+└────────────────────────────────────────────────────────┘
+```
+
+---
 
 ## 🚀 Technologies Used
 
-The project is built using the MERN stack and other modern technologies to ensure a robust and scalable application.
-
 ### Frontend
-
-*   **React.js:** A popular JavaScript library for building dynamic and interactive user interfaces.
-*   **Vite:** A next-generation frontend tooling that provides a faster and leaner development experience for modern web projects.
-*   **React Router DOM:** For handling client-side routing and navigation between different pages in the application.
-*   **Tailwind CSS:** A utility-first CSS framework for rapidly building custom user interfaces without writing custom CSS.
-*   **PostCSS:** A tool for transforming CSS with JavaScript plugins, used here with Tailwind CSS.
-*   **ESLint:** A static code analysis tool for identifying and fixing problems in JavaScript code, ensuring code quality and consistency.
+| Technology | Purpose |
+|-----------|--------|
+| React.js | UI Framework |
+| Vite | Build Tool |
+| React Router DOM | Client-side Routing |
+| Tailwind CSS | Styling |
+| Lucide React | Icons |
+| PostCSS | CSS Processing |
+| ESLint | Code Quality |
 
 ### Backend
-
-*   **Node.js:** A JavaScript runtime environment that allows executing JavaScript code on the server-side.
-*   **Express.js:** A fast, unopinionated, and minimalist web framework for Node.js, used to build the RESTful API.
-*   **MongoDB:** A NoSQL database that stores data in flexible, JSON-like documents.
-*   **Mongoose:** An Object Data Modeling (ODM) library for MongoDB and Node.js, which provides a straightforward, schema-based solution to model application data.
-*   **jsonwebtoken (JWT):** For generating and verifying JSON Web Tokens to secure the application's API endpoints.
-*   **bcryptjs:** A library for hashing user passwords before storing them in the database.
-*   **cookie-parser:** Middleware to parse `Cookie` headers and populate `req.cookies` with an object keyed by the cookie names.
-*   **Multer:** A middleware for handling `multipart/form-data`, which is primarily used for uploading files.
-*   **ImageKit:** A cloud-based image management and delivery service that provides an easy-to-use API for image uploads, optimization, and transformation.
-*   **dotenv:** A zero-dependency module that loads environment variables from a `.env` file into `process.env`.
-*   **cors:** A Node.js middleware for enabling Cross-Origin Resource Sharing (CORS) with various options.
-*   **Nodemon:** A utility that automatically restarts the Node.js application when file changes are detected.
-
-## 📂 Folder Structure
-
-The project is organized into two main directories: `client` for the frontend application and `server` for the backend application.
-
-```
-YatraMate-VehicleRentalSystem/
-├── client/                 # Frontend application
-│   ├── public/             # Static assets
-│   ├── src/                # React source code
-│   │   ├── components/     # Reusable React components
-│   │   ├── config/         # Configuration files (e.g., API base URL)
-│   │   ├── contexts/       # React Context API for global state
-│   │   ├── pages/          # Individual page components
-│   │   ├── services/       # API service calls
-│   │   └── utils/          # Utility functions
-│   └── ...
-├── server/                 # Backend application
-│   ├── controllers/        # Logic for handling requests
-│   ├── middleware/         # Express middleware (e.g., authentication)
-│   ├── models/             # Mongoose schemas and models
-│   ├── routes/             # API routes definitions
-│   └── utils/              # Utility functions and error handling
-│   └── ...
-|
-├── .gitignore              # Git ignore file for the root directory
-├── LICENSE                 # Project license file
-├── CONTRIBUTING.md         # Contribution guidelines
-└── README.md               # Project documentation
-```
+| Technology | Purpose |
+|-----------|--------|
+| Node.js | Runtime Environment |
+| Express.js | Web Framework |
+| MongoDB | Database |
+| Mongoose | ODM |
+| JWT | Authentication |
+| bcryptjs | Password Hashing |
+| Multer | File Uploads |
+| ImageKit | Image Management |
+| Nodemailer | Email Service |
+| Razorpay | Payment Gateway |
 
 ## ⚙️ Installation
 
 ### Prerequisites
+- **Node.js** (v18+ recommended)
+- **npm** or **yarn**
+- **MongoDB** (local or MongoDB Atlas)
 
-Before you begin, ensure you have the following installed:
+### Environment Variables
 
-*   **Node.js** (LTS version recommended)
-*   **npm** (comes with Node.js) or **Yarn**
-*   **MongoDB:** A running instance of MongoDB, either locally or a cloud-hosted service (e.g., MongoDB Atlas).
+#### Backend (.env in /server)
+```env
+# Server
+PORT=8000
+NODE_ENV=development
 
-### Backend Setup:
+# Database
+DATABASE=mongodb+srv://<username>:<PASSWORD>@cluster.mongodb.net/yatramate
+DATABASE_PASSWORD=your_database_password
 
-1.  **Navigate to the `server` directory:**
-    ```bash
-    cd server
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Create a `.env` file:**
-    In the `server` directory, create a file named `.env` and add the environment variables as specified below:
-    ```
-    PORT=8000
-    MONGO_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret_key
-    JWT_EXPIRES_IN=90d
-    JWT_COOKIE_EXPIRES_IN=90
-    IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
-    IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
-    IMAGEKIT_URL_ENDPOINT=your_imagekit_url_endpoint
-    ```
-    *   `MONGO_URI`: Your MongoDB connection string.
-    *   `JWT_SECRET`: A strong, random string for JWT signing.
-    *   `IMAGEKIT_*`: Your ImageKit credentials for image uploads.
+# JWT
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=90d
+JWT_COOKIE_EXPIRES_IN=90
 
-4.  **Start the backend server:**
-    ```bash
-    npm start
-    ```
-    The server will run on `http://localhost:8000`.
+# ImageKit (for image uploads)
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_id
 
-### Frontend Setup:
+# Email (for OTP and notifications)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USERNAME=your_email@gmail.com
+EMAIL_PASSWORD=your_app_password
+EMAIL_FROM=YatraMate <noreply@yatramate.com>
 
-1.  **Navigate to the `client` directory:**
-    ```bash
-    cd client
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Start the frontend development server:**
-    ```bash
-    npm run dev
-    ```
-    The frontend application will run on `http://localhost:5173`.
+# Razorpay (for payments)
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 
-### Alternate method:
-#### Run the application using Concurrently-
-1. Simply, create `.env` for backend as instructed above
-2. In root directory, install concurrently by running the command 
-    ```
-    npm install
-    ```
-3. After that, run the command for installing required packages for the application
-    ```
-    npm run download
-    ```
-4. Then run the command to run the application
-    ```
-    npm run app
-    ```
-    Access the application in your browser in this link `http://localhost:5173`
+# Frontend URL (for password reset links)
+FRONTEND_URL=http://localhost:5173
+```
 
-## 🚀 Usage
+#### Frontend (.env in /client)
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+```
 
-Once both the backend and frontend servers are running:
+### Quick Start
 
-1.  Open your web browser and navigate to the frontend URL (e.g., `http://localhost:5173`).
-2.  Register a new user account or log in with existing credentials.
-3.  Explore the vehicle listings, make bookings, or switch to a vendor/staff/admin role if you have the necessary access.
+#### Option 1: Run Everything Together
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/YatraMate-VehicleRentalSystem.git
+cd YatraMate-VehicleRentalSystem
 
-## API Endpoints (Overview)
+# Install root dependencies
+npm install
 
-The backend provides a RESTful API. Key routes include:
+# Install all dependencies (client + server)
+npm run download
 
-*   `/api/v1/auth`: User authentication (register, login, logout, forgot password, reset password).
-*   `/api/v1/users`: User management (profile, update, delete).
-*   `/api/v1/vehicles`: Vehicle management (add, view, update, delete vehicles).
-*   `/api/v1/bookings`: Booking management (create, view, update bookings).
-*   `/api/v1/vendors`: Vendor specific operations.
-*   `/api/v1/admin`: Administrative operations.
-*   `/api/v1/upload`: Image upload endpoints.
+# Create server/.env file with your credentials
 
-Refer to the backend `routes` directory for detailed endpoint definitions.
+# Start both frontend and backend
+npm run app
+```
 
+#### Option 2: Run Separately
+
+**Backend:**
+```bash
+cd server
+npm install
+# Create .env file
+npm start      # Production
+npm run dev    # Development with nodemon
+```
+
+**Frontend:**
+```bash
+cd client
+npm install
+npm run dev
+```
+
+### Access the Application
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000
+
+---
+
+## 📡 API Endpoints
+
+### Authentication Routes (`/api/v1/auth`)
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/register` | Register new user | ❌ |
+| POST | `/verify-otp` | Verify email OTP | ❌ |
+| POST | `/resend-otp` | Resend OTP | ❌ |
+| POST | `/register-vendor` | Register vendor | ❌ |
+| POST | `/verify-vendor-otp` | Verify vendor OTP | ❌ |
+| POST | `/login` | User/Vendor login | ❌ |
+| GET | `/logout` | Logout | ❌ |
+| POST | `/forgot-password` | Request password reset | ❌ |
+| POST | `/reset-password` | Reset password | ❌ |
+| GET | `/me` | Get current user | ✅ |
+| PATCH | `/update-password` | Update password | ✅ |
+| PATCH | `/update-profile` | Update profile | ✅ |
+| POST | `/request-password-change-otp` | Request password change OTP | ✅ |
+| POST | `/verify-password-change-otp` | Verify and change password | ✅ |
+
+### Booking Routes (`/api/v1/bookings`)
+| Method | Endpoint | Description | Auth | Role |
+|--------|----------|-------------|------|------|
+| POST | `/request` | Create booking | ✅ | User |
+| GET | `/user/:userId` | Get user bookings | ✅ | Any |
+| GET | `/office-staff/requests` | Get all requests | ✅ | Staff |
+| PATCH | `/:bookingId/pickup` | Confirm pickup | ✅ | Staff |
+| PATCH | `/:bookingId/return` | Confirm return | ✅ | Staff |
+| PATCH | `/:bookingId/reject` | Reject booking | ✅ | Staff |
+| PATCH | `/:bookingId/mark-refund-returned` | Mark refund | ✅ | Staff |
+| GET | `/` | Get all bookings | ✅ | Admin |
+| GET | `/:id` | Get booking details | ✅ | Any |
+| DELETE | `/:id` | Cancel booking | ✅ | User |
+
+### Vehicle Routes (`/api/v1/vehicles`)
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/` | Get all vehicles | ❌ |
+| GET | `/:id` | Get vehicle by ID | ❌ |
+| POST | `/` | Create vehicle | ✅ |
+| PATCH | `/:id` | Update vehicle | ✅ |
+| DELETE | `/:id` | Delete vehicle | ✅ |
+
+### Vendor Routes (`/api/v1/vendors`)
+| Method | Endpoint | Description | Auth | Role |
+|--------|----------|-------------|------|------|
+| GET | `/` | Get all vendors | ✅ | Admin |
+| GET | `/:id` | Get vendor | ✅ | Any |
+| PATCH | `/:id/verify` | Verify vendor | ✅ | Admin |
+| GET | `/earnings` | Get vendor earnings | ✅ | Vendor |
+
+### Package Routes (`/api/v1/packages`)
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/` | Get all packages | ❌ |
+| GET | `/for-vehicle` | Get package for CC | ❌ |
+| POST | `/` | Create package | ✅ |
+| PATCH | `/:id` | Update package | ✅ |
+| DELETE | `/:id` | Delete package | ✅ |
+
+### Upload Routes (`/api/v1/upload`)
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/` | Upload file | ❌ |
+
+---
+
+## 💰 Pricing Model
+
+### How Pricing Works
+
+1. **Packages are defined by:**
+   - Vehicle Type (Car/Bike)
+   - Engine CC Range (e.g., 100-150 CC, 1000-1500 CC)
+   - Price per Hour
+   - Price per Kilometer
+
+2. **Final Cost Calculation:**
+   ```
+   Distance Cost = (Odometer End - Odometer Start) × Price per KM
+   Time Cost = Duration in Hours × Price per Hour
+   
+   Base Cost = MAX(Distance Cost, Time Cost)
+   Final Cost = Base Cost + Damage Cost (if any)
+   ```
+
+3. **Example Packages:**
+   | Package Name | Type | CC Range | ₹/Hour | ₹/KM |
+   |-------------|------|----------|--------|------|
+   | Economy Bike | Bike | 100-150 | 30 | 3 |
+   | Standard Bike | Bike | 150-250 | 50 | 5 |
+   | Premium Bike | Bike | 250-500 | 80 | 8 |
+   | Economy Car | Car | 800-1200 | 100 | 10 |
+   | Standard Car | Car | 1200-1600 | 150 | 15 |
+   | Premium Car | Car | 1600-2500 | 200 | 20 |
+
+---
+
+## 🔐 Security Features
+
+- **JWT Authentication:** Secure token-based authentication with HTTP-only cookies
+- **Password Hashing:** bcrypt with 12 salt rounds
+- **OTP Verification:** 6-digit OTP with 10-minute expiry for email verification
+- **Password Reset:** Secure token-based password reset with expiry
+- **Role-Based Access Control:** Middleware restricts access based on user roles
+- **Input Validation:** Server-side validation for all inputs
+- **CORS Protection:** Configured CORS for allowed origins
+- **Secure Cookies:** SameSite and Secure flags in production
+
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
+Contributions are welcome! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines.
 
-Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for more details on how to contribute to this project.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
 
 ## 📝 License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
 
 ## 🙏 Acknowledgements
 
 We would like to express our sincere gratitude to our project guide, Professor Tanmoy Bera Sir, for his invaluable guidance and insightful ideas throughout the development of this MERN stack final year project.
 
 ---
+
+## 📞 Support
+
+For support, please:
+- Visit our [Help Center](https://yatramate.vercel.app/help)
+- Email us at support@yatramate.com
+- Check our [FAQ page](https://yatramate.vercel.app/faq)
+
+---
+
+**Made with ❤️ by the YatraMate Team**

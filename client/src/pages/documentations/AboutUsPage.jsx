@@ -55,7 +55,7 @@ const AboutUsPage = () => {
         </svg>
       ),
       title: 'Trust & Safety',
-      description: 'We prioritize your safety with verified vehicles and transparent pricing'
+      description: 'All vehicles are verified with proper documentation. Comprehensive insurance coverage on every rental.'
     },
     {
       icon: (
@@ -64,7 +64,7 @@ const AboutUsPage = () => {
         </svg>
       ),
       title: 'Innovation',
-      description: 'Leveraging technology to make vehicle rentals seamless and efficient'
+      description: 'Modern tech stack with real-time booking, automated billing, and seamless payment integration.'
     },
     {
       icon: (
@@ -73,7 +73,7 @@ const AboutUsPage = () => {
         </svg>
       ),
       title: 'Customer First',
-      description: '24/7 support and dedication to delivering exceptional experiences'
+      description: '24/7 support, transparent pricing with no hidden fees, and hassle-free cancellation policies.'
     },
     {
       icon: (
@@ -82,13 +82,109 @@ const AboutUsPage = () => {
         </svg>
       ),
       title: 'Sustainability',
-      description: 'Promoting eco-friendly transportation solutions for a better tomorrow'
+      description: 'Promoting shared mobility to reduce carbon footprint and supporting local vendors across India.'
     }
   ];
 
   const milestones = [
-    { year: '2025', title: 'Foundation Stage', description: 'Started with a vision to revolutionize vehicle rentals' },
-    { year: '2026', title: 'Journey Started', description: 'Serving and growing by providing customer satisfaction' },
+    { year: '2025', title: 'Foundation Stage', description: 'Started with a vision to revolutionize vehicle rentals in India' },
+    { year: '2026', title: 'Growth Phase', description: 'Expanding to multiple cities with thousands of satisfied customers' },
+  ];
+
+  const stats = [
+    { number: '1000+', label: 'Registered Users' },
+    { number: '500+', label: 'Vehicles Listed' },
+    { number: '100+', label: 'Verified Vendors' },
+    { number: '50+', label: 'Cities Covered' }
+  ];
+
+  const howItWorks = [
+    {
+      step: '1',
+      title: 'Browse & Select',
+      description: 'Search for cars or bikes based on your location, dates, and preferences. Filter by type, price, and availability.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      )
+    },
+    {
+      step: '2',
+      title: 'Book Online',
+      description: 'Choose your pickup date, time, and location. Complete the booking with your details - no advance payment required!',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    {
+      step: '3',
+      title: 'Pickup Vehicle',
+      description: 'Visit the pickup location with your ID and driving license. Our staff will verify your documents and hand over the vehicle.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      step: '4',
+      title: 'Enjoy Your Ride',
+      description: 'Hit the road! Use the vehicle for your trip. All vehicles come with comprehensive insurance coverage.',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      )
+    },
+    {
+      step: '5',
+      title: 'Return & Pay',
+      description: 'Return the vehicle at the designated location. Pay based on actual usage (distance or time, whichever is higher).',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      )
+    }
+  ];
+
+  const forWhom = [
+    {
+      title: 'For Customers',
+      description: 'Book cars and bikes hassle-free for daily commute, weekend getaways, or special occasions.',
+      features: ['Wide range of vehicles', 'Transparent pricing', 'Easy booking process', 'No advance payment', '24/7 support'],
+      icon: (
+        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      color: 'from-blue-500 to-indigo-600'
+    },
+    {
+      title: 'For Vendors',
+      description: 'List your vehicles and earn money. Reach thousands of customers without marketing hassle.',
+      features: ['Easy vehicle listing', 'Earnings dashboard', 'Secure payments', 'Admin support', 'Fleet management'],
+      icon: (
+        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      ),
+      color: 'from-emerald-500 to-teal-600'
+    },
+    {
+      title: 'For Office Staff',
+      description: 'Manage bookings efficiently with our intuitive dashboard designed for smooth operations.',
+      features: ['Booking management', 'Pickup/Return processing', 'Document verification', 'Billing system', 'Refund handling'],
+      icon: (
+        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      ),
+      color: 'from-orange-500 to-red-600'
+    }
   ];
 
   return (
@@ -105,26 +201,37 @@ const AboutUsPage = () => {
               About <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-500 to-secondary-600">YatraMate</span>
             </h1>
             <p className="text-lg md:text-xl text-neutral-600 leading-relaxed">
-              Your trusted companion for seamless vehicle rentals. We're on a mission to make transportation accessible, affordable, and convenient for everyone.
+              Your trusted companion for seamless vehicle rentals. We connect customers with verified vehicles and empower vendors to grow their business - all on one platform.
             </p>
           </div>
         </div>
         {/* Background Decorative Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Top-left cluster */}
           <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
-
-          {/* Center-right floating grouping */}
           <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
-
-          {/* Bottom-right anchor cluster */}
           <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
           <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
           <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-primary-500 to-secondary-600 mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-neutral-600 font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -140,7 +247,7 @@ const AboutUsPage = () => {
               </div>
               <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-4">Our Mission <span className='text-red-500'>:</span></h2>
               <p className="text-neutral-700 leading-relaxed">
-                To democratize transportation by providing easy access to quality vehicles at affordable prices. We believe everyone deserves the freedom to explore without barriers.
+                To democratize transportation by providing easy access to quality vehicles at affordable prices. We connect vehicle owners with customers, creating a win-win ecosystem where vendors earn and customers travel freely without the burden of ownership.
               </p>
             </div>
 
@@ -153,9 +260,72 @@ const AboutUsPage = () => {
               </div>
               <h2 className="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-4">Our Vision <span className='text-red-500'>:</span></h2>
               <p className="text-neutral-700 leading-relaxed">
-                To become the most trusted and preferred vehicle rental platform across the nation, setting new standards in customer service and innovation.
+                To become India's most trusted vehicle rental platform, setting new standards in customer service, vendor empowerment, and operational excellence. We envision a future where mobility is accessible, affordable, and sustainable for everyone.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 md:py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">How YatraMate Works <span className='text-red-500'>:</span></h2>
+            <p className="text-neutral-600 max-w-2xl mx-auto">Simple, transparent, and hassle-free - from booking to return</p>
+          </div>
+          <div className="grid md:grid-cols-5 gap-6">
+            {howItWorks.map((step, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl shadow-md border border-neutral-100 hover:shadow-xl transition-all duration-300 relative"
+              >
+                <div className="absolute -top-4 left-6 w-10 h-10 bg-linear-to-br from-primary-500 to-secondary-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                  {step.step}
+                </div>
+                <div className="mt-4 mb-4 text-primary-600">
+                  {step.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-neutral-900 mb-2">{step.title}</h3>
+                <p className="text-neutral-600 text-sm leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who Is YatraMate For Section */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Who Is YatraMate For <span className='text-red-500'>?</span></h2>
+            <p className="text-neutral-600 max-w-2xl mx-auto">Built for everyone in the vehicle rental ecosystem</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {forWhom.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-lg border border-neutral-200 overflow-hidden hover:shadow-xl transition-all duration-300"
+              >
+                <div className={`bg-linear-to-r ${item.color} p-6 text-white`}>
+                  <div className="mb-4">{item.icon}</div>
+                  <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
+                  <p className="text-white/90 text-sm">{item.description}</p>
+                </div>
+                <div className="p-6">
+                  <ul className="space-y-3">
+                    {item.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center text-neutral-700">
+                        <svg className="w-5 h-5 text-emerald-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -184,8 +354,63 @@ const AboutUsPage = () => {
         </div>
       </section>
 
-      {/* Timeline Section */}
+      {/* What Makes Us Different */}
       <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">What Makes Us Different <span className='text-red-500'>?</span></h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-linear-to-br from-emerald-50 to-white p-8 rounded-xl border border-emerald-100">
+              <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center">
+                <svg className="w-6 h-6 text-emerald-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Pay-Per-Use Pricing
+              </h3>
+              <p className="text-neutral-700 leading-relaxed">
+                No advance payment required! Pay only after you use the vehicle. Final cost is calculated based on actual distance traveled OR duration - whichever is higher. Completely transparent, no hidden charges.
+              </p>
+            </div>
+            <div className="bg-linear-to-br from-blue-50 to-white p-8 rounded-xl border border-blue-100">
+              <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center">
+                <svg className="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                100% Verified
+              </h3>
+              <p className="text-neutral-700 leading-relaxed">
+                Every vehicle on our platform is verified with proper documentation including RC, insurance, and fitness certificates. All vendors go through a thorough verification process before approval.
+              </p>
+            </div>
+            <div className="bg-linear-to-br from-purple-50 to-white p-8 rounded-xl border border-purple-100">
+              <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center">
+                <svg className="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                24/7 Support
+              </h3>
+              <p className="text-neutral-700 leading-relaxed">
+                Round-the-clock customer support via phone, email, and live chat. Our dedicated team is always ready to help you with bookings, issues, or queries.
+              </p>
+            </div>
+            <div className="bg-linear-to-br from-orange-50 to-white p-8 rounded-xl border border-orange-100">
+              <h3 className="text-xl font-bold text-neutral-900 mb-4 flex items-center">
+                <svg className="w-6 h-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Comprehensive Insurance
+              </h3>
+              <p className="text-neutral-700 leading-relaxed">
+                All vehicles come with comprehensive insurance coverage as per government regulations. Third-party liability and own damage coverage included for your peace of mind.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Timeline Section */}
+      <section className="py-16 md:py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Our Journey <span className='text-red-500'>:</span></h2>
@@ -213,7 +438,7 @@ const AboutUsPage = () => {
       </section>
 
       {/* Meet the Developers Section */}
-      <section className="py-16 md:py-20 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
+      <section className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Meet the Developers <span className='text-red-500'>:</span></h2>
@@ -284,13 +509,21 @@ const AboutUsPage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">Ready to Start Your Journey?</h2>
           <p className="text-xl text-primary-100 mb-8">Join thousands of happy customers who trust YatraMate for their travel needs</p>
-          <Link
-            to="/vehicles"
-            data-testid="about-browse-vehicles-btn"
-            className="inline-block bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-neutral-50 transition-colors duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
-          >
-            Browse Vehicles
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/vehicles"
+              data-testid="about-browse-vehicles-btn"
+              className="inline-block bg-white text-primary-600 px-8 py-4 rounded-xl font-semibold hover:bg-neutral-50 transition-colors duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+            >
+              Browse Vehicles
+            </Link>
+            <Link
+              to="/vendor"
+              className="inline-block bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold hover:bg-secondary-700 transition-colors duration-200 border-2 border-white"
+            >
+              Become a Vendor
+            </Link>
+          </div>
         </div>
       </section>
     </div>

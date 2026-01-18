@@ -11,6 +11,7 @@ const HelpCenterPage = () => {
   });
   const [formStatus, setFormStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeGuide, setActiveGuide] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -133,6 +134,247 @@ const HelpCenterPage = () => {
     }
   ];
 
+  // Comprehensive User Guides
+  const userGuides = [
+    {
+      id: 'customer',
+      title: 'Customer Guide',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+      color: 'from-blue-500 to-indigo-600',
+      sections: [
+        {
+          title: 'How to Book a Vehicle',
+          steps: [
+            'Browse our vehicle catalog and select your preferred car or bike',
+            'Click on the vehicle to view detailed specifications and pricing',
+            'Select your pickup date and time using the booking form',
+            'Review the cost breakdown showing hourly/daily rates',
+            'Pay 40% advance amount securely via Razorpay (cards, UPI, wallets)',
+            'Receive booking confirmation via email with Bill ID',
+            'Visit our office at the scheduled time with valid ID proof'
+          ]
+        },
+        {
+          title: 'Document Requirements for Pickup',
+          steps: [
+            'Original valid driving license (two-wheeler for bikes, four-wheeler for cars)',
+            'Government-issued ID proof (Aadhaar, PAN, Voter ID, or Passport)',
+            'Booking confirmation email or Bill ID',
+            'Payment receipt for advance amount'
+          ]
+        },
+        {
+          title: 'During Your Rental Period',
+          steps: [
+            'Drive safely and follow all traffic rules',
+            'Do not exceed the vehicle\'s carrying capacity',
+            'Maintain the fuel level as provided at pickup',
+            'Report any accidents or issues immediately to our 24/7 helpline',
+            'Keep the booking confirmation handy for verification'
+          ]
+        },
+        {
+          title: 'Returning the Vehicle',
+          steps: [
+            'Return the vehicle to the same pickup location',
+            'Our staff will record the odometer reading',
+            'Vehicle inspection will be conducted for any damages',
+            'Final cost calculated based on distance + time used',
+            'Pay remaining 60% amount (cash or online)',
+            'Receive final receipt and trip summary'
+          ]
+        },
+        {
+          title: 'Cancellation & Refund Process',
+          steps: [
+            'Login to your account and go to "My Bookings"',
+            'Select the booking you want to cancel',
+            'Click "Cancel Booking" and provide a reason',
+            'Refund amount depends on cancellation timing (see Terms)',
+            'Refunds are processed within 7-10 business days',
+            'Track refund status in your bookings page'
+          ]
+        }
+      ]
+    },
+    {
+      id: 'vendor',
+      title: 'Vendor Guide',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      ),
+      color: 'from-emerald-500 to-teal-600',
+      sections: [
+        {
+          title: 'Vendor Registration Process',
+          steps: [
+            'Visit the "Become a Vendor" page',
+            'Fill in personal/organization details',
+            'Upload valid ID proof (PAN, Aadhaar, License, or Business Certificate)',
+            'Set your account password',
+            'Verify your email with OTP sent to your registered email',
+            'Wait for admin approval (usually within 24-48 hours)',
+            'Once approved, access your Vendor Dashboard'
+          ]
+        },
+        {
+          title: 'Adding a Vehicle',
+          steps: [
+            'Login to your Vendor Dashboard',
+            'Click "Add Vehicle" button',
+            'Enter vehicle details: Name, Model, Brand, Type (Bike/Car)',
+            'Provide registration, engine, and chassis numbers',
+            'Enter engine CC (determines pricing package automatically)',
+            'Upload RC document and valid insurance (max 1MB each)',
+            'Upload 5 vehicle images (4 sides + interior, max 1MB each)',
+            'Submit for admin review',
+            'Once approved, your vehicle goes live for booking'
+          ]
+        },
+        {
+          title: 'Managing Your Fleet',
+          steps: [
+            'View all your vehicles in the "Vehicles" tab',
+            'Track each vehicle\'s availability status (Available/Booked/Maintenance)',
+            'Monitor total bookings, distance traveled, and earnings per vehicle',
+            'Delete vehicles no longer available for rental',
+            'Vehicle becomes unavailable automatically when booked'
+          ]
+        },
+        {
+          title: 'Tracking Earnings',
+          steps: [
+            'Access the "Earnings" tab in your dashboard',
+            'Filter earnings by day, week, month, or year',
+            'View detailed breakdown: pickup/return dates, distance, costs',
+            'Track currently booked vehicles count',
+            'Monitor total earnings across all vehicles',
+            'Earnings are calculated after customer return and final payment'
+          ]
+        },
+        {
+          title: 'Commission & Payment Structure',
+          steps: [
+            'YatraMate charges a platform commission on each booking',
+            'Earnings are credited after successful vehicle return',
+            'View detailed earnings history in your dashboard',
+            'Pricing is automatically set based on vehicle CC and type',
+            'Price includes hourly and per-kilometer rates'
+          ]
+        }
+      ]
+    },
+    {
+      id: 'staff',
+      title: 'Office Staff Guide',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        </svg>
+      ),
+      color: 'from-purple-500 to-pink-600',
+      sections: [
+        {
+          title: 'Processing Vehicle Pickup',
+          steps: [
+            'Access "Pending Requests" tab in your dashboard',
+            'Verify customer identity with valid government ID',
+            'Record ID proof type and number in the system',
+            'Note the starting odometer reading',
+            'Verify vehicle plate number matches booking',
+            'Click "Complete Pickup" to generate Bill ID',
+            'Hand over vehicle keys and booking receipt to customer'
+          ]
+        },
+        {
+          title: 'Processing Vehicle Return',
+          steps: [
+            'Access "Active Bookings" tab',
+            'Note the ending odometer reading',
+            'Inspect vehicle for any damages',
+            'If damaged: select "Damaged", enter cost and description',
+            'System calculates final cost (distance × rate + time × rate + damages)',
+            'Collect remaining payment (cash or online via Razorpay)',
+            'Click "Verify Return" to complete the booking'
+          ]
+        },
+        {
+          title: 'Rejecting a Booking',
+          steps: [
+            'From "Pending Requests", click "Reject Booking"',
+            'Provide a valid rejection reason (mandatory)',
+            'Customer receives notification with reason',
+            'Refund is automatically initiated for advance payment',
+            'Booking moves to "Cancelled" section'
+          ]
+        },
+        {
+          title: 'Handling Refunds',
+          steps: [
+            'View cancelled bookings in "Cancelled" tab',
+            'Check if refund is pending',
+            'After processing refund manually, click "Mark Refund as Returned"',
+            'Update refund status for customer visibility',
+            'Keep records for accounting purposes'
+          ]
+        },
+        {
+          title: 'Best Practices',
+          steps: [
+            'Always verify customer ID thoroughly before vehicle handover',
+            'Take photos of vehicle condition at pickup and return',
+            'Document any pre-existing damages clearly',
+            'Be polite and professional with all customers',
+            'Report any suspicious activity to management immediately',
+            'Keep login credentials secure and confidential'
+          ]
+        }
+      ]
+    }
+  ];
+
+  // Troubleshooting Guide
+  const troubleshooting = [
+    {
+      issue: 'Payment Failed',
+      solution: 'Check your card/UPI details, ensure sufficient balance, try another payment method, or contact your bank. If amount is deducted but booking failed, contact support with payment ID.'
+    },
+    {
+      issue: 'OTP Not Received',
+      solution: 'Check spam/junk folder, wait 2-3 minutes, click "Resend OTP". Ensure email address is correct. If issue persists, try a different email or contact support.'
+    },
+    {
+      issue: 'Cannot Login',
+      solution: 'Use "Forgot Password" to reset. Ensure you\'re using the correct email. Clear browser cache and try again. If account is locked, wait 30 minutes or contact support.'
+    },
+    {
+      issue: 'Booking Not Showing',
+      solution: 'Refresh the page and check "My Bookings". Verify payment was successful. Check spam folder for confirmation email. Contact support with payment ID if issue persists.'
+    },
+    {
+      issue: 'Vehicle Not Available',
+      solution: 'The vehicle might be booked by another customer. Try different dates or browse similar vehicles in the same category.'
+    },
+    {
+      issue: 'Refund Not Received',
+      solution: 'Refunds take 7-10 business days. Check your original payment method. For UPI/cards, contact your bank with refund reference ID provided in confirmation email.'
+    },
+    {
+      issue: 'Document Upload Failed',
+      solution: 'Ensure file is under 1MB. Use JPG, PNG, or PDF format. Check internet connection. Try compressing the image before uploading.'
+    },
+    {
+      issue: 'Vendor Application Pending',
+      solution: 'Applications are reviewed within 24-48 hours. Ensure all documents are clear and valid. Check email for any rejection reason or additional document requests.'
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-50 via-white to-primary-50">
       {/* Hero Section */}
@@ -146,22 +388,17 @@ const HelpCenterPage = () => {
             How Can We <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-500 to-secondary-600">Help You?</span>
           </h1>
           <p className="text-lg md:text-xl text-neutral-600">
-            Get the support you need, whenever you need it
+            Comprehensive guides for customers, vendors, and staff. Get the support you need, whenever you need it.
           </p>
         </div>
         {/* Background Decorative Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Top-left cluster */}
           <div className="absolute -top-10 -left-6 w-32 h-32 bg-red-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-6 -left-12 w-20 h-20 bg-blue-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-20 left-4 w-14 h-14 bg-yellow-300 rounded-full opacity-50 blur-md" />
-
-          {/* Center-right floating grouping */}
           <div className="absolute top-16 right-24 w-28 h-28 bg-pink-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-32 right-10 w-16 h-16 bg-purple-300 rounded-full opacity-50 blur-md" />
           <div className="absolute top-44 right-16 w-12 h-12 bg-green-300 rounded-full opacity-50 blur-md" />
-
-          {/* Bottom-right anchor cluster */}
           <div className="absolute -bottom-10 right-8 w-24 h-24 bg-red-300 rounded-full opacity-50 blur-md" />
           <div className="absolute -bottom-4 right-24 w-16 h-16 bg-blue-300 rounded-full opacity-50 blur-md" />
           <div className="absolute -bottom-20 right-16 w-12 h-12 bg-yellow-300 rounded-full opacity-50 blur-md" />
@@ -189,6 +426,108 @@ const HelpCenterPage = () => {
                 <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">{link.title}</h3>
                 <p className="text-neutral-600 text:xs sm:text-sm">{link.description}</p>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* User Guides Section */}
+      <section className="py-12 md:py-16 bg-linear-to-br from-neutral-50 via-primary-50 to-secondary-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Detailed User Guides <span className='text-red-500'>:</span></h2>
+            <p className="text-neutral-600">Step-by-step guides for every user type</p>
+          </div>
+          
+          <div className="space-y-6">
+            {userGuides.map((guide, index) => (
+              <div 
+                key={guide.id}
+                data-testid={`user-guide-${guide.id}`}
+                className="bg-white rounded-2xl shadow-lg border border-neutral-200 overflow-hidden"
+              >
+                {/* Guide Header */}
+                <button
+                  onClick={() => setActiveGuide(activeGuide === guide.id ? null : guide.id)}
+                  className={`w-full px-6 py-5 flex items-center justify-between bg-linear-to-r ${guide.color} text-white`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                      {guide.icon}
+                    </div>
+                    <div className="text-left">
+                      <h3 className="text-xl font-bold">{guide.title}</h3>
+                      <p className="text-white/80 text-sm">Click to {activeGuide === guide.id ? 'collapse' : 'expand'} guide</p>
+                    </div>
+                  </div>
+                  <svg 
+                    className={`w-6 h-6 transition-transform duration-300 ${activeGuide === guide.id ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Guide Content */}
+                <div className={`transition-all duration-300 overflow-hidden ${activeGuide === guide.id ? 'max-h-[5000px]' : 'max-h-0'}`}>
+                  <div className="p-6 space-y-8">
+                    {guide.sections.map((section, sIdx) => (
+                      <div key={sIdx} className="border-b border-neutral-100 pb-6 last:border-b-0 last:pb-0">
+                        <h4 className="text-lg font-bold text-neutral-900 mb-4 flex items-center">
+                          <span className={`w-8 h-8 bg-linear-to-r ${guide.color} text-white rounded-lg flex items-center justify-center text-sm mr-3`}>
+                            {sIdx + 1}
+                          </span>
+                          {section.title}
+                        </h4>
+                        <ol className="space-y-3 ml-11">
+                          {section.steps.map((step, stepIdx) => (
+                            <li key={stepIdx} className="flex items-start">
+                              <span className="w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5 shrink-0">
+                                {stepIdx + 1}
+                              </span>
+                              <span className="text-neutral-700">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Troubleshooting Section */}
+      <section className="py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-900 mb-4">Troubleshooting <span className='text-red-500'>:</span></h2>
+            <p className="text-neutral-600">Quick solutions to common issues</p>
+          </div>
+          
+          <div className="grid gap-4">
+            {troubleshooting.map((item, index) => (
+              <div 
+                key={index}
+                data-testid={`troubleshoot-${index}`}
+                className="bg-white rounded-xl p-5 border-2 border-neutral-200 hover:border-primary-300 transition-colors"
+              >
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-neutral-900 mb-2">{item.issue}</h3>
+                    <p className="text-neutral-600 text-sm">{item.solution}</p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -299,6 +638,8 @@ const HelpCenterPage = () => {
                     <option value="payment">Payment & Refunds</option>
                     <option value="vehicle">Vehicle Problems</option>
                     <option value="account">Account Support</option>
+                    <option value="vendor">Vendor Registration</option>
+                    <option value="staff">Staff Support</option>
                     <option value="feedback">Feedback & Suggestions</option>
                     <option value="other">Other</option>
                   </select>
