@@ -13,6 +13,7 @@ router.get('/office-staff/requests', protect, restrictTo('office_staff'), bookin
 router.patch('/:bookingId/pickup', protect, restrictTo('office_staff'), bookingController.confirmPickup);
 router.patch('/:bookingId/return', protect, restrictTo('office_staff'), bookingController.confirmReturn);
 router.patch('/:bookingId/reject', protect, restrictTo('office_staff'), bookingController.rejectBooking);
+router.patch('/:bookingId/mark-refund-returned', protect, restrictTo('office_staff'), bookingController.markRefundReturned);
 
 // General routes
 router

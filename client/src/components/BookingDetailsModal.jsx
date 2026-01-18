@@ -256,7 +256,12 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                 <h3 className="font-bold text-sm sm:text-base">Return Details</h3>
                             </div>
                             <div className="space-y-1.5">
-                                {booking.return_datetime ? (
+                                {booking.status === 'cancelled' ? (
+                                    <div className="flex flex-col sm:flex-row sm:justify-between py-1.5 border-b border-gray-100 gap-1 sm:gap-0">
+                                        <span className="text-gray-600 text-xs sm:text-sm font-medium">Return Date</span>
+                                        <span className="text-gray-900 font-semibold text-xs sm:text-sm">Cancelled</span>
+                                    </div>
+                                ) : booking.return_datetime ? (
                                     <div className="flex flex-col sm:flex-row sm:justify-between py-1.5 border-b border-gray-100 gap-1 sm:gap-0">
                                         <span className="text-gray-600 text-xs sm:text-sm font-medium">Return Date</span>
                                         <span className="text-gray-900 font-semibold text-xs sm:text-sm">{formatDate(booking.return_datetime)}</span>
@@ -336,11 +341,50 @@ const BookingDetailsModal = ({ booking, onClose }) => {
                                 </>
                             )}
                             <div className="flex justify-between items-center pt-2 border-t-2 border-blue-300">
-                                <span className="text-blue-900 font-bold text-sm sm:text-base">Total Cost</span>
-                                <span className="text-lg sm:text-2xl font-bold text-blue-600">₹{booking.total_cost || 'TBD'}</span>
+                                <span className="text-blue-900 font-bold text-sm sm:text-base">
+                                    {booking.status === 'completed' ? 'Final Amount' : 'Advance Payment'}
+                                </span>
+                                <span className="text-lg sm:text-2xl font-bold text-blue-600">
+                                    {booking.status === 'completed' ? `₹${booking.final_cost}` : `₹${booking.advance_payment?.amount || 0}`}
+                                </span>
                             </div>
                         </div>
                     </div>
+
+                    {/* Refund Status Display */}
+                    {booking.status === 'cancelled' && booking.refund_status !== 'not_applicable' && booking.refund_amount > 0 && (
+                        <div className={`mt-4 p-4 rounded-lg border ${booking.refund_status === 'completed'
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-yellow-50 border-yellow-200'
+                            }`}>
+                            <div className="flex items-start space-x-2">
+                                <svg className={`w-5 h-5 shrink-0 mt-0.5 ${booking.refund_status === 'completed' ? 'text-green-600' : 'text-yellow-600'
+                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div className="flex-1">
+                                    <p className={`text-sm font-semibold mb-1 ${booking.refund_status === 'completed' ? 'text-green-900' : 'text-yellow-900'
+                                        }`}>
+                                        Refund Status: {booking.refund_status === 'completed' ? '✅ Completed' : '⏳ Pending'}
+                                    </p>
+                                    <p className={`text-sm ${booking.refund_status === 'completed' ? 'text-green-700' : 'text-yellow-700'
+                                        }`} data-testid="refund-amount-text">
+                                        Amount: ₹{booking.refund_amount.toFixed(2)}
+                                    </p>
+                                    {booking.refund_status === 'pending' && (
+                                            <p className="text-xs text-yellow-600 mt-1">
+                                                Your refund will be processed within 7 working days.
+                                            </p>
+                                    )}
+                                    {booking.refund_status === 'completed' && booking.refund_marked_at && (
+                                        <p className="text-xs text-green-600 mt-1">
+                                            Refund processed on {new Date(booking.refund_marked_at).toLocaleDateString('en-IN')}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Rejection Reason */}
                     {booking.status === 'cancelled' && booking.rejection_reason && (

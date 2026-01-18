@@ -39,6 +39,7 @@ export const API_ENDPOINTS = {
     confirmPickup: (bookingId) => `${API_BASE_URL}/bookings/${bookingId}/pickup`,
     confirmReturn: (bookingId) => `${API_BASE_URL}/bookings/${bookingId}/return`,
     rejectBooking: (bookingId) => `${API_BASE_URL}/bookings/${bookingId}/reject`,
+    markRefundReturned: (bookingId) => `${API_BASE_URL}/bookings/${bookingId}/mark-refund-returned`,
 
     // Package endpoints
     packages: `${API_BASE_URL}/packages`,

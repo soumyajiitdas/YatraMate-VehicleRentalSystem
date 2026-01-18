@@ -21,6 +21,7 @@ const OfficeStaffDashboard = () => {
     const [rejectionReason, setRejectionReason] = useState('');
     const [rejecting, setRejecting] = useState(false);
     const [expandedCards, setExpandedCards] = useState({});
+    const [markingRefund, setMarkingRefund] = useState(false);
 
     const toggleCardExpansion = (bookingId) => {
         setExpandedCards(prev => ({
@@ -90,6 +91,7 @@ const OfficeStaffDashboard = () => {
             if (activeTab === 'pending') status = 'booking_requested';
             if (activeTab === 'active') status = 'picked_up';
             if (activeTab === 'completed') status = 'returned';
+            if (activeTab === 'cancelled') status = 'cancelled';
 
             const url = status ? `${API_ENDPOINTS.officeStaffRequests}?status=${status}` : API_ENDPOINTS.officeStaffRequests;
 
@@ -179,6 +181,37 @@ const OfficeStaffDashboard = () => {
         setShowRejectDialog(false);
         setSelectedBooking(null);
         setRejectionReason('');
+    };
+
+    const handleMarkRefundReturned = async (booking) => {
+        if (!window.confirm(`Are you sure you want to mark the refund as returned for booking ${booking.bill_id || booking._id}?`)) {
+            return;
+        }
+
+        try {
+            setMarkingRefund(true);
+            const response = await fetch(API_ENDPOINTS.markRefundReturned(booking._id), {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success('Refund marked as returned successfully');
+                fetchBookings();
+            } else {
+                toast.error(data.message || 'Error marking refund as returned');
+            }
+        } catch (error) {
+            console.error('Error marking refund:', error);
+            toast.error('Error marking refund: ' + error.message);
+        } finally {
+            setMarkingRefund(false);
+        }
     };
 
     const handleLogout = async () => {
@@ -305,6 +338,16 @@ const OfficeStaffDashboard = () => {
                             >
                                 Completed
                             </button>
+                            <button
+                                onClick={() => setActiveTab('cancelled')}
+                                className={`px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'cancelled'
+                                    ? 'border-primary-500 text-primary-600 bg-primary-50'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                data-testid="tab-cancelled"
+                            >
+                                Cancelled
+                            </button>
                         </nav>
                     </div>
 
@@ -364,6 +407,21 @@ const OfficeStaffDashboard = () => {
                                         Completed
                                     </div>
                                 </button>
+                                <button
+                                    onClick={() => setActiveTab('cancelled')}
+                                    className={`px-6 py-4 text-sm font-medium border-l-4 transition-all text-left ${activeTab === 'cancelled'
+                                        ? 'border-primary-500 text-primary-600 bg-primary-50'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300'
+                                        }`}
+                                    data-testid="tab-cancelled"
+                                >
+                                    <div className="flex items-center">
+                                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Cancelled
+                                    </div>
+                                </button>
                             </nav>
                         </div>
                     </aside>
@@ -385,6 +443,7 @@ const OfficeStaffDashboard = () => {
                                     {activeTab === 'pending' && 'No pending requests at the moment.'}
                                     {activeTab === 'active' && 'No active bookings at the moment.'}
                                     {activeTab === 'completed' && 'No completed bookings yet.'}
+                                    {activeTab === 'cancelled' && 'No cancelled bookings.'}
                                 </p>
                             </div>
                         ) : (
@@ -528,6 +587,85 @@ const OfficeStaffDashboard = () => {
                                                         </div>
                                                     </div>
                                                 </>
+                                            ) : activeTab === 'cancelled' ? (
+                                                /* Cancelled bookings layout */
+                                                <div className="flex flex-col space-y-4">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0 mb-3">
+                                                        <h3 className="text-base md:text-lg font-semibold text-gray-900">
+                                                            {booking.vehicle_id?.name || 'N/A'} - {booking.vehicle_id?.model_name || 'N/A'}
+                                                        </h3>
+                                                        {getStatusBadge(booking.status)}
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                                        <div>
+                                                            <p className="text-gray-500">Customer</p>
+                                                            <p className="font-medium text-gray-900">{booking.user_id?.name || 'N/A'}</p>
+                                                            <p className="text-gray-600 wrap-break-words">{booking.user_id?.email || 'N/A'}</p>
+                                                            <p className="text-gray-600">{booking.user_id?.phone || 'N/A'}</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="text-gray-500">Vehicle Details</p>
+                                                            <p className="font-medium text-gray-900">{booking.vehicle_id?.registration_number || 'N/A'}</p>
+                                                            <p className="text-gray-600">{booking.vehicle_id?.type || 'N/A'} - {booking.vehicle_id?.cc_engine || 'N/A'}cc</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="text-gray-500">Requested Pickup</p>
+                                                            <p className="font-medium text-gray-900">
+                                                                {formatDateDDMMYYYY(booking.requested_pickup_date)}
+                                                            </p>
+                                                            <p className="text-gray-600">{booking.requested_pickup_time}</p>
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="text-gray-500">Cancelled By</p>
+                                                            <p className="font-medium text-red-900 capitalize">{booking.cancelled_by === 'staff' ? 'Staff' : 'Customer'}</p>
+                                                            {booking.cancelled_at && (
+                                                                <p className="text-gray-600 text-xs">{new Date(booking.cancelled_at).toLocaleString('en-IN')}</p>
+                                                            )}
+                                                        </div>
+
+                                                        {booking.refund_amount > 0 && (
+                                                            <div>
+                                                                <p className="text-gray-500">Refund Amount</p>
+                                                                <p className="font-medium text-lg text-green-600">₹{booking.refund_amount.toFixed(2)}</p>
+                                                                <p className={`text-xs font-semibold ${
+                                                                    booking.refund_status === 'completed' ? 'text-green-600' : 'text-yellow-600'
+                                                                }`}>
+                                                                    {booking.refund_status === 'completed' ? '✅ Refund Returned' : '⏳ Refund Pending'}
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Cancellation/Rejection Reason */}
+                                                    {(booking.cancellation_reason || booking.rejection_reason) && (
+                                                        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                                            <p className="text-sm font-semibold text-red-900 mb-1">
+                                                                {booking.cancelled_by === 'staff' ? 'Rejection Reason' : 'Cancellation Reason'}
+                                                            </p>
+                                                            <p className="text-sm text-red-700">
+                                                                {booking.cancellation_reason || booking.rejection_reason}
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Mark Refund Returned Button */}
+                                                    {booking.refund_status === 'pending' && booking.refund_amount > 0 && (
+                                                        <div className="pt-2">
+                                                            <button
+                                                                onClick={() => handleMarkRefundReturned(booking)}
+                                                                disabled={markingRefund}
+                                                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                data-testid="mark-refund-returned-btn"
+                                                            >
+                                                                {markingRefund ? 'Processing...' : 'Mark Refund as Returned'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             ) : (
                                                 /* Non-collapsible layout for Pending and Active tabs */
                                                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">

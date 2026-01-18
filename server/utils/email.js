@@ -963,6 +963,232 @@ YatraMate Team`;
     });
 };
 
+// Send cancellation email
+const sendCancellationEmail = async (email, bookingData) => {
+    const {
+        customerName,
+        billId,
+        vehicleName,
+        vehicleModel,
+        vehicleBrand,
+        vehicleType,
+        registrationNumber,
+        pickupDate,
+        pickupTime,
+        cancellationReason,
+        cancelledBy,
+        refundAmount,
+        refundStatus
+    } = bookingData;
+
+    const subject = `🚫 Booking Cancelled - ${billId !== 'N/A' ? billId : 'Booking Request'} | YatraMate`;
+    
+    const formatDate = (date) => {
+        if (!date) return 'N/A';
+        const d = new Date(date);
+        return d.toLocaleDateString('en-IN', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 2
+        }).format(amount || 0);
+    };
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 40px 0; text-align: center;">
+                    <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <!-- Header -->
+                        <tr>
+                            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 16px 16px 0 0;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">YatraMate</h1>
+                                <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Your Journey, Our Passion</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Cancellation Banner -->
+                        <tr>
+                            <td style="padding: 30px 40px 20px; text-align: center;">
+                                <div style="display: inline-block; background: #fee2e2; border-radius: 50%; padding: 15px; margin-bottom: 15px;">
+                                    <span style="font-size: 40px;">🚫</span>
+                                </div>
+                                <h2 style="margin: 0 0 10px; color: #dc2626; font-size: 24px; font-weight: 700;">Booking Cancelled</h2>
+                                <p style="margin: 0; color: #6b7280; font-size: 16px;">${cancelledBy === 'You' ? 'Your booking has been cancelled as per your request' : 'Your pickup request was rejected'}</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 20px 40px;">
+                                <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.6;">Hi <strong>${customerName}</strong>,</p>
+                                <p style="margin: 0 0 25px; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                                    ${cancelledBy === 'You' 
+                                        ? 'We have successfully cancelled your booking as requested.' 
+                                        : 'We regret to inform you that your pickup request has been rejected by our staff.'}
+                                </p>
+                                
+                                ${billId !== 'N/A' ? `
+                                <!-- Bill ID Box -->
+                                <div style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 25px; border: 2px dashed #9ca3af;">
+                                    <p style="margin: 0 0 5px; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Bill ID</p>
+                                    <p style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 700; letter-spacing: 2px;">${billId}</p>
+                                </div>
+                                ` : ''}
+                                
+                                <!-- Vehicle Details -->
+                                <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">🚗 Vehicle Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Vehicle</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${vehicleBrand} ${vehicleName} (${vehicleModel})</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Type</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right; text-transform: capitalize;">${vehicleType}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Registration No.</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${registrationNumber}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Booking Details -->
+                                <div style="background: #fef2f2; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                    <h3 style="margin: 0 0 15px; color: #1f2937; font-size: 16px; font-weight: 600; border-bottom: 2px solid #fecaca; padding-bottom: 10px;">📅 Booking Details</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Pickup Date</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${formatDate(pickupDate)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Pickup Time</td>
+                                            <td style="padding: 8px 0; color: #1f2937; font-size: 14px; font-weight: 600; text-align: right;">${pickupTime}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Status</td>
+                                            <td style="padding: 8px 0; color: #dc2626; font-size: 14px; font-weight: 600; text-align: right;">❌ Cancelled</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                                <!-- Cancellation Reason -->
+                                <div style="background: #fffbeb; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+                                    <h4 style="margin: 0 0 10px; color: #92400e; font-size: 14px; font-weight: 600;">📝 ${cancelledBy === 'You' ? 'Cancellation Reason' : 'Rejection Reason'}</h4>
+                                    <p style="margin: 0; color: #78350f; font-size: 14px; line-height: 1.6;">${cancellationReason}</p>
+                                </div>
+                                
+                                ${refundAmount > 0 ? `
+                                <!-- Refund Information -->
+                                <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-radius: 12px; padding: 25px; margin-bottom: 25px; border: 2px solid #10b981;">
+                                    <h3 style="margin: 0 0 15px; color: #065f46; font-size: 18px; font-weight: 600; text-align: center;">💰 Refund Information</h3>
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #047857; font-size: 14px;">Refund Amount</td>
+                                            <td style="padding: 8px 0; color: #065f46; font-size: 16px; font-weight: 700; text-align: right;">${formatCurrency(refundAmount)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0; color: #047857; font-size: 14px;">Refund Status</td>
+                                            <td style="padding: 8px 0; color: #065f46; font-size: 14px; font-weight: 600; text-align: right; text-transform: capitalize;">${refundStatus === 'pending' ? '⏳ Pending' : refundStatus === 'completed' ? '✅ Completed' : refundStatus}</td>
+                                        </tr>
+                                    </table>
+                                    <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.7); border-radius: 8px;">
+                                        <p style="margin: 0; color: #047857; font-size: 13px; line-height: 1.6; text-align: center;">
+                                            <strong>Note:</strong> Your refund will be processed within <strong>7 working days</strong> and credited to your original payment method.
+                                        </p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                <!-- Next Steps -->
+                                <div style="background: #f3f4f6; border-radius: 12px; padding: 20px;">
+                                    <h4 style="margin: 0 0 10px; color: #1f2937; font-size: 14px; font-weight: 600;">What's Next?</h4>
+                                    <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 13px; line-height: 1.8;">
+                                        ${refundAmount > 0 ? '<li>Your refund will be processed and credited within 7 working days</li>' : ''}
+                                        <li>You can browse and book other available vehicles on our platform</li>
+                                        <li>Contact our support team if you have any questions</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0 0 16px 16px;">
+                                <p style="margin: 0 0 10px; color: #6b7280; font-size: 14px;">Need help? Contact us at</p>
+                                <p style="margin: 0 0 15px; color: #dc2626; font-size: 14px; font-weight: 600;">support@yatramate.com</p>
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px;">&copy; ${new Date().getFullYear()} YatraMate. All rights reserved.</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    const text = `Hi ${customerName},
+
+Booking Cancelled
+
+${cancelledBy === 'You' ? 'Your booking has been cancelled as per your request.' : 'Your pickup request was rejected by our staff.'}
+
+${billId !== 'N/A' ? `BILL ID: ${billId}\n` : ''}
+VEHICLE DETAILS:
+- Vehicle: ${vehicleBrand} ${vehicleName} (${vehicleModel})
+- Type: ${vehicleType}
+- Registration No.: ${registrationNumber}
+
+BOOKING DETAILS:
+- Pickup Date: ${formatDate(pickupDate)}
+- Pickup Time: ${pickupTime}
+- Status: Cancelled
+
+${cancelledBy === 'You' ? 'CANCELLATION REASON:' : 'REJECTION REASON:'}
+${cancellationReason}
+
+${refundAmount > 0 ? `REFUND INFORMATION:
+- Refund Amount: ${formatCurrency(refundAmount)}
+- Refund Status: ${refundStatus}
+
+Note: Your refund will be processed within 7 working days and credited to your original payment method.
+` : ''}
+
+WHAT'S NEXT?
+${refundAmount > 0 ? '- Your refund will be processed and credited within 7 working days\n' : ''}- You can browse and book other available vehicles on our platform
+- Contact our support team if you have any questions
+
+Need help? Contact us at support@yatramate.com
+
+Best regards,
+YatraMate Team`;
+
+    await sendEmail({
+        email,
+        subject,
+        text,
+        html
+    });
+};
+
 module.exports = {
     sendEmail,
     sendOTPEmail,
@@ -970,6 +1196,7 @@ module.exports = {
     sendPasswordChangeOTPEmail,
     sendPickupConfirmationEmail,
     sendReturnConfirmationEmail,
+    sendCancellationEmail,
     sendVendorVerificationEmail,
     sendVehicleApprovalEmail
 };

@@ -540,9 +540,14 @@ exports.getAllBookings = catchAsync(async (req, res, next) => {
     });
 });
 
-// Cancel booking
+// Cancel booking by customer
 exports.cancelBooking = catchAsync(async (req, res, next) => {
-    const booking = await Booking.findById(req.params.id);
+    const { cancellation_reason } = req.body;
+    
+    const booking = await Booking.findById(req.params.id)
+        .populate('vehicle_id')
+        .populate('package_id')
+        .populate('user_id', 'name email phone');
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404));
@@ -551,8 +556,24 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
     if (booking.status !== 'booking_requested') {
         return next(new AppError('Can only cancel bookings in requested state', 400));
     }
+    
+    if (!cancellation_reason || cancellation_reason.trim() === '') {
+        return next(new AppError('Cancellation reason is required', 400));
+    }
 
+    // Update booking status and cancellation details
     booking.status = 'cancelled';
+    booking.cancellation_reason = cancellation_reason;
+    booking.cancelled_by = 'customer';
+    booking.cancelled_at = new Date();
+    
+    // Check if advance payment was made
+    if (booking.advance_payment && booking.advance_payment.status === 'completed') {
+        booking.refund_status = 'pending';
+        booking.refund_amount = booking.advance_payment.amount;
+        booking.advance_payment.status = 'refunded';
+    }
+    
     await booking.save();
     
     // Update vehicle status back to available
@@ -562,8 +583,38 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
         await vehicle.save();
     }
 
+    // Send cancellation email to customer
+    try {
+        const user = booking.user_id;
+        const vehicleData = booking.vehicle_id;
+        
+        if (user && user.email) {
+            const { sendCancellationEmail } = require('../utils/email');
+            await sendCancellationEmail(user.email, {
+                customerName: user.name,
+                billId: booking.bill_id || 'N/A',
+                vehicleName: vehicleData.name,
+                vehicleModel: vehicleData.model_name,
+                vehicleBrand: vehicleData.brand,
+                vehicleType: vehicleData.type,
+                registrationNumber: vehicleData.registration_number,
+                pickupDate: booking.requested_pickup_date,
+                pickupTime: booking.requested_pickup_time,
+                cancellationReason: cancellation_reason,
+                cancelledBy: 'You',
+                refundAmount: booking.refund_amount,
+                refundStatus: booking.refund_status
+            });
+            console.log(`Cancellation email sent to ${user.email}`);
+        }
+    } catch (emailError) {
+        console.error('Failed to send cancellation email:', emailError);
+        // Don't fail the request if email fails
+    }
+
     res.status(200).json({
         status: 'success',
+        message: 'Booking cancelled successfully. Refund will be processed within 7 working days.',
         data: {
             booking
         }
@@ -575,7 +626,10 @@ exports.rejectBooking = catchAsync(async (req, res, next) => {
     const { bookingId } = req.params;
     const { rejection_reason } = req.body;
 
-    const booking = await Booking.findById(bookingId);
+    const booking = await Booking.findById(bookingId)
+        .populate('vehicle_id')
+        .populate('package_id')
+        .populate('user_id', 'name email phone');
 
     if (!booking) {
         return next(new AppError('No booking found with that ID', 404));
@@ -589,8 +643,20 @@ exports.rejectBooking = catchAsync(async (req, res, next) => {
         return next(new AppError('Rejection reason is required', 400));
     }
 
+    // Update booking status and cancellation details
     booking.status = 'cancelled';
     booking.rejection_reason = rejection_reason;
+    booking.cancellation_reason = rejection_reason;
+    booking.cancelled_by = 'staff';
+    booking.cancelled_at = new Date();
+    
+    // Check if advance payment was made
+    if (booking.advance_payment && booking.advance_payment.status === 'completed') {
+        booking.refund_status = 'pending';
+        booking.refund_amount = booking.advance_payment.amount;
+        booking.advance_payment.status = 'refunded';
+    }
+    
     await booking.save();
     
     // Update vehicle status back to available
@@ -600,6 +666,35 @@ exports.rejectBooking = catchAsync(async (req, res, next) => {
         await vehicle.save();
     }
 
+    // Send cancellation email to customer
+    try {
+        const user = booking.user_id;
+        const vehicleData = booking.vehicle_id;
+        
+        if (user && user.email) {
+            const { sendCancellationEmail } = require('../utils/email');
+            await sendCancellationEmail(user.email, {
+                customerName: user.name,
+                billId: booking.bill_id || 'N/A',
+                vehicleName: vehicleData.name,
+                vehicleModel: vehicleData.model_name,
+                vehicleBrand: vehicleData.brand,
+                vehicleType: vehicleData.type,
+                registrationNumber: vehicleData.registration_number,
+                pickupDate: booking.requested_pickup_date,
+                pickupTime: booking.requested_pickup_time,
+                cancellationReason: rejection_reason,
+                cancelledBy: 'Staff',
+                refundAmount: booking.refund_amount,
+                refundStatus: booking.refund_status
+            });
+            console.log(`Cancellation email sent to ${user.email}`);
+        }
+    } catch (emailError) {
+        console.error('Failed to send cancellation email:', emailError);
+        // Don't fail the request if email fails
+    }
+
     const populatedBooking = await Booking.findById(booking._id)
         .populate('vehicle_id')
         .populate('package_id')
@@ -607,6 +702,56 @@ exports.rejectBooking = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: 'success',
+        message: 'Booking rejected successfully. Customer will be notified.',
+        data: {
+            booking: populatedBooking
+        }
+    });
+});
+
+// Mark refund as returned (Office staff)
+exports.markRefundReturned = catchAsync(async (req, res, next) => {
+    const { bookingId } = req.params;
+    
+    const booking = await Booking.findById(bookingId)
+        .populate('vehicle_id')
+        .populate('package_id')
+        .populate('user_id', 'name email phone')
+        .populate('refund_marked_by', 'name');
+
+    if (!booking) {
+        return next(new AppError('No booking found with that ID', 404));
+    }
+    
+    if (booking.status !== 'cancelled') {
+        return next(new AppError('Only cancelled bookings can have refund marked', 400));
+    }
+    
+    if (booking.refund_status === 'not_applicable') {
+        return next(new AppError('This booking has no refund to process', 400));
+    }
+    
+    if (booking.refund_status === 'completed') {
+        return next(new AppError('Refund has already been marked as returned', 400));
+    }
+
+    // Update refund status
+    booking.refund_status = 'completed';
+    booking.refund_marked_by = req.user.id;
+    booking.refund_marked_at = new Date();
+    booking.payment_status = 'refunded';
+    
+    await booking.save();
+
+    const populatedBooking = await Booking.findById(booking._id)
+        .populate('vehicle_id')
+        .populate('package_id')
+        .populate('user_id', 'name email phone')
+        .populate('refund_marked_by', 'name');
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Refund marked as returned successfully',
         data: {
             booking: populatedBooking
         }

@@ -79,6 +79,14 @@ const BookingsPage = () => {
           pickup_details: booking.pickup_details,
           return_details: booking.return_details,
           rejection_reason: booking.rejection_reason || null,
+          advance_payment: booking.advance_payment,
+          // Cancellation and refund tracking
+          cancellation_reason: booking.cancellation_reason || null,
+          cancelled_by: booking.cancelled_by || null,
+          cancelled_at: booking.cancelled_at || null,
+          refund_status: booking.refund_status || 'not_applicable',
+          refund_amount: booking.refund_amount || 0,
+          refund_marked_at: booking.refund_marked_at || null,
           // Additional fields for bill display
           distance_traveled_km: booking.distance_traveled_km,
           duration_hours: booking.duration_hours,
@@ -151,7 +159,7 @@ const BookingsPage = () => {
     setShowCancelModal(true);
   };
 
-  const handleCancelBooking = async () => {
+  const handleCancelBooking = async (cancellationReason) => {
     if (!selectedBooking) return;
 
     setCancelLoading(true);
@@ -162,12 +170,13 @@ const BookingsPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ cancellation_reason: cancellationReason }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.status === 'success') {
-        showToast('Booking cancelled successfully', 'success');
+        showToast(data.message || 'Booking cancelled successfully', 'success');
         setShowCancelModal(false);
         setSelectedBooking(null);
         // Refresh bookings list
@@ -263,9 +272,11 @@ const BookingsPage = () => {
                           </div>
                         </div>
                         <div className="text-left sm:text-right shrink-0">
-                          <div className="text-sm text-neutral-600 mb-1">Total Cost</div>
+                          <div className="text-sm text-neutral-600 mb-1">
+                            {booking.status === 'completed' ? 'Final Amount' : 'Advance Payment'}
+                          </div>
                           <div className="text-xl sm:text-2xl font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                            ₹{booking.total_cost || 'TBD'}
+                            {booking.status === 'completed' ? `₹${booking.total_cost}` : `₹${booking.advance_payment?.amount || 0}`}
                           </div>
                         </div>
                       </div>
@@ -293,7 +304,9 @@ const BookingsPage = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <div>
-                              {booking.return_datetime ? (
+                              {booking.status === 'cancelled' ? (
+                                <div className="text-sm text-neutral-600">Cancelled</div>
+                              ) : booking.return_datetime ? (
                                 <div className="text-sm text-neutral-600">{formatDate(booking.return_datetime)}</div>
                               ) : (
                                 <div className="text-sm text-neutral-600">Pending</div>
@@ -308,20 +321,6 @@ const BookingsPage = () => {
                           {booking.status}
                         </span>
                       </div>
-
-                      {/* Rejection Reason Display */}
-                      {booking.status === 'cancelled' && booking.rejection_reason && (
-                        <div className="mt-4 p-2 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-start space-x-2">
-                            <svg className="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <div className="flex-1">
-                              <p className="text-sm text-red-700" data-testid="rejection-reason-text"><span className='font-semibold text-red-900'>Rejection Reason: </span>{booking.rejection_reason}</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
 
                       <div className="flex flex-wrap gap-3 pt-2">
                         <button

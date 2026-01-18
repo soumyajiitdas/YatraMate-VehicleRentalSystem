@@ -160,6 +160,37 @@ const bookingSchema = new mongoose.Schema({
     },
     rejection_reason: {
         type: String
+    },
+    
+    // Cancellation tracking
+    cancellation_reason: {
+        type: String
+    },
+    cancelled_by: {
+        type: String,
+        enum: ['customer', 'staff'],
+        default: null
+    },
+    cancelled_at: {
+        type: Date
+    },
+    
+    // Refund tracking
+    refund_status: {
+        type: String,
+        enum: ['not_applicable', 'pending', 'processing', 'completed'],
+        default: 'not_applicable'
+    },
+    refund_amount: {
+        type: Number,
+        default: 0
+    },
+    refund_marked_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    refund_marked_at: {
+        type: Date
     }
 }, { timestamps: true });
 

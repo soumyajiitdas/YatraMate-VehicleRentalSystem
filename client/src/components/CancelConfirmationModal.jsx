@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
 const CancelConfirmationModal = ({ booking, onConfirm, onClose, loading }) => {
+    const [cancellationReason, setCancellationReason] = useState('');
+
     if (!booking) return null;
+
+    const handleConfirm = () => {
+        if (!cancellationReason.trim()) {
+            return; // Validation handled by disabled button
+        }
+        onConfirm(cancellationReason);
+    };
 
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fadeIn" onClick={onClose}>
@@ -41,11 +51,28 @@ const CancelConfirmationModal = ({ booking, onConfirm, onClose, loading }) => {
                         </p>
                     </div>
 
+                    {/* Cancellation Reason */}
+                    <div>
+                        <label htmlFor="cancellation-reason" className="block text-sm font-medium text-neutral-700 mb-2">
+                            Cancellation Reason <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                            id="cancellation-reason"
+                            value={cancellationReason}
+                            onChange={(e) => setCancellationReason(e.target.value)}
+                            placeholder="Please provide a reason for cancelling this booking..."
+                            className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                            rows="4"
+                            disabled={loading}
+                            data-testid="cancellation-reason-input"
+                        />
+                    </div>
+
                     <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
                         <div className="flex gap-3">
                             <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0" />
                             <p className="text-sm text-yellow-800">
-                                This action cannot be undone. Your booking will be permanently cancelled.
+                                This action cannot be undone. Your booking will be permanently cancelled and any advance payment will be refunded within 7 working days.
                             </p>
                         </div>
                     </div>
@@ -63,8 +90,8 @@ const CancelConfirmationModal = ({ booking, onConfirm, onClose, loading }) => {
                             Keep Booking
                         </button>
                         <button
-                            onClick={onConfirm}
-                            disabled={loading}
+                            onClick={handleConfirm}
+                            disabled={loading || !cancellationReason.trim()}
                             className="flex-1 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             data-testid="cancel-modal-yes-button"
                         >
