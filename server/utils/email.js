@@ -13,6 +13,23 @@ const createTransporter = () => {
 };
 
 const sendEmail = async (options) => {
+    // If email server credentials are not configured, fall back in non-production
+    const missingMailConfig = !process.env.EMAIL_HOST || !process.env.EMAIL_PORT || !process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD;
+
+    if (missingMailConfig) {
+        if (process.env.NODE_ENV !== 'production') {
+            // Development fallback: log the email contents so registration can proceed without real SMTP
+            console.log('--- Development email fallback ---');
+            console.log('To:', options.email);
+            console.log('Subject:', options.subject);
+            console.log('Text:', options.text);
+            console.log('HTML preview omitted');
+            console.log('--- End fallback ---');
+            return;
+        }
+        throw new Error('Email server not configured');
+    }
+
     const transporter = createTransporter();
 
     const mailOptions = {
