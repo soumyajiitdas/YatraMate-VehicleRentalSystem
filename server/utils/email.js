@@ -4,13 +4,25 @@ const AppError = require('./appError');
 
 const createTransporter = () => {
     const port = parseInt(process.env.EMAIL_PORT, 10);
+    const host = process.env.EMAIL_HOST;
+    
+    console.log(`Attempting to connect to email server: ${host}:${port} (Secure: ${port === 465})`);
+    
     return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
+        host: host,
         port: port,
         secure: port === 465, // true for 465, false for other ports (587 uses STARTTLS)
         auth: {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD
+        },
+        // Add timeouts to prevent hanging
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+        tls: {
+            // Do not fail on invalid certs (common with some mail providers)
+            rejectUnauthorized: false
         }
     });
 };
@@ -33,17 +45,32 @@ const sendEmail = async (options) => {
         throw new AppError('Email service is not configured in production. Please set EMAIL_HOST, EMAIL_PORT, EMAIL_USERNAME, and EMAIL_PASSWORD environment variables.', 500);
     }
 
-    const transporter = createTransporter();
+    try {
+        const transporter = createTransporter();
 
-    const mailOptions = {
-        from: process.env.EMAIL_FROM || 'YatraMate <noreply@yatramate.com>',
-        to: options.email,
-        subject: options.subject,
-        text: options.text,
-        html: options.html
-    };
+        const mailOptions = {
+            from: process.env.EMAIL_FROM || 'YatraMate <noreply@yatramate.com>',
+            to: options.email,
+            subject: options.subject,
+            text: options.text,
+            html: options.html
+        };
 
-    await transporter.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully to ${options.email}`);
+    } catch (error) {
+        console.error('Nodemailer Error:', error);
+        
+        if (error.code === 'ETIMEDOUT') {
+            throw new AppError(`Connection to email server (${process.env.EMAIL_HOST}) timed out. Please check your EMAIL_PORT and host settings.`, 500);
+        }
+        
+        if (error.code === 'ECONNREFUSED') {
+            throw new AppError(`Connection refused by email server (${process.env.EMAIL_HOST}). Ensure the port is correct and not blocked.`, 500);
+        }
+
+        throw new AppError(`Failed to send email: ${error.message}`, 500);
+    }
 };
 
 const sendOTPEmail = async (email, otp, name) => {
