@@ -1,10 +1,13 @@
 const nodemailer = require('nodemailer');
 
+const AppError = require('./appError');
+
 const createTransporter = () => {
+    const port = parseInt(process.env.EMAIL_PORT, 10);
     return nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: false, // true for 465, false for other ports (587 uses STARTTLS)
+        port: port,
+        secure: port === 465, // true for 465, false for other ports (587 uses STARTTLS)
         auth: {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD
@@ -27,7 +30,7 @@ const sendEmail = async (options) => {
             console.log('--- End fallback ---');
             return;
         }
-        throw new Error('Email server not configured');
+        throw new AppError('Email service is not configured in production. Please set EMAIL_HOST, EMAIL_PORT, EMAIL_USERNAME, and EMAIL_PASSWORD environment variables.', 500);
     }
 
     const transporter = createTransporter();

@@ -130,6 +130,11 @@ exports.register = catchAsync(async (req, res, next) => {
         console.error('Email sending failed:', emailError);
         // Delete the pending user if email fails
         await PendingUser.findOneAndDelete({ email });
+
+        // If it's already an AppError, pass it along
+        if (emailError.isOperational) {
+            return next(emailError);
+        }
         return next(new AppError('Failed to send verification email. Please try again.', 500));
     }
 
@@ -494,6 +499,11 @@ exports.registerVendor = catchAsync(async (req, res, next) => {
         console.error('Email sending failed:', emailError);
         // Delete the pending vendor if email fails
         await PendingVendor.findOneAndDelete({ email });
+
+        // If it's already an AppError, pass it along
+        if (emailError.isOperational) {
+            return next(emailError);
+        }
         return next(new AppError('Failed to send verification email. Please try again.', 500));
     }
 
