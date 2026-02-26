@@ -77,4 +77,9 @@ export const API_ENDPOINTS = {
     verifyVendor: (id) => `${API_BASE_URL}/vendors/${id}/verify`,
 };
 
+export const getAuthHeader = () => {
+    const token = localStorage.getItem('jwt');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
 export default API_BASE_URL;

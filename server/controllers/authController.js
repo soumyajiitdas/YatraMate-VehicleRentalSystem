@@ -39,15 +39,24 @@ const createSendToken = (req, res, user, statusCode, role = null) => {
     const token = signToken(user._id, userRole);
     const useSecureCookies = requiresSecureCookies(req);
 
+    // Default to 90 days if JWT_COOKIE_EXPIRES_IN is not set
+    const cookieExpiresIn = process.env.JWT_COOKIE_EXPIRES_IN || 90;
+
     const cookieOptions = {
         expires: new Date(
-            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+            Date.now() + cookieExpiresIn * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
         sameSite: useSecureCookies ? 'none' : 'lax',
         secure: useSecureCookies,
         path: '/'
     };
+
+    // Force secure and sameSite: 'none' in production regardless of header detection
+    if (process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true;
+        cookieOptions.sameSite = 'none';
+    }
 
     res.cookie('jwt', token, cookieOptions);
 
@@ -428,13 +437,20 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 exports.logout = catchAsync(async (req, res, next) => {
     const useSecureCookies = requiresSecureCookies(req);
 
-    res.cookie('jwt', 'loggedout', {
+    const cookieOptions = {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,
         sameSite: useSecureCookies ? 'none' : 'lax',
         secure: useSecureCookies,
         path: '/'
-    });
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true;
+        cookieOptions.sameSite = 'none';
+    }
+
+    res.cookie('jwt', 'loggedout', cookieOptions);
 
     res.status(200).json({
         status: 'success',

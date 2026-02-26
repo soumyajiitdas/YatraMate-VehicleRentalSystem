@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, getAuthHeader } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
@@ -124,7 +124,10 @@ const BookingForm = ({ vehicle, onSubmit, onPaymentSuccess }) => {
       // Create order for advance payment
       const orderResponse = await fetch(API_ENDPOINTS.createAdvanceOrder, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
         credentials: 'include',
         body: JSON.stringify({
           vehicle_id: vehicle._id,
@@ -161,7 +164,10 @@ const BookingForm = ({ vehicle, onSubmit, onPaymentSuccess }) => {
             // Verify payment and create booking
             const verifyResponse = await fetch(API_ENDPOINTS.verifyAdvancePayment, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                ...getAuthHeader()
+              },
               credentials: 'include',
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,

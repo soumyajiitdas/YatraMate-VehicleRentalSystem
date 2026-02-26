@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, getAuthHeader } from '../config/api';
 import BookingDetailsModal from '../components/BookingDetailsModal';
 import CancelConfirmationModal from '../components/CancelConfirmationModal';
 import { useToast } from '../contexts/ToastContext';
@@ -39,7 +39,10 @@ const BookingsPage = () => {
       }
 
       const response = await fetch(API_ENDPOINTS.userBookings(userId), {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          ...getAuthHeader()
+        }
       });
 
       if (!response.ok) {
@@ -169,6 +172,7 @@ const BookingsPage = () => {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...getAuthHeader()
         },
         body: JSON.stringify({ cancellation_reason: cancellationReason }),
       });

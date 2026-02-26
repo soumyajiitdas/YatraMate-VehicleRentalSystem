@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { API_ENDPOINTS } from '../../config/api';
+import { API_ENDPOINTS, getAuthHeader } from '../../config/api';
 import { MapPinned, Mail, Shield, Settings, LockKeyhole, Car, PiggyBank } from 'lucide-react';
 import CustomDropdown from '../../components/common/CustomDropdown';
 
@@ -122,7 +122,8 @@ const VendorDashboard = () => {
                 : `${API_ENDPOINTS.vendorEarnings}?filter=${filter}`;
             
             const response = await fetch(url, {
-                credentials: 'include'
+                credentials: 'include',
+                headers: { ...getAuthHeader() }
             });
             const data = await response.json();
 
@@ -246,6 +247,7 @@ const VendorDashboard = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify({
@@ -303,7 +305,11 @@ const VendorDashboard = () => {
 
         try {
             const response = await fetch(API_ENDPOINTS.vehicleById(vehicleId), {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    ...getAuthHeader()
+                },
+                credentials: 'include'
             });
 
             const data = await response.json();
