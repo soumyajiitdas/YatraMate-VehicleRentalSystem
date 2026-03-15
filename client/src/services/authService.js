@@ -1,6 +1,12 @@
 import { API_ENDPOINTS } from '../config/api';
 
 class AuthService {
+    // Helper to get auth headers
+    getAuthHeader() {
+        const token = localStorage.getItem('jwt');
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
+    }
+
     // Register new customer
     async register(userData) {
         try {
@@ -16,6 +22,7 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
                 return { 
                     success: true, 
                     data: data.data, 
@@ -45,6 +52,7 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
                 return { success: true, data: data.data };
             } else {
                 return { success: false, message: data.message || 'OTP verification failed' };
@@ -123,6 +131,7 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
                 return { success: true, data: data.data, message: data.message };
             } else {
                 return { success: false, message: data.message || 'OTP verification failed' };
@@ -171,6 +180,7 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
                 return { success: true, data: data.data };
             } else {
                 return { 
@@ -192,11 +202,13 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.logout, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include'
             });
 
+            localStorage.removeItem('jwt');
             const data = await response.json();
 
             if (data.status === 'success') {
@@ -205,6 +217,7 @@ class AuthService {
                 return { success: false, message: data.message || 'Logout failed' };
             }
         } catch (error) {
+            localStorage.removeItem('jwt');
             return { success: false, message: error.message };
         }
     }
@@ -215,7 +228,8 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.currentUser, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include'
             });
@@ -238,7 +252,8 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.updatePassword, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify(passwordData)
@@ -247,6 +262,7 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
                 return { success: true, message: 'Password updated successfully' };
             } else {
                 return { success: false, message: data.message || 'Password update failed' };
@@ -262,7 +278,8 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.updateProfile, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify(profileData)
@@ -334,7 +351,8 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.requestPasswordChangeOTP, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify({ currentPassword })
@@ -358,7 +376,8 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.verifyPasswordChangeOTP, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify({ otp, newPassword })
@@ -367,6 +386,7 @@ class AuthService {
             const data = await response.json();
 
             if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
                 return { success: true, data: data.data, message: 'Password changed successfully' };
             } else {
                 return { success: false, message: data.message || 'Failed to change password' };
@@ -382,7 +402,8 @@ class AuthService {
             const response = await fetch(API_ENDPOINTS.resendPasswordChangeOTP, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
                 },
                 credentials: 'include'
             });

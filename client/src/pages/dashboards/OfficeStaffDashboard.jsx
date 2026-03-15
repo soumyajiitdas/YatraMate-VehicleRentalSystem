@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { API_ENDPOINTS } from '../../config/api';
+import { API_ENDPOINTS, getAuthHeader } from '../../config/api';
 import PickupModal from '../../components/PickupModal';
 import ReturnModal from '../../components/ReturnModal';
 import { MapPinned, ChevronDown, ChevronUp } from 'lucide-react';
@@ -96,7 +96,8 @@ const OfficeStaffDashboard = () => {
             const url = status ? `${API_ENDPOINTS.officeStaffRequests}?status=${status}` : API_ENDPOINTS.officeStaffRequests;
 
             const response = await fetch(url, {
-                credentials: 'include'
+                credentials: 'include',
+                headers: { ...getAuthHeader() }
             });
             const data = await response.json();
 
@@ -153,6 +154,7 @@ const OfficeStaffDashboard = () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify({ rejection_reason: rejectionReason })
@@ -195,6 +197,7 @@ const OfficeStaffDashboard = () => {
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...getAuthHeader()
                 },
             });
 

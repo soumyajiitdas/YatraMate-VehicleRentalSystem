@@ -6,10 +6,12 @@ const Vendor = require('../models/Vendor');
 
 // Protect routes - verify JWT token
 exports.protect = catchAsync(async (req, res, next) => {
-    // Get token from cookie
+    // 1) Get token from cookie or Authorization header
     let token;
     if (req.cookies.jwt) {
         token = req.cookies.jwt;
+    } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
     }
 
     if (!token) {

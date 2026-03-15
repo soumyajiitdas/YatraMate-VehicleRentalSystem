@@ -6,8 +6,25 @@ const createTransporter = () => {
     const port = parseInt(process.env.EMAIL_PORT, 10);
     const host = process.env.EMAIL_HOST;
     
-    console.log(`Attempting to connect to email server: ${host}:${port} (Secure: ${port === 465})`);
+    console.log(`Attempting to connect to email server: ${host}:${port}`);
     
+    // For Gmail, using the built-in service config is more reliable in production
+    if (host === 'smtp.gmail.com') {
+        return nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USERNAME,
+                pass: process.env.EMAIL_PASSWORD
+            },
+            connectionTimeout: 20000, // Increased to 20 seconds
+            greetingTimeout: 20000,
+            socketTimeout: 30000,
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+    }
+
     return nodemailer.createTransport({
         host: host,
         port: port,
@@ -16,10 +33,11 @@ const createTransporter = () => {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD
         },
-        // Add timeouts to prevent hanging
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
+        // Add timeouts to prevent hanging - increased for production stability
+        connectionTimeout: 20000, // 20 seconds
+        greetingTimeout: 20000,
+        socketTimeout: 30000,
+        requireTLS: port === 587,
         tls: {
             // Do not fail on invalid certs (common with some mail providers)
             rejectUnauthorized: false

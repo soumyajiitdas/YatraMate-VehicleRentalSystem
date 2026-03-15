@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { API_ENDPOINTS } from '../../config/api';
+import { API_ENDPOINTS, getAuthHeader } from '../../config/api';
 import CustomDropdown from '../../components/common/CustomDropdown';
 import { MapPinned, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -48,7 +48,8 @@ const AdminDashboard = () => {
 
             if (activeTab === 'customers' || activeTab === 'office-staff') {
                 const response = await fetch(API_ENDPOINTS.users, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: { ...getAuthHeader() }
                 });
                 const data = await response.json();
                 if (data.status === 'success') {
@@ -56,7 +57,8 @@ const AdminDashboard = () => {
                 }
             } else if (activeTab === 'vendors') {
                 const response = await fetch(API_ENDPOINTS.vendors, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: { ...getAuthHeader() }
                 });
                 const data = await response.json();
                 if (data.status === 'success') {
@@ -64,7 +66,8 @@ const AdminDashboard = () => {
                 }
             } else if (activeTab === 'packages') {
                 const response = await fetch(API_ENDPOINTS.packages, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: { ...getAuthHeader() }
                 });
                 const data = await response.json();
                 if (data.status === 'success') {
@@ -73,7 +76,8 @@ const AdminDashboard = () => {
             } else if (activeTab === 'vehicle-requests') {
                 // Fetch both vehicle requests and all vehicles for feature management
                 const requestsResponse = await fetch(API_ENDPOINTS.vehicleRequests, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: { ...getAuthHeader() }
                 });
                 const requestsData = await requestsResponse.json();
                 if (requestsData.status === 'success') {
@@ -81,7 +85,8 @@ const AdminDashboard = () => {
                 }
 
                 const vehiclesResponse = await fetch(API_ENDPOINTS.vehicles, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: { ...getAuthHeader() }
                 });
                 const vehiclesData = await vehiclesResponse.json();
                 if (vehiclesData.status === 'success') {
@@ -89,7 +94,8 @@ const AdminDashboard = () => {
                 }
             } else if (activeTab === 'bookings-payments') {
                 const response = await fetch(API_ENDPOINTS.bookings, {
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: { ...getAuthHeader() }
                 });
                 const data = await response.json();
                 if (data.status === 'success') {
@@ -184,6 +190,9 @@ const AdminDashboard = () => {
         try {
             const response = await fetch(API_ENDPOINTS.verifyVendor(vendorToVerify._id), {
                 method: 'PATCH',
+                headers: {
+                    ...getAuthHeader()
+                },
                 credentials: 'include'
             });
 
@@ -215,6 +224,7 @@ const AdminDashboard = () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify({})
@@ -240,6 +250,7 @@ const AdminDashboard = () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify({ rejection_reason: reason })
@@ -260,6 +271,9 @@ const AdminDashboard = () => {
         try {
             const response = await fetch(API_ENDPOINTS.toggleFeatureVehicle(vehicleId), {
                 method: 'PATCH',
+                headers: {
+                    ...getAuthHeader()
+                },
                 credentials: 'include'
             });
 
@@ -1194,6 +1208,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
+                    ...getAuthHeader()
                 },
                 credentials: 'include',
                 body: JSON.stringify(body),
@@ -1221,6 +1236,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                             method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json',
+                                ...getAuthHeader()
                             },
                             credentials: 'include',
                             body: JSON.stringify(vendorBody),
@@ -1231,6 +1247,7 @@ const Modal = ({ type, item, onClose, onSuccess, userRole }) => {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                ...getAuthHeader()
                             },
                             credentials: 'include',
                             body: JSON.stringify(vendorBody),
