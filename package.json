@@ -25,12 +25,17 @@
   "scripts": {
     "iclient": "cd client && npm install",
     "iserver": "cd server && npm install",
-    "client":"cd client && npm run dev",
-    "server":"cd server && npm start",
-    "download":"concurrently \"npm run iclient\" \"npm run iserver\"",
-    "app":"concurrently \"npm run client\" \"npm run server\""
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm start",
+    "download": "concurrently \"npm run iclient\" \"npm run iserver\"",
+    "app": "concurrently \"npm run client\" \"npm run server\"",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "dependencies": {
     "concurrently": "^9.2.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.80.0"
   }
 }
