@@ -162,7 +162,7 @@ const LoginPage = () => {
       </div>
 
       {/* Right Column - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 bg-white relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-20 bg-white relative">
         <div className="w-full max-w-md space-y-8 animate-fade-in">
           {/* Mobile Header (only visible on small screens) */}
           <div className="lg:hidden text-center mb-8">
@@ -171,7 +171,7 @@ const LoginPage = () => {
           </div>
 
           <div className="hidden lg:block text-left mb-8">
-            <h2 className="text-3xl font-display font-bold text-neutral-900">Sign In</h2>
+            <h2 className="text-4xl font-display font-bold text-neutral-900">Sign <span className='text-red-600'>In</span> </h2>
             <p className="text-neutral-600 mt-2">Enter your credentials to access your account</p>
           </div>
 
