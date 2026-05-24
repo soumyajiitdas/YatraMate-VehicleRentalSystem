@@ -196,6 +196,42 @@ class AuthService {
         }
     }
 
+    // Google Login
+    async googleLogin(token, role = null) {
+        try {
+            const bodyData = { token };
+            if (role) {
+                bodyData.role = role;
+            }
+            
+            const response = await fetch(API_ENDPOINTS.googleLogin, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(bodyData)
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
+                return { success: true, data: data.data };
+            } else {
+                return { 
+                    success: false, 
+                    message: data.message || 'Google Login failed',
+                    requiresVerification: data.requiresVerification,
+                    email: data.email,
+                    userType: data.userType
+                };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
     // Logout user
     async logout() {
         try {
