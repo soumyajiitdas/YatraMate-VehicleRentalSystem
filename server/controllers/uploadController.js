@@ -44,10 +44,12 @@ exports.uploadFile = catchAsync(async (req, res, next) => {
         return next(new AppError('Please upload a file', 400));
     }
 
+    const folder = req.body.folder || '/uploads';
+
     const result = await imagekit.upload({
         file: req.file.buffer,
         fileName: req.file.originalname,
-        folder: '/vendor-documents'
+        folder: folder
     });
 
     res.status(200).json({

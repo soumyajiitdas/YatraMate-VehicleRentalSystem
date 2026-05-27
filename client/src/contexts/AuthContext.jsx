@@ -112,6 +112,14 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const deleteAccount = async () => {
+        const result = await authService.deleteAccount();
+        if (result.success) {
+            setUser(null);
+        }
+        return result;
+    };
+
     const value = {
         user,
         loading,
@@ -125,6 +133,7 @@ export const AuthProvider = ({ children }) => {
         login,
         googleLogin,
         logout,
+        deleteAccount,
         updatePassword,
         updateProfile,
         refreshUser,

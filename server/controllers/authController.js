@@ -553,6 +553,40 @@ exports.logout = catchAsync(async (req, res, next) => {
     });
 });
 
+// Delete account
+exports.deleteMe = catchAsync(async (req, res, next) => {
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findByIdAndDelete(req.user.id);
+    } else {
+        user = await User.findByIdAndDelete(req.user.id);
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Clear cookie
+    const useSecureCookies = requiresSecureCookies(req);
+    const cookieOptions = {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        secure: useSecureCookies,
+        path: '/'
+    };
+    if (process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true;
+        cookieOptions.sameSite = 'none';
+    }
+    res.cookie('jwt', 'loggedout', cookieOptions);
+
+    res.status(204).json({
+        status: 'success',
+        data: null
+    });
+});
+
 // Register vendor - Now requires email verification
 // Vendor is stored in PendingVendor collection until email is verified
 exports.registerVendor = catchAsync(async (req, res, next) => {

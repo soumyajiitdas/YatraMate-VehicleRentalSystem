@@ -258,6 +258,30 @@ class AuthService {
         }
     }
 
+    // Delete account
+    async deleteAccount() {
+        try {
+            const response = await fetch(API_ENDPOINTS.deleteAccount, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
+                },
+                credentials: 'include'
+            });
+
+            if (response.status === 204 || response.ok) {
+                localStorage.removeItem('jwt');
+                return { success: true };
+            } else {
+                const data = await response.json();
+                return { success: false, message: data.message || 'Failed to delete account' };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
     // Get current user from API
     async getCurrentUser() {
         try {

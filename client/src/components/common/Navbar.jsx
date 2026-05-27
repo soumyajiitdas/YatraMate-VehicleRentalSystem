@@ -6,7 +6,7 @@ import { CircleUser, LogIn, LogOut, Menu, X, MapPinned } from 'lucide-react';
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -90,11 +90,17 @@ const Navbar = () => {
               <>
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-ink-100 text-ink-700 hover:border-primary-500 hover:text-primary-600 transition-all duration-300 magnetic text-sm font-medium"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-ink-100 hover:border-primary-500 transition-all duration-300 magnetic overflow-hidden"
                   data-testid="navbar-profile-btn"
+                  title="Profile"
                 >
-                  <CircleUser className="w-4 h-4" />
-                  <span>Profile</span>
+                  {user?.profile_image ? (
+                    <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-linear-to-r from-primary-500 to-secondary-500 flex items-center justify-center text-white font-bold">
+                      {user?.name?.charAt(0)?.toUpperCase()}
+                    </div>
+                  )}
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -132,10 +138,16 @@ const Navbar = () => {
             {isAuthenticated ? (
               <Link
                 to="/profile"
-                className="p-2.5 rounded-full bg-primary-50 border border-primary-100 text-primary-600"
+                className="w-10 h-10 rounded-full border border-primary-100 overflow-hidden flex items-center justify-center bg-primary-50"
                 data-testid="mobile-profile-icon"
               >
-                <CircleUser className="w-5 h-5" />
+                {user?.profile_image ? (
+                  <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-linear-to-r from-primary-500 to-secondary-500 flex items-center justify-center text-white font-bold">
+                    {user?.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
               </Link>
             ) : (
               <Link

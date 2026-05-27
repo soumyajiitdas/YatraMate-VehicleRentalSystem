@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { CircleUser, ClipboardList, LockKeyhole, LogOut, Mail, Shield } from 'lucide-react';
+import { CircleUser, ClipboardList, LockKeyhole, LogOut, Mail, Shield, Camera, Trash2, UserMinus, AlertTriangle } from 'lucide-react';
+import { API_ENDPOINTS } from '../../config/api';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { user, logout, updateProfile, refreshUser, requestPasswordChangeOTP, verifyPasswordChangeOTP, resendPasswordChangeOTP } = useAuth();
+  const { user, logout, deleteAccount, updateProfile, refreshUser, requestPasswordChangeOTP, verifyPasswordChangeOTP, resendPasswordChangeOTP } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
@@ -15,12 +16,17 @@ const ProfilePage = () => {
     email: '',
     phone: '',
     address: '',
+    profile_image: '',
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   
   // Password change OTP states
   const [passwordChangeStep, setPasswordChangeStep] = useState('form'); // 'form', 'otp'
@@ -43,7 +49,10 @@ const ProfilePage = () => {
       email: user.email || '',
       phone: user.phone || '',
       address: user.address || '',
+      profile_image: user.profile_image || '',
     });
+    setAvatarPreview(null);
+    setAvatarFile(null);
   }, [user, navigate]);
 
   // Resend cooldown timer
@@ -61,6 +70,24 @@ const ProfilePage = () => {
     }));
   };
 
+  const handleAvatarChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setFormData(prev => ({ ...prev, profile_image: '' }));
+  };
+
   const handlePasswordChange = (e) => {
     setPasswordData(prev => ({
       ...prev,
@@ -70,14 +97,41 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     try {
+      let finalProfileImageUrl = formData.profile_image;
+
+      if (avatarFile) {
+        setIsUploading(true);
+        const uploadData = new FormData();
+        uploadData.append('file', avatarFile);
+        uploadData.append('folder', '/user-profiles');
+
+        const uploadRes = await fetch(API_ENDPOINTS.uploadFile, {
+          method: 'POST',
+          body: uploadData,
+        });
+        const uploadResult = await uploadRes.json();
+        
+        if (uploadResult.status === 'success') {
+          finalProfileImageUrl = uploadResult.data.url;
+        } else {
+          toast.error(uploadResult.message || 'Failed to upload avatar');
+          setIsUploading(false);
+          return;
+        }
+        setIsUploading(false);
+      }
+
       const result = await updateProfile({
         name: formData.name,
         phone: formData.phone,
-        address: formData.address
+        address: formData.address,
+        profile_image: finalProfileImageUrl
       });
 
       if (result.success) {
         setIsEditing(false);
+        setAvatarFile(null);
+        setAvatarPreview(null);
         toast.success('Profile updated successfully!');
         await refreshUser();
       } else {
@@ -189,6 +243,23 @@ const ProfilePage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      const result = await deleteAccount();
+      if (result.success) {
+        toast.success('Your account has been deleted successfully.');
+        navigate('/login');
+      } else {
+        toast.error(result.message || 'Failed to delete account');
+      }
+    } catch (error) {
+      toast.error('Error deleting account: ' + error.message);
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
   if (!user) {
     return null;
   }
@@ -252,6 +323,18 @@ const ProfilePage = () => {
                   <LogOut className="w-5 h-5" />
                   <span className='hidden sm:block'>Logout</span>
                 </button>
+                <button
+                  onClick={() => setActiveTab('delete-account')}
+                  data-testid="delete-account-btn-mobile"
+                  className={`shrink-0 flex items-center space-x-0 sm:space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+                    activeTab === 'delete-account' 
+                      ? 'bg-red-500 text-white shadow-glow' 
+                      : 'text-red-500 bg-red-50 hover:bg-red-100'
+                  }`}
+                >
+                  <UserMinus className="w-5 h-5" />
+                  <span className='hidden sm:block'>Delete Account</span>
+                </button>
               </div>
             </div>
 
@@ -274,10 +357,22 @@ const ProfilePage = () => {
               <button
                 onClick={handleLogout}
                 data-testid="logout-btn-desktop"
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-secondary-500 bg-red-50 hover:scale-104 transition-all duration-200"
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-secondary-500 bg-secondary-50 hover:bg-secondary-100 transition-all duration-200"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('delete-account')}
+                data-testid="delete-account-btn-desktop"
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  activeTab === 'delete-account'
+                    ? 'bg-red-500 text-white shadow-glow'
+                    : 'text-red-500 bg-red-50 hover:bg-red-100'
+                }`}
+              >
+                <UserMinus className="w-5 h-5" />
+                <span>Delete Account</span>
               </button>
             </div>
           </div>
@@ -288,12 +383,44 @@ const ProfilePage = () => {
               <div className="bg-white border-2 border-primary-200 rounded-2xl shadow-card p-8 space-y-6">
                 {/* Profile Header */}
                 <div className="pb-6 border-b border-neutral-200">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                    <div className="flex items-center space-x-3 sm:space-x-4">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold shrink-0">
-                        {formData.name.charAt(0)}
-                      </div>
-                      <div className="min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                      <div className="flex items-center space-x-3 sm:space-x-4">
+                        <div className="relative">
+                          {(avatarPreview || formData.profile_image) ? (
+                            <img 
+                              src={avatarPreview || formData.profile_image} 
+                              alt="Profile" 
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shrink-0 border-2 border-primary-100"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-linear-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold shrink-0">
+                              {formData.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          
+                          {isEditing && (
+                            <div className="absolute -bottom-2 -right-2 flex space-x-1">
+                              <label className="p-1.5 bg-white border border-neutral-200 rounded-full cursor-pointer hover:bg-neutral-50 shadow-sm transition-colors">
+                                <Camera className="w-4 h-4 text-primary-600" />
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  className="hidden" 
+                                  onChange={handleAvatarChange}
+                                />
+                              </label>
+                              {(avatarPreview || formData.profile_image) && (
+                                <button 
+                                  onClick={removeAvatar}
+                                  className="p-1.5 bg-white border border-neutral-200 rounded-full hover:bg-red-50 text-red-500 shadow-sm transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
                         <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 truncate">{formData.name}</h2>
                         <p className="text-sm sm:text-base text-neutral-600 truncate">{formData.email}</p>
                       </div>
@@ -376,13 +503,24 @@ const ProfilePage = () => {
                     <div className="flex space-x-3 pt-4">
                       <button
                         onClick={handleSave}
+                        disabled={isUploading}
                         data-testid="save-profile-btn"
-                        className="px-6 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200"
+                        className="px-6 py-3 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-200 disabled:opacity-70 flex items-center"
                       >
-                        Save Changes
+                        {isUploading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Saving...
+                          </>
+                        ) : 'Save Changes'}
                       </button>
                       <button
-                        onClick={() => setIsEditing(false)}
+                        onClick={() => {
+                          setIsEditing(false);
+                          setAvatarPreview(null);
+                          setAvatarFile(null);
+                          setFormData(prev => ({ ...prev, profile_image: user.profile_image || '' }));
+                        }}
                         data-testid="cancel-edit-btn"
                         className="px-6 py-3 border-2 border-neutral-300 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-50 transition-all duration-200"
                       >
@@ -576,6 +714,67 @@ const ProfilePage = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'delete-account' && (
+              <div className="bg-white border-2 border-red-200 rounded-2xl shadow-card p-8 space-y-6">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="p-3 bg-red-100 rounded-xl">
+                    <AlertTriangle className="w-8 h-8 text-red-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-neutral-900">Delete Account <span className='text-red-500'>!</span></h2>
+                </div>
+                
+                <div className="bg-red-50 border border-red-100 rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-red-800 mb-4">Why you shouldn't delete your account:</h3>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start text-red-700 text-sm">
+                      <span className="mr-2">•</span>
+                      <span><strong>Loss of Booking History:</strong> All your past and current booking information will be permanently deleted and cannot be recovered.</span>
+                    </li>
+                    <li className="flex items-start text-red-700 text-sm">
+                      <span className="mr-2">•</span>
+                      <span><strong>Active Bookings Canceled:</strong> Any ongoing or upcoming vehicle rentals will be automatically canceled without refund.</span>
+                    </li>
+                    <li className="flex items-start text-red-700 text-sm">
+                      <span className="mr-2">•</span>
+                      <span><strong>Profile Data Erased:</strong> Your preferences, saved addresses, and profile details will be wiped completely.</span>
+                    </li>
+                    <li className="flex items-start text-red-700 text-sm">
+                      <span className="mr-2">•</span>
+                      <span><strong>No Account Recovery:</strong> Once deleted, you cannot reactivate this account. You will need to register as a new user if you return.</span>
+                    </li>
+                  </ul>
+                  
+                  <p className="text-sm font-semibold text-red-800 mb-6">Are you absolutely sure you want to proceed with deleting your account?</p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                    <button
+                      onClick={() => setActiveTab('profile')}
+                      className="px-6 py-3 border-2 border-neutral-300 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-50 transition-all duration-200 flex-1 text-center"
+                    >
+                      Cancel, Keep Account
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={isDeletingAccount}
+                      className="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 shadow-sm transition-all duration-200 flex-1 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {isDeletingAccount ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <span>Deleting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserMinus className="w-5 h-5" />
+                          <span>Confirm Deletion</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -26,5 +26,6 @@ router.patch('/update-profile', authController.updateProfile);
 router.post('/request-password-change-otp', authController.requestPasswordChangeOTP);
 router.post('/verify-password-change-otp', authController.verifyPasswordChangeOTP);
 router.post('/resend-password-change-otp', authController.resendPasswordChangeOTP);
+router.delete('/delete-me', authController.deleteMe);
 
 module.exports = router;
