@@ -316,15 +316,15 @@ const FAQsPage = () => {
       </section>
 
       {/* Quick Navigation */}
-      <section className="py-8 bg-white border-b">
+      <section className="py-8 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-neutral-600 mb-4">Jump to section:</p>
+          <p className="text-center text-sm text-primary-600 mb-4">Jump to section:</p>
           <div className="flex flex-wrap justify-center gap-2">
             {faqCategories.map((category, index) => (
               <a
                 key={index}
                 href={`#category-${index}`}
-                className="px-4 py-2 bg-neutral-100 hover:bg-primary-100 text-neutral-700 hover:text-primary-700 rounded-full text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-neutral-200 hover:bg-primary-300 text-neutral-700 hover:text-black rounded-full text-sm font-medium transition-colors"
               >
                 {category.category}
               </a>

@@ -26,7 +26,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative bg-ink-950 text-white overflow-hidden mb-20 sm:mb-0" data-testid="footer">
+    <footer className="relative bg-ink-950 text-white overflow-hidden" data-testid="footer">
       {/* Background decoration */}
       <div className="absolute inset-0 dot-grid-light opacity-40 pointer-events-none" />
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-600/20 rounded-full blur-[120px] pointer-events-none" />
@@ -69,7 +69,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-36 sm:pb-16">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-12">
           {/* Brand */}
           <div className="col-span-2 space-y-5">
