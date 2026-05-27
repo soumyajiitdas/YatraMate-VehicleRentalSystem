@@ -1,11 +1,25 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { MapPinned, CircleUser, LogIn, LogOut } from 'lucide-react';
+import { CircleUser, LogIn, LogOut, Menu, X, MapPinned } from 'lucide-react';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -16,116 +30,180 @@ const Navbar = () => {
 
   const navLinks = [
     { path: '/', label: 'Home' },
-    { path: '/vehicles', label: 'Vehicles' },
+    { path: '/vehicles', label: 'Fleet' },
     { path: '/pricing', label: 'Pricing' },
-    { path: '/bookings', label: 'My Bookings' },
-    { path: '/vendor', label: 'For Vendors' },
+    { path: '/bookings', label: 'Bookings' },
+    { path: '/vendor', label: 'Vendors' },
   ];
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav
+      className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
+        ? 'bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(20,20,32,0.12)] border-b border-ink-900/5'
+        : 'bg-white/60 backdrop-blur-md border-b border-transparent'
+        }`}
+      data-testid="main-navbar"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-18 py-3">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="bg-linear-to-r from-primary-500 to-secondary-600 p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200">
-              <MapPinned className="w-6 h-6 text-white" />
+          <Link to="/" className="flex items-center gap-3 group shrink-0" data-testid="navbar-logo">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary-600 rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
+              <div className="relative bg-primary-500 p-2 rounded-xl group-hover:rotate-[-8deg] transition-transform duration-500 shadow-lg">
+                <MapPinned className="w-6 h-6 text-white" strokeWidth={2.5} />
+              </div>
             </div>
-            <div className='flex flex-col'>
-              <span className="text-2xl font-display font-bold bg-linear-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                YatraMate
+            <div className="flex flex-col leading-none">
+              <span className="text-2xl font-display font-bold tracking-tight text-ink-900">
+                Yatra<span className="text-primary-600">Mate</span>
               </span>
-              <p className='text-xs text-gray-500 font-medium -mt-1'>
-                Travel made effortless <span className='text-red-500 font-bold'>~</span>
-              </p>
+              <span className="text-[10px] font-display tracking-[0.1em] text-ink-400 font-medium mt-0.4">
+                <span className='text-primary-500 font-bold'>~</span> Travel made effortless
+              </span>
             </div>
-
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center gap-1 bg-ink-50/70 backdrop-blur-sm rounded-full p-1.5 border border-ink-100">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${isActive(link.path)
-                  ? 'bg-linear-to-r from-primary-500 to-secondary-500 text-white shadow-glow'
-                  : 'text-neutral-700 hover:bg-primary-50 hover:text-primary-600'
+                data-testid={`nav-link-${link.label.toLowerCase()}`}
+                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive(link.path)
+                  ? 'text-white'
+                  : 'text-ink-700 hover:text-ink-900'
                   }`}
               >
-                {link.label}
+                {isActive(link.path) && (
+                  <span className="absolute inset-0 bg-ink-900 rounded-full shadow-lg" />
+                )}
+                <span className="relative z-10">{link.label}</span>
               </Link>
             ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
+          {/* Desktop Auth */}
+          <div className="hidden md:flex items-center gap-2">
             {isAuthenticated ? (
               <>
                 <Link
                   to="/profile"
-                  className="flex items-center space-x-2 px-4 py-2 text-neutral-800 bg-red-50 rounded-lg hover:text-primary-600 transition-colors duration-200"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-ink-100 hover:border-primary-500 transition-all duration-300 magnetic overflow-hidden"
+                  data-testid="navbar-profile-btn"
+                  title="Profile"
                 >
-                  <CircleUser className="w-5 h-5 text-primary-500" />
-                  <span className="font-medium">Profile</span>
+                  {user?.profile_image ? (
+                    <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-linear-to-r from-primary-500 to-secondary-500 flex items-center justify-center text-white font-bold">
+                      {user?.name?.charAt(0)?.toUpperCase()}
+                    </div>
+                  )}
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 px-4 py-2 text-neutral-800 bg-red-50 rounded-lg hover:scale-105 transition-all duration-200"
+                  className="p-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white transition-all duration-300 magnetic"
+                  data-testid="navbar-logout-btn"
+                  aria-label="Logout"
                 >
-                  <LogOut className="w-5 h-5 text-primary-500" />
+                  <LogOut className="w-4 h-4" />
                 </button>
               </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="flex items-center space-x-2 px-5 py-2 text-neutral-800 bg-red-100 rounded-lg hover:text-primary-600 transition-colors duration-200 hover:bg-red-50"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-full text-ink-700 hover:text-ink-900 transition-colors duration-200 text-sm font-medium"
+                  data-testid="navbar-login-btn"
                 >
-                  <LogIn className="w-5 h-5 text-primary-500" />
-                  <span className='font-medium'>Login</span>
+                  <LogIn className="w-4 h-4" />
+                  <span>Login</span>
                 </Link>
                 <Link
                   to="/register"
-                  className="px-6 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
+                  data-testid="navbar-signup-btn"
+                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold magnetic transition-colors"
                 >
-                  Sign Up
+                  <span className="relative z-10">Sign Up</span>
+                  <span className="relative z-10 w-1.5 h-1.5 rounded-full bg-primary-400 group-hover:bg-white transition-colors" />
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile Auth Icons */}
-          <div className="flex md:hidden items-center space-x-2">
+          {/* Mobile actions */}
+          <div className="flex md:hidden items-center gap-2">
             {isAuthenticated ? (
               <Link
                 to="/profile"
-                className="p-2 rounded-lg text-primary-600 bg-red-100"
+                className="w-10 h-10 rounded-full border border-primary-100 overflow-hidden flex items-center justify-center bg-primary-50"
                 data-testid="mobile-profile-icon"
               >
-                <CircleUser className="w-6 h-6" />
+                {user?.profile_image ? (
+                  <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-linear-to-r from-primary-500 to-secondary-500 flex items-center justify-center text-white font-bold">
+                    {user?.name?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
               </Link>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="p-2 rounded-lg text-primary-600 bg-red-100 hover:-rotate-7 transition-colors duration-200"
-                  data-testid="mobile-login-icon"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2.5 bg-linear-to-r from-primary-500 to-secondary-500 text-white text-sm rounded-lg font-semibold hover:shadow-glow transform hover:scale-105 transition-all duration-200"
-                >
-                  Sign Up
-                </Link>
-              </>
+              <Link
+                to="/register"
+                className="px-4 py-2 rounded-full bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition-colors"
+                data-testid="mobile-signup-btn"
+              >
+                Sign Up
+              </Link>
             )}
+            <button
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              className="p-2.5 rounded-full bg-white border border-ink-100 text-ink-900"
+              data-testid="mobile-menu-toggle"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-[calc(100%-0.5rem)] left-0 w-full px-4 pb-4 animate-fade-in-down" data-testid="mobile-menu">
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl border border-ink-100 p-2 shadow-2xl">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive(link.path)
+                    ? 'bg-primary-50 text-primary-600 font-bold'
+                    : 'text-ink-700 hover:bg-ink-50'
+                    }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {!isAuthenticated && (
+                <Link
+                  to="/login"
+                  className="block px-4 py-3 rounded-xl text-sm font-medium text-ink-700 hover:bg-ink-50"
+                >
+                  Login
+                </Link>
+              )}
+              {isAuthenticated && (
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-secondary-600 hover:bg-secondary-50"
+                >
+                  Logout
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

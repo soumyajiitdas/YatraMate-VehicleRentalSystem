@@ -3,6 +3,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 export const API_ENDPOINTS = {
     // Auth endpoints
     login: `${API_BASE_URL}/auth/login`,
+    googleLogin: `${API_BASE_URL}/auth/google`,
     register: `${API_BASE_URL}/auth/register`,
     verifyOtp: `${API_BASE_URL}/auth/verify-otp`,
     resendOtp: `${API_BASE_URL}/auth/resend-otp`,
@@ -13,6 +14,7 @@ export const API_ENDPOINTS = {
     currentUser: `${API_BASE_URL}/auth/me`,
     updatePassword: `${API_BASE_URL}/auth/update-password`,
     updateProfile: `${API_BASE_URL}/auth/update-profile`,
+    deleteAccount: `${API_BASE_URL}/auth/delete-me`,
     forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
     resetPassword: `${API_BASE_URL}/auth/reset-password`,
     requestPasswordChangeOTP: `${API_BASE_URL}/auth/request-password-change-otp`,

@@ -60,6 +60,14 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const googleLogin = async (token, role = null) => {
+        const result = await authService.googleLogin(token, role);
+        if (result.success) {
+            setUser(result.data.user);
+        }
+        return result;
+    };
+
     const logout = async () => {
         await authService.logout();
         setUser(null);
@@ -104,6 +112,14 @@ export const AuthProvider = ({ children }) => {
         return result;
     };
 
+    const deleteAccount = async () => {
+        const result = await authService.deleteAccount();
+        if (result.success) {
+            setUser(null);
+        }
+        return result;
+    };
+
     const value = {
         user,
         loading,
@@ -115,7 +131,9 @@ export const AuthProvider = ({ children }) => {
         verifyVendorOtp,
         resendVendorOtp,
         login,
+        googleLogin,
         logout,
+        deleteAccount,
         updatePassword,
         updateProfile,
         refreshUser,

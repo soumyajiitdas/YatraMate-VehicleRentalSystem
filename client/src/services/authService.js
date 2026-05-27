@@ -196,6 +196,42 @@ class AuthService {
         }
     }
 
+    // Google Login
+    async googleLogin(token, role = null) {
+        try {
+            const bodyData = { token };
+            if (role) {
+                bodyData.role = role;
+            }
+            
+            const response = await fetch(API_ENDPOINTS.googleLogin, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(bodyData)
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                if (data.token) localStorage.setItem('jwt', data.token);
+                return { success: true, data: data.data };
+            } else {
+                return { 
+                    success: false, 
+                    message: data.message || 'Google Login failed',
+                    requiresVerification: data.requiresVerification,
+                    email: data.email,
+                    userType: data.userType
+                };
+            }
+        } catch (error) {
+            return { success: false, message: error.message };
+        }
+    }
+
     // Logout user
     async logout() {
         try {
@@ -218,6 +254,30 @@ class AuthService {
             }
         } catch (error) {
             localStorage.removeItem('jwt');
+            return { success: false, message: error.message };
+        }
+    }
+
+    // Delete account
+    async deleteAccount() {
+        try {
+            const response = await fetch(API_ENDPOINTS.deleteAccount, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeader()
+                },
+                credentials: 'include'
+            });
+
+            if (response.status === 204 || response.ok) {
+                localStorage.removeItem('jwt');
+                return { success: true };
+            } else {
+                const data = await response.json();
+                return { success: false, message: data.message || 'Failed to delete account' };
+            }
+        } catch (error) {
             return { success: false, message: error.message };
         }
     }

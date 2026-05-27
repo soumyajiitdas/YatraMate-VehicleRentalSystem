@@ -8,7 +8,9 @@ const PendingVendor = require('../models/PendingVendor');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const { sendOTPEmail, sendPasswordResetEmail, sendPasswordChangeOTPEmail } = require('../utils/email');
+const { OAuth2Client } = require('google-auth-library');
 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const requiresSecureCookies = (req) => {
     const forwardedProtoHeader = req.headers['x-forwarded-proto'];
     const forwardedProtocols = forwardedProtoHeader
@@ -98,7 +100,7 @@ exports.register = catchAsync(async (req, res, next) => {
     // Check if user already exists in verified users
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        return next(new AppError('User with this email already exists', 400));
+        return next(new AppError('Account already exists. Please log in.', 400));
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -252,7 +254,7 @@ exports.resendOTP = catchAsync(async (req, res, next) => {
 
 // Login user (all roles)
 exports.login = catchAsync(async (req, res, next) => {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     // Check if email and password exist
     if (!email || !password) {
@@ -260,15 +262,32 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     let user;
-    let userRole = role || 'user';
+    let userRole;
+
+    user = await User.findOne({ email });
+    if (user) {
+        userRole = user.role;
+    } else {
+        user = await Vendor.findOne({ email });
+        if (user) {
+            userRole = 'vendor';
+        } else {
+            return next(new AppError('Incorrect email or password', 401));
+        }
+    }
+
+    if (user.authProvider === 'google' && !user.password_hash) {
+        return next(new AppError('This account uses Google Sign-In. Please continue with Google.', 401));
+    }
+
+    // Check if password is correct
+    const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordCorrect) {
+        return next(new AppError('Incorrect email or password', 401));
+    }
 
     // Check if logging in as vendor
     if (userRole === 'vendor') {
-        user = await Vendor.findOne({ email });
-        if (!user) {
-            return next(new AppError('Incorrect email or password', 401));
-        }
-
         // Check if vendor email is verified
         if (!user.email_verified) {
             return res.status(401).json({
@@ -280,14 +299,8 @@ exports.login = catchAsync(async (req, res, next) => {
             });
         }
     } else {
-        // For user, admin, office_staff
-        user = await User.findOne({ email });
-        if (!user) {
-            return next(new AppError('Incorrect email or password', 401));
-        }
-
         // Check if email is verified (only for regular users, not admin/office_staff)
-        if (user.role === 'user' && !user.is_verified) {
+        if (userRole === 'user' && !user.is_verified) {
             return res.status(401).json({
                 status: 'fail',
                 message: 'Please verify your email before logging in.',
@@ -296,19 +309,6 @@ exports.login = catchAsync(async (req, res, next) => {
                 userType: 'user'
             });
         }
-
-        // If role is specified, verify it matches
-        if (role && user.role !== role) {
-            return next(new AppError('Incorrect email or password', 401));
-        }
-
-        userRole = user.role;
-    }
-
-    // Check if password is correct
-    const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
-    if (!isPasswordCorrect) {
-        return next(new AppError('Incorrect email or password', 401));
     }
 
     // Check if user is active (for non-vendors)
@@ -323,6 +323,101 @@ exports.login = catchAsync(async (req, res, next) => {
 
     createSendToken(req, res, user, 200, userRole);
 });
+
+// Google Login
+exports.googleLogin = catchAsync(async (req, res, next) => {
+    const { token, role } = req.body; // role is passed only during registration (e.g. 'user')
+    
+    if (!token) {
+        return next(new AppError('Please provide Google token', 400));
+    }
+    
+    let payload;
+    try {
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch user info');
+        }
+        payload = await response.json();
+    } catch (err) {
+        return next(new AppError('Invalid Google token', 401));
+    }
+    
+    const { email, name, picture, sub: googleId, email_verified } = payload;
+    
+    // First, search by googleId
+    let user = await User.findOne({ googleId });
+    let userRole = user ? user.role : null;
+    
+    if (!user) {
+        user = await Vendor.findOne({ googleId });
+        if (user) userRole = 'vendor';
+    }
+    
+    if (user) {
+        // User found by googleId, log them in
+        return handleGoogleLoginSuccess(req, res, next, user, userRole);
+    }
+    
+    // If not found by googleId, search by email
+    user = await User.findOne({ email });
+    if (user) {
+        userRole = user.role;
+        // Link account
+        user.googleId = googleId;
+        user.authProvider = user.authProvider === 'local' ? 'both' : user.authProvider;
+        if (picture && !user.profile_image) {
+            user.profile_image = picture;
+        }
+        user.is_verified = true; // Auto-verify email if it was pending
+        await user.save();
+        return handleGoogleLoginSuccess(req, res, next, user, userRole);
+    }
+    
+    user = await Vendor.findOne({ email });
+    if (user) {
+        userRole = 'vendor';
+        user.googleId = googleId;
+        user.authProvider = user.authProvider === 'local' ? 'both' : user.authProvider;
+        user.email_verified = true;
+        await user.save();
+        return handleGoogleLoginSuccess(req, res, next, user, userRole);
+    }
+    
+    // Account does not exist.
+    // If role was passed, it's a registration flow.
+    if (role === 'user') {
+        user = await User.create({
+            name,
+            email,
+            profile_image: picture,
+            role: 'user',
+            is_verified: true, // Google email is verified
+            is_active: true,
+            authProvider: 'google',
+            googleId: googleId,
+            password_hash: 'not_applicable' // Workaround if mongoose validator triggers before saving conditionally
+        });
+        return handleGoogleLoginSuccess(req, res, next, user, 'user');
+    } else {
+        // Not a registration flow or unsupported role
+        return next(new AppError('Account not found. Please register.', 404));
+    }
+});
+
+function handleGoogleLoginSuccess(req, res, next, user, userRole) {
+    if (userRole !== 'vendor' && !user.is_active) {
+        return next(new AppError('Your account has been deactivated', 401));
+    }
+
+    if (userRole === 'vendor' && !user.is_verified) {
+        return next(new AppError('Your vendor account is pending verification', 401));
+    }
+
+    createSendToken(req, res, user, 200, userRole);
+}
 
 // Get current logged in user
 exports.getCurrentUser = catchAsync(async (req, res, next) => {
@@ -455,6 +550,40 @@ exports.logout = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         message: 'Logged out successfully'
+    });
+});
+
+// Delete account
+exports.deleteMe = catchAsync(async (req, res, next) => {
+    let user;
+    if (req.user.role === 'vendor') {
+        user = await Vendor.findByIdAndDelete(req.user.id);
+    } else {
+        user = await User.findByIdAndDelete(req.user.id);
+    }
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
+    }
+
+    // Clear cookie
+    const useSecureCookies = requiresSecureCookies(req);
+    const cookieOptions = {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        secure: useSecureCookies,
+        path: '/'
+    };
+    if (process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true;
+        cookieOptions.sameSite = 'none';
+    }
+    res.cookie('jwt', 'loggedout', cookieOptions);
+
+    res.status(204).json({
+        status: 'success',
+        data: null
     });
 });
 
